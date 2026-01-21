@@ -4,11 +4,22 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
+
+  public TalonFX frontMotor;
+
   /** Creates a new Shooter. */
-  public Shooter() {}
+  public Shooter(int frontId) {
+    frontMotor = new TalonFX(frontId);
+  }
+
+  private void setSpeed(double voltage){
+    frontMotor.setVoltage(voltage);
+  }
 
   @Override
   public void periodic() {
