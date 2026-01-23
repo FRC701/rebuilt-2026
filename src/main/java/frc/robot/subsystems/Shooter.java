@@ -8,14 +8,21 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import com.ctre.phoenix6.controls.Follower;
+
 public class Shooter extends SubsystemBase {
 
-  public TalonFX frontMotor;
+  private TalonFX frontMotor;
+  private TalonFX backMotor;
 
   /** Creates a new Shooter. */
-  public Shooter(int frontId) {
+  public Shooter(int frontId, int backId) {
     frontMotor = new TalonFX(frontId);
+    backMotor = new TalonFX(backId);
+    frontMotor.setControl(new Follower(backId,true));
   }
+
+  
 
   private void setSpeed(double voltage){
     frontMotor.setVoltage(voltage);
