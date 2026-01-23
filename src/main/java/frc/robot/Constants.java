@@ -17,6 +17,11 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
+  public static class ArmConstants {
+    public static final int kArmMotor1 = 1;
+    public static final int kArmMotor2 = 2;
+  }
+
   // Shooter Motor Ids = 40s
   public static class ShooterConstants {
     // Facing from the front of the shooters (For Left and Right)
