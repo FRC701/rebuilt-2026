@@ -5,19 +5,26 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
 
   public TalonFX frontMotor;
 
+  public static ShooterEnumState mShooterEnumState;
+
   /** Creates a new Shooter. */
   public Shooter(int frontId) {
+    mShooterEnumState = ShooterEnumState.S_Shooting;
     frontMotor = new TalonFX(frontId);
   }
 
-  private void setSpeed(double voltage){
+  public enum ShooterEnumState {
+    S_Shooting,
+    S_NotShooting
+  }
+
+  private void setSpeed(double voltage) {
     frontMotor.setVoltage(voltage);
   }
 
