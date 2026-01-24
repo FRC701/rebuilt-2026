@@ -27,28 +27,22 @@ public class Arm extends SubsystemBase {
   public void runArmState() {
     switch (armstate) {
       case S_Up:
-      UpPosition();
+        UpPosition();
         break;
       case S_Down:
-      DownPosition();
+        DownPosition();
         break;
       case S_Hold:
-      Hold();
-      break;  
+        Hold();
+        break;
     }
   }
 
-  public void UpPosition(){
+  public void UpPosition() {}
 
-  }
+  public void DownPosition() {}
 
-  public void DownPosition(){
-
-  }
-
-  public void Hold(){
-
-  }
+  public void Hold() {}
 
   @Override
   public void periodic() {
