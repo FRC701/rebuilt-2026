@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -19,13 +20,7 @@ public class Shooter extends SubsystemBase {
   public Shooter(int frontId, int backId) {
     frontMotor = new TalonFX(frontId);
     backMotor = new TalonFX(backId);
-    frontMotor.setControl(new Follower(backId,true));
-  }
-
-  
-
-  private void setSpeed(double voltage){
-    frontMotor.setVoltage(voltage);
+    backMotor.setControl(new Follower(frontId, MotorAlignmentValue.Opposed));
   }
 
   @Override
