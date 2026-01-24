@@ -32,7 +32,7 @@ public class Intake extends SubsystemBase {
         UpPosition();
         break;
       case S_Down:
-         DownPosition();
+        DownPosition();
         break;
       case S_Outtake:
         Outtake();
@@ -40,7 +40,7 @@ public class Intake extends SubsystemBase {
     }
   }
 
-   public void UpPosition() {}
+  public void UpPosition() {}
 
   public void DownPosition() {}
 
