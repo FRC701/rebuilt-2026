@@ -4,13 +4,21 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Agitator extends SubsystemBase {
   /** Creates a new Aggitator. */
+  private TalonFX AgitatorMotor;
+
   public Agitator() {
+    AgitatorMotor = new TalonFX(0);
     mAgitatorState = AgitatorState.S_On;
   }
+
+  public void spinAgitatorMotor() {}
+
+  public void stopAgitatorMotor() {}
 
   public enum AgitatorState {
     S_On,
@@ -22,15 +30,16 @@ public class Agitator extends SubsystemBase {
   public void runAgitatorState() {
     switch (mAgitatorState) {
       case S_On:
+        spinAgitatorMotor();
         break;
       case S_Off:
+        stopAgitatorMotor();
         break;
     }
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
     runAgitatorState();
   }
 }
