@@ -20,7 +20,8 @@ public class Arm extends SubsystemBase {
 
   public enum Armstate {
     S_Up,
-    S_Down
+    S_Down,
+    S_Hold
   }
 
   public void runArmState() {
@@ -29,6 +30,8 @@ public class Arm extends SubsystemBase {
         break;
       case S_Down:
         break;
+      case S_Hold:
+      break;  
     }
   }
 
