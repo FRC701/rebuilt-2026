@@ -56,7 +56,6 @@ public final class Constants {
     public static final double kG = 0;
   }
 
- 
   public static class IntakeConstants {
     public static final int kIntakeMotor1 = 11;
     public static final int kIntakeMotor2 = 12;
