@@ -17,27 +17,51 @@ public class Climber extends SubsystemBase {
   public static ClimberState mClimberState;
 
   public enum ClimberState{
-    S_Default, S_top, S_Extend, S_Lock, S_Reset
+    S_Default, S_Top, S_Extend, S_Lock, S_Reset
   }
   public Climber() {
     mClimberMotor1 = new TalonFX(Constants.ClimberConstants.kClimberMotor1);
     mClimberMotor2 = new TalonFX(Constants.ClimberConstants.kClimberMotor2);
   }
-  
+
   public void runClimberState(){
    switch (mClimberState){
     case S_Default:
+    DefaultPosition();
     break;
-    case S_top:
+    case S_Top:
+    HoldPosition();
     break;
     case S_Extend:
+    Extend();
     break;
     case S_Lock:
+    Lock();
     break;
     case S_Reset:
     break;
     }
   }
+
+  public void DefaultPosition(){
+
+  }
+   public void HoldPosition(){
+
+  }
+  public void Extend(){
+
+  }
+  public void Release(){
+
+  }
+  public void Lock(){
+
+  }
+  public void Reset(){
+    
+  }
+  
  
   @Override
   public void periodic() {
