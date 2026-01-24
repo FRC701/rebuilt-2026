@@ -8,10 +8,29 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Feeder extends SubsystemBase {
   /** Creates a new Feeder. */
-  public Feeder() {}
+  public static FeederState mFeederState;
+
+  public Feeder() {
+    mFeederState = FeederState.S_Off;
+  }
+
+  public void runFeederState() {
+    switch (mFeederState) {
+      case S_On:
+        break;
+      case S_Off:
+        break;
+    }
+  }
+
+  public enum FeederState {
+    S_On,
+    S_Off
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    runFeederState();
   }
 }
