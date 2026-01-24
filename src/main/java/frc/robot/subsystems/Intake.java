@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+import frc.robot.Constants; 
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 // import com.ctre.phoenix6.controls.Follower;
