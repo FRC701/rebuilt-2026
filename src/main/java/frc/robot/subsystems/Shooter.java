@@ -21,15 +21,27 @@ public class Shooter extends SubsystemBase {
 
   public enum ShooterEnumState {
     S_Shooting,
+    S_Passing,
     S_NotShooting
   }
 
-  private void setSpeed(double voltage) {
-    frontMotor.setVoltage(voltage);
+  public void runShooterStates() {
+    switch (mShooterEnumState) {
+      case S_Shooting:
+
+      break;
+      case S_Passing:
+
+      break;
+      case S_NotShooting:
+
+      break;
+    }
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    runShooterStates();
   }
 }
