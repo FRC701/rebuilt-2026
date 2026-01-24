@@ -4,29 +4,38 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Feeder extends SubsystemBase {
   /** Creates a new Feeder. */
   public FeederState m_FeederState;
+  private TalonFX m_FeederMotor;
 
   public Feeder() {
     m_FeederState = FeederState.S_Off;
+    m_FeederMotor = new TalonFX();
   }
 
   public void runFeederState() {
     switch (m_FeederState) {
       case S_On:
-        break;
+
+      break;
       case S_Off:
-        break;
+
+      break;
     }
   }
 
   public enum FeederState {
-    S_On,
-    S_Off
+    S_On, S_Off
   }
+
+  public void spinFeederMotor() {}
+
+  public void stopFeederMotor() {}
 
   @Override
   public void periodic() {
