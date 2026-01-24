@@ -9,18 +9,21 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Agitator extends SubsystemBase {
-  /** Creates a new Aggitator. */
+
   private TalonFX AgitatorMotor;
 
+  public static AgitatorState mAgitatorState;
+
+  /** Creates a new Aggitator. */
   public Agitator() {
     AgitatorMotor = new TalonFX(Constants.AgitatorConstants.kAgitatorMotor);
     mAgitatorState = AgitatorState.S_On;
   }
 
-  public void spinAgitatorMotor() {}
-
-  public void stopAgitatorMotor() {}
-
+  /*
+   * S_On = motor is spinning at a constant speed
+   * S_Off = motor is inactive
+   */
   public enum AgitatorState {
     S_On,
     S_Off
@@ -38,6 +41,12 @@ public class Agitator extends SubsystemBase {
         break;
     }
   }
+
+  // method for when motor is in motion
+  public void spinAgitatorMotor() {}
+
+  // method for when motor is not in motion
+  public void stopAgitatorMotor() {}
 
   @Override
   public void periodic() {
