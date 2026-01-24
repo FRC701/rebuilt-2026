@@ -17,6 +17,10 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
+  public static class AgitatorConstants {
+    public static final int kAgitatorMotor = 21;
+  }
+
   public static class ClimberConstants {
     public static final int kClimberLeftMotor = 62;
     public static final int kClimberRightMotor = 61;

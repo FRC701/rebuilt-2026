@@ -6,13 +6,14 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Agitator extends SubsystemBase {
   /** Creates a new Aggitator. */
   private TalonFX AgitatorMotor;
 
   public Agitator() {
-    AgitatorMotor = new TalonFX(0);
+    AgitatorMotor = new TalonFX(Constants.AgitatorConstants.kAgitatorMotor);
     mAgitatorState = AgitatorState.S_On;
   }
 
