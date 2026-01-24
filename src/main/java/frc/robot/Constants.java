@@ -17,6 +17,7 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
+  // Agitator IDs : 20s
   public static class AgitatorConstants {
     public static final int kAgitatorMotor = 21;
   }
