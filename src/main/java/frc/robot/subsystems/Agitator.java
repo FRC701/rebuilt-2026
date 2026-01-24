@@ -41,10 +41,14 @@ public class Agitator extends SubsystemBase {
   }
 
   // method for when motor is in motion
-  public void spinAgitatorMotor() {}
+  public void spinAgitatorMotor() {
+    AgitatorMotor.setVoltage(4);
+  }
 
   // method for when motor is not in motion
-  public void stopAgitatorMotor() {}
+  public void stopAgitatorMotor() {
+    AgitatorMotor.setVoltage(0);
+  }
 
   @Override
   public void periodic() {
