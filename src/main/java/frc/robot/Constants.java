@@ -22,7 +22,7 @@ public final class Constants {
     public static final int kArmMotor2 = 2;
   }
 
-  public static class IntakeConstants{
+  public static class IntakeConstants {
     public static final int kIntakeMotor1 = 3;
     public static final int kIntakeMotor2 = 4;
   }
