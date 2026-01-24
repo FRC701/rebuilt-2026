@@ -10,29 +10,29 @@ import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
-  private TalonFX m_IntakeMotor1;
+  private TalonFX m_IntakeMotorArm;
 
-  private TalonFX m_IntakeMotor2;
+  private TalonFX m_IntakeMotorRoller;
   private static IntakeState intakeState;
 
   public Intake() {
-    m_IntakeMotor1 = new TalonFX(Constants.IntakeConstants.kIntakeMotor1);
-    m_IntakeMotor2 = new TalonFX(Constants.IntakeConstants.kIntakeMotor2);
+    m_IntakeMotorArm = new TalonFX(Constants.IntakeConstants.kIntakeMotor1);
+    m_IntakeMotorRoller = new TalonFX(Constants.IntakeConstants.kIntakeMotor2);
   }
 
   public enum IntakeState {
-    S_Rolling,
-    S_Stop,
+    S_Up,
+    S_Down,
     S_Outtake
   }
 
   public void RunIntakeState() {
     switch (intakeState) {
-      case S_Rolling:
-        SpinMotor();
+      case S_Up:
+        UpPosition();
         break;
-      case S_Stop:
-        StopMotor();
+      case S_Down:
+         DownPosition();
         break;
       case S_Outtake:
         Outtake();
@@ -40,9 +40,9 @@ public class Intake extends SubsystemBase {
     }
   }
 
-  public void SpinMotor() {}
+   public void UpPosition() {}
 
-  public void StopMotor() {}
+  public void DownPosition() {}
 
   public void Outtake() {}
 
