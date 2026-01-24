@@ -27,12 +27,27 @@ public class Arm extends SubsystemBase {
   public void runArmState() {
     switch (armstate) {
       case S_Up:
+      UpPosition();
         break;
       case S_Down:
+      DownPosition();
         break;
       case S_Hold:
+      Hold();
       break;  
     }
+  }
+
+  public void UpPosition(){
+
+  }
+
+  public void DownPosition(){
+
+  }
+
+  public void Hold(){
+
   }
 
   @Override
