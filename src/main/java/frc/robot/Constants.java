@@ -18,7 +18,7 @@ public final class Constants {
   }
 
   public static class ClimberConstants {
-    public static final int kClimberMotor1 = 1;
-    public static final int kClimberMotor2 = 2;
+    public static final int kClimberLeftMotor = 61;
+    public static final int kClimberRightMotor = 62;
   }
 }

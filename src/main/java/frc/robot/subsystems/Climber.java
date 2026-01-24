@@ -10,9 +10,9 @@ import frc.robot.Constants;
 
 public class Climber extends SubsystemBase {
   /** Creates a new Climber. */
-  private TalonFX mClimberMotor1;
+  private TalonFX mClimberLeftMotor;
 
-  private TalonFX mClimberMotor2;
+  private TalonFX mClimberRightMotor;
 
   public static ClimberState mClimberState;
 
@@ -24,8 +24,8 @@ public class Climber extends SubsystemBase {
   }
 
   public Climber() {
-    mClimberMotor1 = new TalonFX(Constants.ClimberConstants.kClimberMotor1);
-    mClimberMotor2 = new TalonFX(Constants.ClimberConstants.kClimberMotor2);
+    mClimberLeftMotor = new TalonFX(Constants.ClimberConstants.kClimberLeftMotor);
+    mClimberRightMotor = new TalonFX(Constants.ClimberConstants.kClimberRightMotor);
   }
 
   public void runClimberState() {
