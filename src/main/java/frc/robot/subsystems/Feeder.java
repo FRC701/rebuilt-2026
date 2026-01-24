@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Feeder extends SubsystemBase {
   /** Creates a new Feeder. */
@@ -14,8 +15,8 @@ public class Feeder extends SubsystemBase {
   private TalonFX m_FeederMotor;
 
   public Feeder() {
+    m_FeederMotor = new TalonFX(Constants.FeederConstants.kFeederMotor);
     m_FeederState = FeederState.S_Off;
-    m_FeederMotor = new TalonFX();
   }
 
   public void runFeederState() {
