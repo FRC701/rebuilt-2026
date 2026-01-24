@@ -18,7 +18,7 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final int kIntakeMotor1 = 11;
-    public static final int kIntakeMotor2 = 12;
+    public static final int kIntakeMotorArm = 11;
+    public static final int kIntakeMotorRoller = 12;
   }
 }

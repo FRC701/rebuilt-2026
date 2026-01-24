@@ -16,8 +16,8 @@ public class Intake extends SubsystemBase {
   private static IntakeState intakeState;
 
   public Intake() {
-    m_IntakeMotorArm = new TalonFX(Constants.IntakeConstants.kIntakeMotor1);
-    m_IntakeMotorRoller = new TalonFX(Constants.IntakeConstants.kIntakeMotor2);
+    m_IntakeMotorArm = new TalonFX(Constants.IntakeConstants.kIntakeMotorArm);
+    m_IntakeMotorRoller = new TalonFX(Constants.IntakeConstants.kIntakeMotorRoller);
   }
 
   public enum IntakeState {
