@@ -14,9 +14,9 @@ import frc.robot.subsystems.Shooter.ShooterEnumState;
 public class PassingCommand extends InstantCommand {
   Shooter mShooterSubsystem;
 
-  public PassingCommand(int frontId, int backId) {
+  public PassingCommand(Shooter tempShooter) {
     // Use addRequirements() here to declare subsystem dependencies.
-    mShooterSubsystem = new Shooter(frontId, backId);
+    mShooterSubsystem = tempShooter;
   }
 
   // Called when the command is initially scheduled.
