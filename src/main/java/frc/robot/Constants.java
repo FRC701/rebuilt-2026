@@ -16,4 +16,24 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  // Shooter Motor Ids = 40s
+  public static class ShooterConstants {
+    public static final int kFrontLeftShooterId = 41;
+    public static final int kBackLeftShooterId = 42;
+    public static final int kFrontRightShooterId = 43;
+    public static final int kBackRightShooterId = 44;
+
+    // PID Constants for Shooting
+    public static final double kP = 0.1;
+    public static final double kI = 0;
+    public static final double kD = 0;
+    public static final double kV = 0.1;
+    public static final double kA = 100;
+
+    /*Desired Rotations per second for shooter Motors
+    WARNING: CURRENTLY TEMPORARY NUMBERS*/
+    public static final double shootRev = 2;
+    public static final double passRev = 1;
+  }
 }
