@@ -22,8 +22,8 @@ public class Shooter extends SubsystemBase {
   /** Creates a new Shooter. */
   public Shooter(int frontId, int backId) {
     mShooterEnumState = ShooterEnumState.S_Shooting;
-  
-  // Configs that use the PID values to help with motor speed
+
+    // Configs that use the PID values to help with motor speed
     var Slot0Configs = new Slot0Configs();
     Slot0Configs.kP = Constants.ShooterConstants.kP;
     Slot0Configs.kI = Constants.ShooterConstants.kI;
@@ -70,14 +70,14 @@ public class Shooter extends SubsystemBase {
   public void runShooterStates() {
     switch (mShooterEnumState) {
       case S_Shooting:
-
-      break;
+        shooting();
+        break;
       case S_Passing:
-
-      break;
+        passing();
+        break;
       case S_NotShooting:
-
-      break;
+        stopping();
+        break;
     }
   }
 
