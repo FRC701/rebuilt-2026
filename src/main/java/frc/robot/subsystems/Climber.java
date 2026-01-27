@@ -4,7 +4,9 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -26,6 +28,8 @@ public class Climber extends SubsystemBase {
   public Climber() {
     mClimberLeftMotor = new TalonFX(Constants.ClimberConstants.kClimberLeftMotor);
     mClimberRightMotor = new TalonFX(Constants.ClimberConstants.kClimberRightMotor);
+    mClimberRightMotor.setControl(
+        new Follower(mClimberLeftMotor.getDeviceID(), MotorAlignmentValue.Opposed));
   }
 
   public void runClimberState() {
