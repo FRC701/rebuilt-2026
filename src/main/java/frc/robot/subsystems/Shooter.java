@@ -17,9 +17,13 @@ public class Shooter extends SubsystemBase {
   private TalonFX mFrontMotor;
   private TalonFX mBackMotor;
 
+  public static ShooterEnumState mShooterEnumState;
+
   /** Creates a new Shooter. */
   public Shooter(int frontId, int backId) {
-    // Configs that use the PID values to help with motor speed
+    mShooterEnumState = ShooterEnumState.S_Shooting;
+  
+  // Configs that use the PID values to help with motor speed
     var Slot0Configs = new Slot0Configs();
     Slot0Configs.kP = Constants.ShooterConstants.kP;
     Slot0Configs.kI = Constants.ShooterConstants.kI;
@@ -57,8 +61,29 @@ public class Shooter extends SubsystemBase {
     mFrontMotor.setControl(new VelocityVoltage(0).withSlot(0));
   }
 
+  public enum ShooterEnumState {
+    S_Shooting,
+    S_Passing,
+    S_NotShooting
+  }
+
+  public void runShooterStates() {
+    switch (mShooterEnumState) {
+      case S_Shooting:
+
+      break;
+      case S_Passing:
+
+      break;
+      case S_NotShooting:
+
+      break;
+    }
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    runShooterStates();
   }
 }
