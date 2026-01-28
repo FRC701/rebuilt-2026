@@ -17,7 +17,7 @@ public class Shooter extends SubsystemBase {
   private TalonFX mFrontMotor;
   private TalonFX mBackMotor;
 
-  public static ShooterEnumState mShooterEnumState;
+  public ShooterEnumState mShooterEnumState;
 
   /** Creates a new Shooter. */
   public Shooter(int frontId, int backId) {
