@@ -20,5 +20,8 @@ public final class Constants {
   public static class IntakeConstants {
     public static final int kIntakeMotorArm = 11;
     public static final int kIntakeMotorRoller = 12;
+    public static final double kExtensionPosition = 37.5/360; //The 
+    public static final int kRetractPosition = 0; //placeholder in inches
+    public static final double GearRatio = 88/3;
   }
 }
