@@ -20,6 +20,17 @@ public final class Constants {
   public static class IntakeConstants {
     public static final int kIntakeMotorArm = 11;
     public static final int kIntakeMotorRoller = 12;
+    // The number of rotations until fully extended from retract position (in degrees)
+    public static final double kExtensionPosition = 37.5 / 360;
+    public static final int kRetractPosition = 0; // Intake is retracted and in the bot
+    public static final double GearRatio = 88 / 3; // Arm Teeth:Motor Teeth
+
+    // PID Constants for Intake Extension
+    public static final double kP = 0.1;
+    public static final double kI = 0;
+    public static final double kD = 0;
+    public static final double kV = 0.1;
+    public static final double kA = 100;
   }
 
   // Shooter Motor Ids = 40s
