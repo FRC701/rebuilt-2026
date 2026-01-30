@@ -8,8 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.AgitatorOffCommand;
-import frc.robot.commands.AgitatorOnCommand;
+import frc.robot.commands.AgitatorOnOffCommand;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.Agitator;
@@ -54,8 +53,7 @@ public class RobotContainer {
         .onTrue(new ExampleCommand(m_exampleSubsystem));
 
     // binds the a-button to turn off the agitator and the b-button to turn on the agitator
-    m_coDriverController.a().onTrue(new AgitatorOffCommand(mAgitator));
-    m_coDriverController.b().onTrue(new AgitatorOnCommand(mAgitator));
+    m_coDriverController.a().onTrue(new AgitatorOnOffCommand(mAgitator));
   }
 
   /**
