@@ -12,21 +12,20 @@ import frc.robot.subsystems.Feeder.FeederState;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class FeederOnAndOffCommand extends InstantCommand {
-Feeder mFeederSubsystem;
+  Feeder mFeederSubsystem;
 
   public FeederOnAndOffCommand(Feeder tempFeeder) {
     // Use addRequirements() here to declare subsystem dependencies.
     mFeederSubsystem = tempFeeder;
   }
 
-  // Called when the command is initially scheduled.
+  // If the feeder is off, the command turns it on, and vice versa
   @Override
   public void initialize() {
-    if (mFeederSubsystem.mFeederState == FeederState.S_Off){
+    if (mFeederSubsystem.mFeederState == FeederState.S_Off) {
       mFeederSubsystem.mFeederState = FeederState.S_On;
     } else {
       mFeederSubsystem.mFeederState = FeederState.S_Off;
     }
-  
   }
 }

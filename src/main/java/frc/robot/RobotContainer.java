@@ -7,11 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.FeederConstants;
+import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
-import frc.robot.commands.FeederOnAndOffCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Feeder;
 
@@ -24,10 +23,9 @@ import frc.robot.subsystems.Feeder;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private Feeder mRightFeeder =
-    new Feeder(FeederConstants.kLeftFeederMotor);
-  private Feeder mRightFeeder2 =
-    new Feeder(FeederConstants.kRightFeederMotor);
+  // Defines the right feeder and left feeder objects
+  private Feeder mRightFeeder = new Feeder(FeederConstants.kLeftFeederMotor);
+  private Feeder mRightFeeder2 = new Feeder(FeederConstants.kRightFeederMotor);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
