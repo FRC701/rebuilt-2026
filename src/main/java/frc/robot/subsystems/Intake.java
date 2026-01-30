@@ -5,10 +5,10 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.controls.Follower;
+// import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
+// import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
@@ -20,24 +20,24 @@ public class Intake extends SubsystemBase {
   private TalonFX m_IntakeMotorArm2;
 
   private TalonFX m_IntakeMotorRoller;
-  private TalonFX m_IntakeMotorRoller2;
+  // private TalonFX m_IntakeMotorRoller2;
   private static IntakeState intakeState;
 
   public Intake() {
     // Created Two Motors
     m_IntakeMotorArm = new TalonFX(Constants.IntakeConstants.kIntakeMotorArm);
     m_IntakeMotorRoller = new TalonFX(Constants.IntakeConstants.kIntakeMotorRoller);
-    m_IntakeMotorArm2 = new TalonFX(Constants.IntakeConstants.kIntakeMotorArm2);
-    m_IntakeMotorRoller2 = new TalonFX(Constants.IntakeConstants.kIntakeMotorRoller2);
+    // m_IntakeMotorArm2 = new TalonFX(Constants.IntakeConstants.kIntakeMotorArm2);
+    // m_IntakeMotorRoller2 = new TalonFX(Constants.IntakeConstants.kIntakeMotorRoller2);
 
-    // Made two motors to follow the other ones
-
+    // Made two motors to follow the other ones if needed
+    /*
     m_IntakeMotorArm2.setControl(
         new Follower(m_IntakeMotorArm.getDeviceID(), MotorAlignmentValue.Opposed));
 
     m_IntakeMotorRoller2.setControl(
         new Follower(m_IntakeMotorRoller.getDeviceID(), MotorAlignmentValue.Opposed));
-
+    */
     // Configs that use the PID values to help with motor speed
     var Slot0Configs = new Slot0Configs();
     Slot0Configs.kP = Constants.IntakeConstants.kP;
