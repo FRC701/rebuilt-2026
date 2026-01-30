@@ -27,15 +27,17 @@ public class Feeder extends SubsystemBase {
         break;
     }
   }
-  
+
   public enum FeederState {
     S_On,
     S_Off
   }
+
   // method for when motor is in motion
   public void spinFeederMotor() {
     m_FeederMotor.setVoltage(3);
   }
+
   // method for when motor is not in motion
   public void stopFeederMotor() {
     m_FeederMotor.setVoltage(0);

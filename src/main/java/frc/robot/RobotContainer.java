@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.FeederConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
@@ -21,6 +22,7 @@ import frc.robot.subsystems.Agitator;
 import frc.robot.subsystems.Agitator.AgitatorState;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -33,6 +35,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final Agitator m_Agitator = new Agitator();
+  private Feeder m_Feeder = new Feeder(FeederConstants.kFeederMotor);
   private Shooter m_LeftShooter = new Shooter(Constants.ShooterConstants.kLeftShooterId);
   private Shooter m_RightShooter = new Shooter(Constants.ShooterConstants.kRightShooterId);
   // Created StartEnd Command for AggitatorToggle
