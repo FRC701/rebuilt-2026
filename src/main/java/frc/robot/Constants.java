@@ -19,6 +19,8 @@ public final class Constants {
 
   // Shooter Motor Ids = 40s
   public static class ShooterConstants {
+    //Facing from the front of the shooters (For Left and Right)
+    //Front is the closest to the edge, Back is the furthest inward
     public static final int kFrontLeftShooterId = 41;
     public static final int kBackLeftShooterId = 42;
     public static final int kFrontRightShooterId = 43;

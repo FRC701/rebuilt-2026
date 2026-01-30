@@ -25,9 +25,9 @@ import frc.robot.subsystems.Shooter;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private Shooter mLeftShooter =
+  private Shooter m_LeftShooter =
       new Shooter(ShooterConstants.kFrontLeftShooterId, ShooterConstants.kBackLeftShooterId);
-  private Shooter mRightShooter =
+  private Shooter m_RightShooter =
       new Shooter(ShooterConstants.kFrontRightShooterId, ShooterConstants.kBackRightShooterId);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -55,11 +55,11 @@ public class RobotContainer {
         .onTrue(new ExampleCommand(m_exampleSubsystem));
 
     // Binds the x-button to shooting the shooters
-    m_driverController.x().onTrue(new ShootingCommand(mLeftShooter));
-    m_driverController.x().onTrue(new ShootingCommand(mRightShooter));
+    m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
+    m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
 
-    m_driverController.y().onTrue(new PassingCommand(mLeftShooter));
-    m_driverController.y().onTrue(new PassingCommand(mRightShooter));
+    m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
+    m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
   }
 
   /**

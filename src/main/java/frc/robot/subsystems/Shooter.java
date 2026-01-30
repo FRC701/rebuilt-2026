@@ -14,14 +14,14 @@ import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase {
 
-  private TalonFX mFrontMotor;
-  private TalonFX mBackMotor;
+  private TalonFX m_FrontMotor;
+  private TalonFX m_BackMotor;
 
-  public ShooterEnumState mShooterEnumState;
+  public ShooterEnumState m_ShooterEnumState;
 
   /** Creates a new Shooter. */
   public Shooter(int frontId, int backId) {
-    mShooterEnumState = ShooterEnumState.S_Shooting;
+    m_ShooterEnumState = ShooterEnumState.S_Shooting;
 
     // Configs that use the PID values to help with motor speed
     var Slot0Configs = new Slot0Configs();
@@ -32,13 +32,13 @@ public class Shooter extends SubsystemBase {
     Slot0Configs.kA = Constants.ShooterConstants.kA;
 
     // Identifying of the motors and making the front one the leader
-    mFrontMotor = new TalonFX(frontId);
-    mBackMotor = new TalonFX(backId);
-    mBackMotor.setControl(new Follower(mFrontMotor.getDeviceID(), MotorAlignmentValue.Opposed));
+    m_FrontMotor = new TalonFX(frontId);
+    m_BackMotor = new TalonFX(backId);
+    m_BackMotor.setControl(new Follower(m_FrontMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
     // Applying the configs to the motors
-    mFrontMotor.getConfigurator().apply(Slot0Configs);
-    mBackMotor.getConfigurator().apply(Slot0Configs);
+    m_FrontMotor.getConfigurator().apply(Slot0Configs);
+    m_BackMotor.getConfigurator().apply(Slot0Configs);
   }
 
   // Uses PID to arrive at our shooting speed
@@ -46,19 +46,19 @@ public class Shooter extends SubsystemBase {
     // voltSpeed = desired amount of rotations per second
     VelocityVoltage voltSpeed =
         new VelocityVoltage(Constants.ShooterConstants.shootRev).withSlot(0);
-    mFrontMotor.setControl(voltSpeed);
+    m_FrontMotor.setControl(voltSpeed);
   }
 
   // Uses PID to arrive at our passing speed
   public void passing() {
     // voltSpeed = desired amount of rotations per second
     VelocityVoltage voltSpeed = new VelocityVoltage(Constants.ShooterConstants.passRev).withSlot(0);
-    mFrontMotor.setControl(voltSpeed);
+    m_FrontMotor.setControl(voltSpeed);
   }
 
   // Sets the speed to 0 by creating a VelocityVotage object with 0 velocity
   public void stopping() {
-    mFrontMotor.setControl(new VelocityVoltage(0).withSlot(0));
+    m_FrontMotor.setControl(new VelocityVoltage(0).withSlot(0));
   }
 
   public enum ShooterEnumState {
@@ -68,7 +68,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void runShooterStates() {
-    switch (mShooterEnumState) {
+    switch (m_ShooterEnumState) {
       case S_Shooting:
         shooting();
         break;

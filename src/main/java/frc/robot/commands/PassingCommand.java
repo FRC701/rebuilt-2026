@@ -12,16 +12,16 @@ import frc.robot.subsystems.Shooter.ShooterEnumState;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class PassingCommand extends InstantCommand {
-  Shooter mShooterSubsystem;
+  Shooter m_ShooterSubsystem;
 
   public PassingCommand(Shooter tempShooter) {
     // Use addRequirements() here to declare subsystem dependencies.
-    mShooterSubsystem = tempShooter;
+    m_ShooterSubsystem = tempShooter;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    mShooterSubsystem.mShooterEnumState = ShooterEnumState.S_Passing;
+    m_ShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_Passing;
   }
 }
