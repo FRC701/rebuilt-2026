@@ -33,10 +33,12 @@ public class Feeder extends SubsystemBase {
     S_On,
     S_Off
   }
+
   // method for when motor is in motion
   public void spinFeederMotor() {
     FeederMotor.setVoltage(3);
   }
+  
   // method for when motor is not in motion
   public void stopFeederMotor() {
     FeederMotor.setVoltage(0);
