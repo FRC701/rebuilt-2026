@@ -5,6 +5,8 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -21,7 +23,10 @@ public class Shooter extends SubsystemBase {
 
   /** Creates a new Shooter. */
   public Shooter(int frontId, int backId) {
+    //Selects the intial state
     m_ShooterEnumState = ShooterEnumState.S_Shooting;
+
+    var m_TalonFXConfig = new TalonFXConfiguration().withVoltage(new VoltageConfigs().withPeakForwardVoltage(6).withPeakReverseVoltage(-6));
 
     // Configs that use the PID values to help with motor speed
     var Slot0Configs = new Slot0Configs();
@@ -36,9 +41,13 @@ public class Shooter extends SubsystemBase {
     m_BackMotor = new TalonFX(backId);
     m_BackMotor.setControl(new Follower(m_FrontMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
-    // Applying the configs to the motors
+    // Applying the configs to the motors, PID
     m_FrontMotor.getConfigurator().apply(Slot0Configs);
     m_BackMotor.getConfigurator().apply(Slot0Configs);
+
+    // Applying the configs to the motors, Voltage Limits
+    m_FrontMotor.getConfigurator().apply(m_TalonFXConfig);
+    m_BackMotor.getConfigurator().apply(m_TalonFXConfig);
   }
 
   // Uses PID to arrive at our shooting speed
