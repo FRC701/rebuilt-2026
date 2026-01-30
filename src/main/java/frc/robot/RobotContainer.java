@@ -11,6 +11,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.PassingCommand;
 import frc.robot.commands.ShootingCommand;
 import frc.robot.subsystems.ExampleSubsystem;
@@ -60,6 +61,9 @@ public class RobotContainer {
 
     m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
     m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
+
+    m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
+    m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
   }
 
   /**
