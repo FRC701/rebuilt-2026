@@ -24,8 +24,8 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   // Defines the right feeder and left feeder objects
-  private Feeder mRightFeeder = new Feeder(FeederConstants.kLeftFeederMotor);
-  private Feeder mRightFeeder2 = new Feeder(FeederConstants.kRightFeederMotor);
+  private Feeder m_RightFeeder = new Feeder(FeederConstants.kLeftFeederMotor);
+  private Feeder m_RightFeeder2 = new Feeder(FeederConstants.kRightFeederMotor);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =

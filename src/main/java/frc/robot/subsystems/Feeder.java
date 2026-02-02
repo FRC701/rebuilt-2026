@@ -9,17 +9,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Feeder extends SubsystemBase {
   /** Creates a new Feeder. */
-  private TalonFX FeederMotor;
+  private TalonFX m_FeederMotor;
 
-  public static FeederState mFeederState;
+  public static FeederState m_FeederState;
 
   public Feeder(int motorID) {
-    FeederMotor = new TalonFX(motorID);
-    mFeederState = FeederState.S_Off;
+    m_FeederMotor = new TalonFX(motorID);
+    m_FeederState = FeederState.S_Off;
   }
 
   public void runFeederState() {
-    switch (mFeederState) {
+    switch (m_FeederState) {
       case S_On:
         spinFeederMotor();
         break;
@@ -36,12 +36,12 @@ public class Feeder extends SubsystemBase {
 
   // method for when motor is in motion
   public void spinFeederMotor() {
-    FeederMotor.setVoltage(3);
+    m_FeederMotor.setVoltage(3);
   }
 
   // method for when motor is not in motion
   public void stopFeederMotor() {
-    FeederMotor.setVoltage(0);
+    m_FeederMotor.setVoltage(0);
   }
 
   @Override
