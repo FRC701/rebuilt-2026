@@ -10,14 +10,14 @@ import frc.robot.Constants;
 
 public class Agitator extends SubsystemBase {
 
-  private TalonFX AgitatorMotor;
+  private TalonFX m_AgitatorMotor;
 
-  public static AgitatorState mAgitatorState;
+  public static AgitatorState m_AgitatorState;
 
   /** Creates a new Aggitator. */
   public Agitator() {
-    AgitatorMotor = new TalonFX(Constants.AgitatorConstants.kAgitatorMotor);
-    mAgitatorState = AgitatorState.S_On;
+    m_AgitatorMotor = new TalonFX(Constants.AgitatorConstants.kAgitatorMotor);
+    m_AgitatorState = AgitatorState.S_On;
   }
 
   /*
@@ -30,7 +30,7 @@ public class Agitator extends SubsystemBase {
   }
 
   public void runAgitatorState() {
-    switch (mAgitatorState) {
+    switch (m_AgitatorState) {
       case S_On:
         spinAgitatorMotor();
         break;
@@ -42,12 +42,12 @@ public class Agitator extends SubsystemBase {
 
   // method for when motor is in motion
   public void spinAgitatorMotor() {
-    AgitatorMotor.setVoltage(4);
+    m_AgitatorMotor.setVoltage(4);
   }
 
   // method for when motor is not in motion
   public void stopAgitatorMotor() {
-    AgitatorMotor.setVoltage(0);
+    m_AgitatorMotor.setVoltage(0);
   }
 
   @Override

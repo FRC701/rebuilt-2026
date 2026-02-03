@@ -23,7 +23,7 @@ import frc.robot.subsystems.ExampleSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private Agitator mAgitator = new Agitator();
+  private Agitator m_Agitator = new Agitator();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
@@ -53,7 +53,7 @@ public class RobotContainer {
         .onTrue(new ExampleCommand(m_exampleSubsystem));
 
     // binds the a-button to turn off the agitator and the b-button to turn on the agitator
-    m_coDriverController.a().onTrue(new AgitatorOnOffCommand(mAgitator));
+    m_coDriverController.a().onTrue(new AgitatorOnOffCommand(m_Agitator));
   }
 
   /**

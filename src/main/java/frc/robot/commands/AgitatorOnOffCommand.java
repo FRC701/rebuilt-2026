@@ -12,20 +12,20 @@ import frc.robot.subsystems.Agitator.AgitatorState;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class AgitatorOnOffCommand extends InstantCommand {
-  Agitator mAgitatorSubsystem;
+  Agitator m_AgitatorSubsystem;
 
   public AgitatorOnOffCommand(Agitator tempAgitator) {
     // Use addRequirements() here to declare subsystem dependencies.
-    mAgitatorSubsystem = tempAgitator;
+    m_AgitatorSubsystem = tempAgitator;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (mAgitatorSubsystem.mAgitatorState == AgitatorState.S_Off) {
-      mAgitatorSubsystem.mAgitatorState = AgitatorState.S_On;
+    if (m_AgitatorSubsystem.m_AgitatorState == AgitatorState.S_Off) {
+      m_AgitatorSubsystem.m_AgitatorState = AgitatorState.S_On;
     } else {
-      mAgitatorSubsystem.mAgitatorState = AgitatorState.S_Off;
+      m_AgitatorSubsystem.m_AgitatorState = AgitatorState.S_Off;
     }
   }
 }
