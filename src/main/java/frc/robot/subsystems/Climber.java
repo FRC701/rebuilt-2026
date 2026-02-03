@@ -92,19 +92,21 @@ public class Climber extends SubsystemBase {
     m_ClimberRightMotor.setVoltage(1.5);
   }
 
+//Sets to the extended position, checks if set point reached then will switch to extend, and holds position
   public void Extend() {
-    setPosition(inchesToRotation(ClimberConstants.kExtensionPosition));
+    setPosition(inchesToRotation(ClimberConstants.kExtensionPosition)); 
     if(SetpointReached(ClimberConstants.kExtensionPosition))
     m_ClimberState = ClimberState.S_Hold;
-
   }
 
+//Sets to the lock position, checks if set point reached then will switch to lock, and holds position
   public void Lock(){
   setPosition(inchesToRotation(ClimberConstants.kLockPosition));
-    if(SetpointReached(ClimberConstants.kRetractPosition))
+    if(SetpointReached(ClimberConstants.kLockPosition))
     m_ClimberState = ClimberState.S_Hold;
   }
 
+//Sets to the retract position, checks if set point reached then will switch to retract, and holds position
   public void Retract() {
     setPosition(inchesToRotation(ClimberConstants.kRetractPosition));
     if(SetpointReached(ClimberConstants.kRetractPosition))
