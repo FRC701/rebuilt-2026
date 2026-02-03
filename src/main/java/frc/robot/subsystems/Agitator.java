@@ -44,7 +44,7 @@ public class Agitator extends SubsystemBase {
 
   // method for when motor is in motion
   public void spinAgitatorMotor() {
-    m_AgitatorMotor.setVoltage(4);
+    m_AgitatorMotor.setVoltage(Constants.AgitatorConstants.kAgitatorVolt);
   }
 
   // method for when motor is not in motion
