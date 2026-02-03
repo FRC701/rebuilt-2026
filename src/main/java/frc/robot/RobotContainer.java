@@ -31,6 +31,7 @@ import frc.robot.subsystems.Shooter;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final Agitator m_Agitator = new Agitator();
   private Shooter m_LeftShooter =
       new Shooter(ShooterConstants.kFrontLeftShooterId, ShooterConstants.kBackLeftShooterId);
   private Shooter m_RightShooter =
