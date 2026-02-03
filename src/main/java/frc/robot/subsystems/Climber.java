@@ -41,6 +41,8 @@ public class Climber extends SubsystemBase {
 
   public Climber() {
 
+    m_ClimberState = ClimberState.S_Hold;
+
     var fx_cfg = new MotorOutputConfigs();
 
     fx_cfg.NeutralMode = NeutralModeValue.Brake;
@@ -86,6 +88,29 @@ public class Climber extends SubsystemBase {
     }
   }
 
+  public void HoldPosition() {
+    m_ClimberRightMotor.setVoltage(1.5);
+  }
+
+  public void Extend() {
+    setPosition(inchesToRotation(ClimberConstants.kExtensionPosition));
+    if(SetpointReached(ClimberConstants.kExtensionPosition))
+    m_ClimberState = ClimberState.S_Hold;
+
+  }
+
+  public void Lock(){
+  setPosition(inchesToRotation(ClimberConstants.kLockPosition));
+    if(SetpointReached(ClimberConstants.kRetractPosition))
+    m_ClimberState = ClimberState.S_Hold;
+  }
+
+  public void Retract() {
+    setPosition(inchesToRotation(ClimberConstants.kRetractPosition));
+    if(SetpointReached(ClimberConstants.kRetractPosition))
+    m_ClimberState = ClimberState.S_Hold;
+  }
+
 public double rotationsToInches(double angle){
   return angle * kSproketCircumference;
 }
@@ -102,36 +127,19 @@ public double LimitCheck() {
 
   }
 
-  public void HoldPosition() {
-    m_ClimberRightMotor.setVoltage(1.5);
-  }
-
-  public void Extend() {
-    setPosition(inchesToRotation(ClimberConstants.kExtensionPosition));
-  }
-
-  public void Lock() {
-   setPosition(inchesToRotation(ClimberConstants.kRetractPosition));
-  
-  }
-
-  public void Retract() {
-    setPosition(inchesToRotation(ClimberConstants.kRetractPosition));
-  }
-
     public double inchesToRotation(double Length){
     return (Length * GearRatio)/ kSproketCircumference;
   }
-
-
+  
   //Setpoint inches extended from lock (desired location)
   //WARNING: 1s are placeholders (Act as our error from location)
   public boolean SetpointReached(double Setpoint){
      return ( LimitCheck() - 1 <=Setpoint) && (LimitCheck() + 1 >=Setpoint);
   }
-    
+  
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    runClimberState();
   }
 }

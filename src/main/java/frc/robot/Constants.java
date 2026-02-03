@@ -22,5 +22,6 @@ public final class Constants {
     public static final int kClimberRightMotor = 62;
     public static final double kExtensionPosition = 3; //placeholder in inches
     public static final double kRetractPosition = 1; //placeholder in inches
+    public static final double kLockPosition = 0;
   }
 }
