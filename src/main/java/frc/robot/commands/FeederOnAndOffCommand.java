@@ -22,10 +22,10 @@ public class FeederOnAndOffCommand extends InstantCommand {
   // If the feeder is off, the command turns it on, and vice versa
   @Override
   public void initialize() {
-    if (m_FeederSubsystem.mFeederState == FeederState.S_Off) {
-      m_FeederSubsystem.mFeederState = FeederState.S_On;
+    if (m_FeederSubsystem.m_FeederState == FeederState.S_Off) {
+      m_FeederSubsystem.m_FeederState = FeederState.S_On;
     } else {
-      m_FeederSubsystem.mFeederState = FeederState.S_Off;
+      m_FeederSubsystem.m_FeederState = FeederState.S_Off;
     }
   }
 }
