@@ -21,5 +21,7 @@ public final class Constants {
   // Agitator IDs : 20s
   public static class AgitatorConstants {
     public static final int kAgitatorMotor = 21;
+    // 4 is a placeholder value for motor voltage
+    public static final double kAgitatorVolt = 4;
   }
 }
