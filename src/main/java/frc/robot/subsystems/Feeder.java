@@ -6,10 +6,12 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Feeder extends SubsystemBase {
   /** Creates a new Feeder. */
   public FeederState m_FeederState;
+
   private TalonFX m_FeederMotor;
 
   public Feeder(int motorID) {
@@ -35,7 +37,7 @@ public class Feeder extends SubsystemBase {
 
   // method for when motor is in motion
   public void spinFeederMotor() {
-    m_FeederMotor.setVoltage(3);
+    m_FeederMotor.setVoltage(Constants.FeederConstants.kFeederVolt);
   }
 
   // method for when motor is not in motion

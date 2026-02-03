@@ -27,6 +27,8 @@ public final class Constants {
 
   public static class FeederConstants {
     public static final int kFeederMotor = 31;
+    // 3 is a placeholder for motor voltage
+    public static final double kFeederVolt = 3;
   }
 
   public static class ClimberConstants {
