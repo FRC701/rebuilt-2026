@@ -12,7 +12,12 @@ import frc.robot.commands.AgitatorOnOffCommand;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.Agitator;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.commands.NotShootingCommand;
+import frc.robot.commands.PassingCommand;
+import frc.robot.commands.ShootingCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Shooter;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -24,6 +29,10 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private Agitator m_Agitator = new Agitator();
+  private Shooter m_LeftShooter =
+      new Shooter(ShooterConstants.kFrontLeftShooterId, ShooterConstants.kBackLeftShooterId);
+  private Shooter m_RightShooter =
+      new Shooter(ShooterConstants.kFrontRightShooterId, ShooterConstants.kBackRightShooterId);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
@@ -54,6 +63,15 @@ public class RobotContainer {
 
     // binds the a-button to turn off the agitator and the b-button to turn on the agitator
     m_coDriverController.a().onTrue(new AgitatorOnOffCommand(m_Agitator));
+    // Binds the x-button to shooting the shooters
+    m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
+    m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
+
+    m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
+    m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
+
+    m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
+    m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
   }
 
   /**
