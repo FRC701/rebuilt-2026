@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -18,6 +19,7 @@ import frc.robot.commands.PassingCommand;
 import frc.robot.commands.Retract;
 import frc.robot.commands.ShootingCommand;
 import frc.robot.subsystems.Agitator;
+import frc.robot.subsystems.Agitator.AgitatorState;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Shooter;
@@ -36,6 +38,12 @@ public class RobotContainer {
       new Shooter(ShooterConstants.kFrontLeftShooterId, ShooterConstants.kBackLeftShooterId);
   private Shooter m_RightShooter =
       new Shooter(ShooterConstants.kFrontRightShooterId, ShooterConstants.kBackRightShooterId);
+  // Created StartEnd Command for AggitatorToggle
+  private Command m_AgitatorToggle =
+      Commands.startEnd(
+          () -> m_Agitator.m_AgitatorState = AgitatorState.S_On,
+          () -> m_Agitator.m_AgitatorState = AgitatorState.S_Off,
+          m_Agitator);
 
   private final Climber m_Climber;
 
@@ -67,6 +75,8 @@ public class RobotContainer {
     new Trigger(m_exampleSubsystem::exampleCondition)
         .onTrue(new ExampleCommand(m_exampleSubsystem));
 
+    // binds the a-button to toggle the agitator
+    m_coDriverController.a().toggleOnTrue(m_AgitatorToggle);
     // Binds the x-button to shooting the shooters
     m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
     m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));

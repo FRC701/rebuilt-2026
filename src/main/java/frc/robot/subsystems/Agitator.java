@@ -12,7 +12,7 @@ public class Agitator extends SubsystemBase {
 
   private TalonFX m_AgitatorMotor;
 
-  public static AgitatorState m_AgitatorState;
+  public AgitatorState m_AgitatorState;
 
   /** Creates a new Aggitator. */
   public Agitator() {
