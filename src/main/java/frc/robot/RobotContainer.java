@@ -23,6 +23,7 @@ import frc.robot.subsystems.Agitator.AgitatorState;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Feeder;
+import frc.robot.subsystems.Feeder.FeederState;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -44,6 +45,11 @@ public class RobotContainer {
           () -> m_Agitator.m_AgitatorState = AgitatorState.S_On,
           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Off,
           m_Agitator);
+  private Command m_FeederToggle =
+      Commands.startEnd(
+          () -> m_Feeder.m_FeederState = FeederState.S_On,
+          () -> m_Feeder.m_FeederState = FeederState.S_Off,
+          m_Feeder);
 
   private final Climber m_Climber;
 
@@ -92,6 +98,8 @@ public class RobotContainer {
     m_driverController.leftBumper().onTrue(new Extend(m_Climber));
     m_driverController.a().onTrue(new Lock(m_Climber));
     m_driverController.rightBumper().onTrue(new Retract(m_Climber));
+    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    m_driverController.y().toggleOnTrue(m_FeederToggle);
   }
 
   /**
