@@ -85,7 +85,9 @@ public class Intake extends SubsystemBase {
   // A method that returns true if we the arm is at its destination
   public boolean PointReached(double Setpoint) {
     return (getPosition() - 1 / 180 <= Setpoint)
-        && (getPosition() + 1 / 180 >= Setpoint); // subject to change
+    double position = getPosition();
+    return (position - 1 / 180 <= Setpoint)
+        && (position + 1 / 180 >= Setpoint); // subject to change
   }
 
   // Extends the intake out and starts the rollers
