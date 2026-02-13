@@ -55,7 +55,9 @@ public class Intake extends SubsystemBase {
   public enum IntakeState {
     S_Extend,
     S_Retract,
-    S_Outtake
+    S_Outtake,
+    S_Extended,
+    S_Retracted
   }
 
   public void RunIntakeState() {
@@ -83,20 +85,20 @@ public class Intake extends SubsystemBase {
     m_IntakeMotorArm.setControl(pos);
   }
 
-  // A method that returns true if we the arm is at its destination
-  public boolean PointReached(double Setpoint) {
-    return (getPosition() - 1 / 180 <= Setpoint)
-    double position = getPosition();
-    return (position - 1 / 180 <= Setpoint)
-        && (position + 1 / 180 >= Setpoint); // subject to change
+  // A method that returns true if the arm is at its destination
+  public boolean S_Extended(double Setpoint){
+  double position = getPosition();
+    return (position - 1 /180 <= Setpoint)
+      && (position + 1/180 >= Setpoint); // subject to change
   }
 
   // Extends the intake out and starts the rollers
   public void ExtendPosition() {
     // If motor has reached its destination the stop the arm and start the rollers
-    if (PointReached(IntakeConstants.kExtensionPosition)) {
+    if (S_Extended(IntakeConstants.kExtensionPosition)) {
       m_IntakeMotorArm.setVoltage(0);
       m_IntakeMotorRoller.setVoltage(4);
+      Intake.intakeState = intakeState.S_Extended;
     } else {
       // Move the arm until it reaches its destination
       setPosition(IntakeConstants.kExtensionPosition);
@@ -108,8 +110,9 @@ public class Intake extends SubsystemBase {
     // When retracting we want to rollers to stay off
     m_IntakeMotorRoller.setVoltage(0);
     // If the arm has reached its destination stop the motor
-    if (PointReached(IntakeConstants.kRetractPosition)) {
+    if (S_Extended(IntakeConstants.kRetractPosition)) {
       m_IntakeMotorArm.setVoltage(0);
+      Intake.intakeState = intakeState.S_Retracted;
     } else {
       // Move the arm until it reaches the destination
       setPosition(IntakeConstants.kRetractPosition);
@@ -120,7 +123,7 @@ public class Intake extends SubsystemBase {
   public void Outtake() {
     // If motor has reached its destination the stop the arm and start the rollers moving backwards
     // (ejecting)
-    if (PointReached(IntakeConstants.kExtensionPosition)) {
+    if (S_Extended(IntakeConstants.kExtensionPosition)) {
       m_IntakeMotorArm.setVoltage(0);
       m_IntakeMotorRoller.setVoltage(-4);
     } else {
