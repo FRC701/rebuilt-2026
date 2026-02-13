@@ -5,9 +5,14 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+// import com.ctre.phoenix6.configs.Slot1Configs;
 // import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+// import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+// import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+
 // import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -39,6 +44,8 @@ public class Intake extends SubsystemBase {
         new Follower(m_IntakeMotorRoller.getDeviceID(), MotorAlignmentValue.Opposed));
     */
     // Configs that use the PID values to help with motor speed
+    var talonFXConfigs = new TalonFXConfiguration();
+  
     var Slot0Configs = new Slot0Configs();
     Slot0Configs.kP = Constants.IntakeConstants.kP;
     Slot0Configs.kI = Constants.IntakeConstants.kI;
@@ -46,9 +53,18 @@ public class Intake extends SubsystemBase {
     Slot0Configs.kV = Constants.IntakeConstants.kV;
     Slot0Configs.kA = Constants.IntakeConstants.kA;
 
+    var motionMagicConfigs = talonFXConfigs.MotionMagic;
+    motionMagicConfigs.MotionMagicCruiseVelocity = Constants.IntakeConstants.MotionMagicCruiseVelocity;
+    motionMagicConfigs.MotionMagicAcceleration = Constants.IntakeConstants.MotionMagicAcceleration;
+    motionMagicConfigs.MotionMagicJerk = Constants.IntakeConstants.MotionMagicJerk;
+
+
+
     // Apply the Configs to the Motor Objects
     m_IntakeMotorArm.getConfigurator().apply(Slot0Configs);
     m_IntakeMotorArm2.getConfigurator().apply(Slot0Configs);
+    m_IntakeMotorArm.getConfigurator().apply(talonFXConfigs);
+    m_IntakeMotorArm2.getConfigurator().apply(talonFXConfigs);
   }
 
   public enum IntakeState {

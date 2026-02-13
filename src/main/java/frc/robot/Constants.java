@@ -33,5 +33,12 @@ public final class Constants {
     public static final double kD = 0;
     public static final double kV = 0.1;
     public static final double kA = 100;
+
+    // Motion Magic Parameters 
+    public static final double MotionMagicCruiseVelocity = 80; // target cruise velocity of 80 rps 
+    public static final double MotionMagicAcceleration = 160; // target acceleration of 160 rps/s (0.5 seconds)
+    public static final double MotionMagicJerk = 1600; // target jerk of 1600 rps/s/s (0.1 seconds) *This is optional and is a derivative of acceleration*
+    // Jerk allows for an S-Curve with Motion Magic 
+
   }
 }
