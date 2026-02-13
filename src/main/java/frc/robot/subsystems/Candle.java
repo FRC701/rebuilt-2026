@@ -8,9 +8,20 @@ import com.ctre.phoenix6.configs.LEDConfigs;
 import com.ctre.phoenix6.controls.ColorFlowAnimation;
 import com.ctre.phoenix6.controls.EmptyAnimation;
 import com.ctre.phoenix6.controls.SolidColor;
+import com.ctre.phoenix6.controls.FireAnimation;
+import com.ctre.phoenix6.controls.LarsonAnimation;
+import com.ctre.phoenix6.controls.RainbowAnimation;
+import com.ctre.phoenix6.controls.RgbFadeAnimation;
+import com.ctre.phoenix6.controls.SingleFadeAnimation;
+import com.ctre.phoenix6.controls.StrobeAnimation;
+import com.ctre.phoenix6.controls.TwinkleAnimation;
+import com.ctre.phoenix6.controls.TwinkleOffAnimation;
+
 import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.signals.StripTypeValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.ctre.phoenix6.signals.RGBWColor;
+
 
 // The Candle subsystem interacts directly with the CANdle device.
 // Other subsystems and commands can interact with this Candle Subsystem
@@ -27,8 +38,13 @@ public class Candle extends SubsystemBase {
         .apply(new LEDConfigs().withStripType(StripTypeValue.GRB).withBrightnessScalar(1.0));
   }
 
-  void LEDs(SolidColor leds) {
-    m_Candle.setControl(leds);
+    private final SolidColor m_slot0Animation = new SolidColor(0, 60)
+      .withLEDStartIndex(kCandleID)
+      .withColor(new RGBWColor( 34, 139, 34, 0))
+      .withMaxLEDsOnProportion(0.5)
+      .withFrameRate(Hertz.of(10));
+
+    
   }
 
   void LEDs(EmptyAnimation leds) {
