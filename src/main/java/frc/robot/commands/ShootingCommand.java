@@ -17,6 +17,7 @@ public class ShootingCommand extends InstantCommand {
   public ShootingCommand(Shooter tempShooter) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_ShooterSubsystem = tempShooter;
+    addRequirements(m_ShooterSubsystem);
   }
 
   // Called when the command is initially scheduled.
