@@ -13,11 +13,11 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.Extend;
 import frc.robot.commands.Lock;
-import frc.robot.commands.Retract;
-import frc.robot.subsystems.Climber;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.PassingCommand;
+import frc.robot.commands.Retract;
 import frc.robot.commands.ShootingCommand;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Shooter;
 
@@ -73,7 +73,7 @@ public class RobotContainer {
     m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    //m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
     m_driverController.leftBumper().onTrue(new Extend(m_Climber));
     m_driverController.a().onTrue(new Lock(m_Climber));
     m_driverController.rightBumper().onTrue(new Retract(m_Climber));

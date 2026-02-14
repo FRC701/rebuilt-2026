@@ -99,7 +99,7 @@ public class Climber extends SubsystemBase {
   // Sets to the extended position, checks if set point reached then will switch to extend, and
   // holds position
   public void Extend() {
-  
+
     setPosition(inchesToRotation(ClimberConstants.kExtensionPosition));
     if (SetpointReached(ClimberConstants.kExtensionPosition)) m_ClimberState = ClimberState.S_Hold;
   }
@@ -150,7 +150,8 @@ public class Climber extends SubsystemBase {
 
     Shuffleboard.getTab("Test");
     SmartDashboard.putNumber("ClimberMotorPosition", LimitCheck());
-    SmartDashboard.putNumber("ClimberMotorRaw", m_ClimberLeftMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "ClimberMotorRaw", m_ClimberLeftMotor.getPosition().getValueAsDouble());
     SmartDashboard.putBoolean(
         "SetpointReached", SetpointReached(Constants.ClimberConstants.kExtensionPosition));
     SmartDashboard.putString("ClimberState", m_ClimberState.toString());
