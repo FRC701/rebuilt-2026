@@ -44,12 +44,12 @@ public final class Constants {
     public static final double kP = 0.1;
     public static final double kI = 0;
     public static final double kD = 0;
-    public static final double kV = 0.1;
-    public static final double kA = 100;
+    public static final double kV = 0.12;
+    public static final double kS = 0.1;
 
     /*Desired Rotations per second for shooter Motors
     WARNING: CURRENTLY TEMPORARY NUMBERS*/
-    public static final double shootRev = 2;
-    public static final double passRev = 1;
+    public static final double shootRev = 10;
+    public static final double passRev = 5;
   }
 }
