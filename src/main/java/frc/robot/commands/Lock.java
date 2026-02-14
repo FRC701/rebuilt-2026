@@ -12,13 +12,17 @@ import frc.robot.subsystems.Climber.ClimberState;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class Lock extends InstantCommand {
-  public Lock() {
+  Climber m_Climber;
+
+  public Lock(Climber climber) {
     // Use addRequirements() here to declare subsystem dependencies.
+    m_Climber = climber;
+    addRequirements(m_Climber);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Climber.m_ClimberState = ClimberState.S_Lock;
+    m_Climber.m_ClimberState = ClimberState.S_Lock;
   }
 }

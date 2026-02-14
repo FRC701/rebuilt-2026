@@ -18,11 +18,11 @@ public final class Constants {
   }
 
   public static class ClimberConstants {
-    public static final int kClimberLeftMotor = 61;
-    public static final int kClimberRightMotor = 62;
-    public static final double kExtensionPosition = 3; //placeholder in inches
-    public static final double kRetractPosition = 1; //placeholder in inches
-    public static final double kLockPosition = 0; 
+    public static final int kClimberLeftMotor = 62;
+    public static final int kClimberRightMotor = 61;
+    public static final double kExtensionPosition = 300; // placeholder in inches
+    public static final double kRetractPosition = 3; // placeholder in inches
+    public static final double kLockPosition = 0;
   }
 
   // Shooter Motor Ids = 40s
