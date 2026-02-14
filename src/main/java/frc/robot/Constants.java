@@ -37,10 +37,8 @@ public final class Constants {
   public static class ShooterConstants {
     // Facing from the front of the shooters (For Left and Right)
     // Front is the closest to the edge, Back is the furthest inward
-    public static final int kFrontLeftShooterId = 41;
-    public static final int kBackLeftShooterId = 42;
-    public static final int kFrontRightShooterId = 43;
-    public static final int kBackRightShooterId = 44;
+    public static final int kLeftShooterId = 41;
+    public static final int kRightShooterId = 42;
 
     // PID Constants for Shooting
     public static final double kP = 0.1;
