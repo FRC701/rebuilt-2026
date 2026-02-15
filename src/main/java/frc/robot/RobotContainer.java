@@ -4,11 +4,18 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FeederConstants;
+// import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
@@ -20,7 +27,9 @@ import frc.robot.commands.Retract;
 import frc.robot.commands.ShootingCommand;
 import frc.robot.subsystems.Agitator;
 import frc.robot.subsystems.Agitator.AgitatorState;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Feeder.FeederState;
@@ -34,6 +43,30 @@ import frc.robot.subsystems.Shooter;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+
+  private double MaxSpeed =
+      1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
+  // speed
+  private double MaxAngularRate =
+      RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max
+  // angular velocity
+
+  /* Setting up bindings for necessary control of the swerve drive platform */
+  private final SwerveRequest.FieldCentric m_DriveField =
+      new SwerveRequest.FieldCentric()
+          .withDeadband(MaxSpeed * 0.1)
+          .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+          .withDriveRequestType(
+              DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+
+  private final Telemetry logger = new Telemetry(MaxSpeed);
+
+  // private final CommandXboxController joystick = new CommandXboxController(0);
+
+  public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
+
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final Agitator m_Agitator = new Agitator();
   private Feeder m_Feeder = new Feeder(FeederConstants.kFeederMotor);
@@ -77,6 +110,56 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+
+    // Note that X is defined as forward according to WPILib convention,
+    // and Y is defined as to the left according to WPILib convention.
+    m_DriveTrain.setDefaultCommand(
+        // Drivetrain will execute this command periodically
+        m_DriveTrain.applyRequest(
+            () ->
+                m_DriveField
+                    .withVelocityX(-m_driverController.getLeftY() * MaxSpeed) // Drive
+                    // forward
+                    // with
+                    // negative
+                    // Y
+                    // (forward)
+                    .withVelocityY(
+                        -m_driverController.getLeftX()
+                            * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(
+                        -m_driverController.getRightX()
+                            * MaxAngularRate) // Drive counterclockwise with
+            // negative X (left)
+            ));
+    // Idle while the robot is disabled. This ensures the configured
+    // neutral mode is applied to the drive motors while disabled.
+    final var idle = new SwerveRequest.Idle();
+    RobotModeTriggers.disabled()
+        .whileTrue(m_DriveTrain.applyRequest(() -> idle).ignoringDisable(true));
+
+    m_driverController.a().whileTrue(m_DriveTrain.applyRequest(() -> brake));
+    m_driverController
+        .b()
+        .whileTrue(
+            m_DriveTrain.applyRequest(
+                () ->
+                    point.withModuleDirection(
+                        new Rotation2d(
+                            -m_driverController.getLeftY(), -m_driverController.getLeftX()))));
+
+    // Run SysId routines when holding back/start and X/Y. (FOR TUNING)
+    // Note that each routine should be run exactly once in a single log.
+    // m_driverController.back().and(m_driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+    // m_driverController.back().and(m_driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+    // m_driverController.start().and(m_driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+    // m_driverController.start().and(m_driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
+    // Reset the field-centric heading on left bumper press.
+    m_driverController
+        .leftTrigger()
+        .onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
+    m_DriveTrain.registerTelemetry(logger::telemeterize);
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     new Trigger(m_exampleSubsystem::exampleCondition)
         .onTrue(new ExampleCommand(m_exampleSubsystem));
@@ -92,7 +175,8 @@ public class RobotContainer {
 
     m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
+    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
+    // pressed,
     // cancelling on release.
     // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
     m_driverController.leftBumper().onTrue(new Extend(m_Climber));
@@ -109,6 +193,8 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    // Simple drive forward auton
+    return Autos.exampleSwerveAuto(m_DriveTrain, m_DriveField);
+    // return Autos.exampleAuto(m_exampleSubsystem);
   }
 }
