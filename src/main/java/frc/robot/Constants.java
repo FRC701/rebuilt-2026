@@ -17,6 +17,11 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
+  public static class CANdiConstants {
+    public static final int kCANdiId = 0;
+    public static final String kCANdiBus = "rio";
+  }
+
   public static class ClimberConstants {
     public static final int kClimberLeftMotor = 61;
     public static final int kClimberRightMotor = 62;
