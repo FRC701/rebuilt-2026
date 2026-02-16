@@ -10,6 +10,7 @@ import com.ctre.phoenix6.signals.S2CloseStateValue;
 import com.ctre.phoenix6.signals.S2FloatStateValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 // Wiring: Limit switch COM to GND, NO to S1IN or S2IN
 public class CANdiLimitSwitch extends SubsystemBase {
@@ -38,6 +39,14 @@ public class CANdiLimitSwitch extends SubsystemBase {
 
   public boolean isSwitch2Pressed() {
     return m_s2Closed.refresh().getValue();
+  }
+
+  public Trigger switch1Trigger() {
+    return new Trigger(this::isSwitch1Pressed);
+  }
+
+  public Trigger switch2Trigger() {
+    return new Trigger(this::isSwitch2Pressed);
   }
 
   public CANdi getCANdi() {
