@@ -12,6 +12,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.CANdiLimitSwitch;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ExampleSubsystem;
 
 /**
@@ -25,6 +26,7 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final CANdiLimitSwitch m_candiLimitSwitch =
       new CANdiLimitSwitch(CANdiConstants.kCANdiId, CANdiConstants.kCANdiBus);
+  private final Climber m_climber = new Climber(m_candiLimitSwitch);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =

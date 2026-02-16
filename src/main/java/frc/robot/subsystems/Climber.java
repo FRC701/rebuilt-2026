@@ -18,10 +18,9 @@ import frc.robot.Constants;
 import frc.robot.Constants.ClimberConstants;
 
 public class Climber extends SubsystemBase {
-  /** Creates a new Climber. */
   private TalonFX m_ClimberLeftMotor;
-
   private TalonFX m_ClimberRightMotor;
+  private final CANdiLimitSwitch m_limitSwitch;
 
   public static ClimberState m_ClimberState;
 
@@ -37,21 +36,22 @@ public class Climber extends SubsystemBase {
     S_Retract
   }
 
-  public Climber() {
-
+  public Climber(CANdiLimitSwitch limitSwitch) {
+    m_limitSwitch = limitSwitch;
     m_ClimberState = ClimberState.S_Hold;
 
+    // Create motors BEFORE applying configs
+    m_ClimberLeftMotor = new TalonFX(Constants.ClimberConstants.kClimberLeftMotor);
+    m_ClimberRightMotor = new TalonFX(Constants.ClimberConstants.kClimberRightMotor);
+
     var fx_cfg = new MotorOutputConfigs();
-
     fx_cfg.NeutralMode = NeutralModeValue.Brake;
-
     m_ClimberLeftMotor.getConfigurator().apply(fx_cfg);
     m_ClimberRightMotor.getConfigurator().apply(fx_cfg);
 
     m_TalonFXConfig =
         new TalonFXConfiguration()
             .withVoltage(new VoltageConfigs().withPeakForwardVoltage(6).withPeakReverseVoltage(-6));
-
     m_ClimberLeftMotor.getConfigurator().apply(m_TalonFXConfig);
     m_ClimberRightMotor.getConfigurator().apply(m_TalonFXConfig);
 
@@ -61,11 +61,8 @@ public class Climber extends SubsystemBase {
     Slot0Configs.kP = 0.1;
     Slot0Configs.kI = 0;
     Slot0Configs.kD = 0;
-
     m_ClimberRightMotor.getConfigurator().apply(Slot0Configs);
 
-    m_ClimberLeftMotor = new TalonFX(Constants.ClimberConstants.kClimberLeftMotor);
-    m_ClimberRightMotor = new TalonFX(Constants.ClimberConstants.kClimberRightMotor);
     m_ClimberRightMotor.setControl(
         new Follower(m_ClimberLeftMotor.getDeviceID(), MotorAlignmentValue.Opposed));
   }
@@ -97,16 +94,22 @@ public class Climber extends SubsystemBase {
     if (SetpointReached(ClimberConstants.kExtensionPosition)) m_ClimberState = ClimberState.S_Hold;
   }
 
-  // Sets to the lock position, checks if set point reached then will switch to lock, and holds
-  // position
+  // Moves to lock position, stops when S1 limit switch is hit or setpoint reached
   public void Lock() {
+    if (m_limitSwitch.isSwitch1Pressed()) {
+      m_ClimberState = ClimberState.S_Hold;
+      return;
+    }
     setPosition(inchesToRotation(ClimberConstants.kLockPosition));
     if (SetpointReached(ClimberConstants.kLockPosition)) m_ClimberState = ClimberState.S_Hold;
   }
 
-  // Sets to the retract position, checks if set point reached then will switch to retract, and
-  // holds position
+  // Moves to retract position, stops when S2 limit switch is hit or setpoint reached
   public void Retract() {
+    if (m_limitSwitch.isSwitch2Pressed()) {
+      m_ClimberState = ClimberState.S_Hold;
+      return;
+    }
     setPosition(inchesToRotation(ClimberConstants.kRetractPosition));
     if (SetpointReached(ClimberConstants.kRetractPosition)) m_ClimberState = ClimberState.S_Hold;
   }
