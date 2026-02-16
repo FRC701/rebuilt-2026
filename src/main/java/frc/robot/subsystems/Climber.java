@@ -49,9 +49,8 @@ public class Climber extends SubsystemBase {
     m_ClimberLeftMotor.getConfigurator().apply(fx_cfg);
     m_ClimberRightMotor.getConfigurator().apply(fx_cfg);
 
-    m_TalonFXConfig =
-        new TalonFXConfiguration()
-            .withVoltage(new VoltageConfigs().withPeakForwardVoltage(6).withPeakReverseVoltage(-6));
+    m_TalonFXConfig = new TalonFXConfiguration()
+        .withVoltage(new VoltageConfigs().withPeakForwardVoltage(6).withPeakReverseVoltage(-6));
     m_ClimberLeftMotor.getConfigurator().apply(m_TalonFXConfig);
     m_ClimberRightMotor.getConfigurator().apply(m_TalonFXConfig);
 
@@ -87,11 +86,19 @@ public class Climber extends SubsystemBase {
     m_ClimberRightMotor.setVoltage(1.5);
   }
 
-  // Sets to the extended position, checks if set point reached then will switch to extend, and
+  // Sets to the extended position, checks if set point reached then will switch
+  // to extend, and
   // holds position
+  // Moves to retract position, stops when S2 limit switch is hit or setpoint
+  // reached
   public void Extend() {
+    if (m_limitSwitch.isSwitch2Pressed()) {
+      m_ClimberState = ClimberState.S_Hold;
+      return;
+    }
     setPosition(inchesToRotation(ClimberConstants.kExtensionPosition));
-    if (SetpointReached(ClimberConstants.kExtensionPosition)) m_ClimberState = ClimberState.S_Hold;
+    if (SetpointReached(ClimberConstants.kExtensionPosition))
+      m_ClimberState = ClimberState.S_Hold;
   }
 
   // Moves to lock position, stops when S1 limit switch is hit or setpoint reached
@@ -101,17 +108,16 @@ public class Climber extends SubsystemBase {
       return;
     }
     setPosition(inchesToRotation(ClimberConstants.kLockPosition));
-    if (SetpointReached(ClimberConstants.kLockPosition)) m_ClimberState = ClimberState.S_Hold;
+    if (SetpointReached(ClimberConstants.kLockPosition))
+      m_ClimberState = ClimberState.S_Hold;
   }
 
-  // Moves to retract position, stops when S2 limit switch is hit or setpoint reached
+
   public void Retract() {
-    if (m_limitSwitch.isSwitch2Pressed()) {
-      m_ClimberState = ClimberState.S_Hold;
-      return;
-    }
+
     setPosition(inchesToRotation(ClimberConstants.kRetractPosition));
-    if (SetpointReached(ClimberConstants.kRetractPosition)) m_ClimberState = ClimberState.S_Hold;
+    if (SetpointReached(ClimberConstants.kRetractPosition))
+      m_ClimberState = ClimberState.S_Hold;
   }
 
   public double rotationsToInches(double angle) {
