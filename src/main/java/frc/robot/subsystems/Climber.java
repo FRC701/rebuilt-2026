@@ -49,8 +49,9 @@ public class Climber extends SubsystemBase {
     m_ClimberLeftMotor.getConfigurator().apply(fx_cfg);
     m_ClimberRightMotor.getConfigurator().apply(fx_cfg);
 
-    m_TalonFXConfig = new TalonFXConfiguration()
-        .withVoltage(new VoltageConfigs().withPeakForwardVoltage(6).withPeakReverseVoltage(-6));
+    m_TalonFXConfig =
+        new TalonFXConfiguration()
+            .withVoltage(new VoltageConfigs().withPeakForwardVoltage(6).withPeakReverseVoltage(-6));
     m_ClimberLeftMotor.getConfigurator().apply(m_TalonFXConfig);
     m_ClimberRightMotor.getConfigurator().apply(m_TalonFXConfig);
 
@@ -97,8 +98,7 @@ public class Climber extends SubsystemBase {
       return;
     }
     setPosition(inchesToRotation(ClimberConstants.kExtensionPosition));
-    if (SetpointReached(ClimberConstants.kExtensionPosition))
-      m_ClimberState = ClimberState.S_Hold;
+    if (SetpointReached(ClimberConstants.kExtensionPosition)) m_ClimberState = ClimberState.S_Hold;
   }
 
   // Moves to lock position, stops when S1 limit switch is hit or setpoint reached
@@ -108,16 +108,13 @@ public class Climber extends SubsystemBase {
       return;
     }
     setPosition(inchesToRotation(ClimberConstants.kLockPosition));
-    if (SetpointReached(ClimberConstants.kLockPosition))
-      m_ClimberState = ClimberState.S_Hold;
+    if (SetpointReached(ClimberConstants.kLockPosition)) m_ClimberState = ClimberState.S_Hold;
   }
-
 
   public void Retract() {
 
     setPosition(inchesToRotation(ClimberConstants.kRetractPosition));
-    if (SetpointReached(ClimberConstants.kRetractPosition))
-      m_ClimberState = ClimberState.S_Hold;
+    if (SetpointReached(ClimberConstants.kRetractPosition)) m_ClimberState = ClimberState.S_Hold;
   }
 
   public double rotationsToInches(double angle) {
