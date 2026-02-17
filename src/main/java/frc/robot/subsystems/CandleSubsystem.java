@@ -32,17 +32,17 @@ import com.ctre.phoenix6.signals.LarsonBounceValue;
 // Other subsystems and commands can interact with this Candle Subsystem
 // in order to change the state of the LEDs
 // All animations are set to a specific color and with other criteria (framerate, etc), can be changed with phoenix tuner for reference 
-public class Candle extends SubsystemBase {;
+public class CandleSubsystem extends SubsystemBase {;
 
   static final int kCandleID = 1;
-  private CANdle m_Candle = new CANdle(kCandleID);
+  public CANdle m_Candle = new CANdle(kCandleID);
 
   /** Creates a new candle. */
-  public Candle() {
+  public CandleSubsystem() {
     m_Candle
         .getConfigurator()
         .apply(new LEDConfigs().withStripType(StripTypeValue.GRB).withBrightnessScalar(1.0));
-        setDefaultCommand(updateLEDs());
+        setDefaultCommand(defaultLED());
   }
    // A quite fast, purple animation, possible for shooter LEDs?
    private final LarsonAnimation m_slot0Animation = new LarsonAnimation(0, 60) 
@@ -106,23 +106,64 @@ public class Candle extends SubsystemBase {;
   };
     
   
-  
-    public Command updateLEDs() {
+  // Calls specific animations for each robot action, needs to be called in seperate subsystems
+  // for example,  m_CandleSub.shooterLED(); 
+
+    public Command defaultLED() {
       return run(() -> {
         for (var solidColor : m_colors) {
           m_Candle.setControl(solidColor);
         }
-        m_Candle.setControl(m_slot0Animation);
-        m_Candle.setControl(m_slot1Animation);
-        m_Candle.setControl(m_slot2Animation);
-        m_Candle.setControl(m_slot3Animation);
-        m_Candle.setControl(m_slot4Animation);
-        m_Candle.setControl(m_slot5Animation);
-        m_Candle.setControl(m_slot6Animation);
         m_Candle.setControl(m_slot7Animation);
       });
-
     }
+
+    public Command shooterLED(){
+      return run(() -> {
+        m_Candle.setControl(m_slot0Animation);
+      });
+    }
+
+    public Command passingLED(){
+      return run(() -> {
+        m_Candle.setControl(m_slot3Animation);
+      });
+    }
+
+    public Command intakeLED(){
+      return run(() -> {
+        m_Candle.setControl(m_slot1Animation);
+      });
+    }
+
+
+
+    public Command climberLED(){
+      return run(() -> {
+        m_Candle.setControl(m_slot4Animation);
+      });
+    }
+
+    public Command agitatorLED(){
+      return run (() -> {
+        m_Candle.setControl(m_slot6Animation);
+      });
+    }
+
+    public Command feederLED(){
+      return run(() -> {
+        m_Candle.setControl(m_slot5Animation); 
+      });
+    }
+    
+    public Command FunLED(){
+      return run(() -> {
+        m_Candle.setControl(m_slot2Animation);
+      });
+    }
+     
+
+  
 
 
   void LEDs(EmptyAnimation leds) {
