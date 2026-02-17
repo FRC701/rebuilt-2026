@@ -13,6 +13,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.CandleSubsystem;
 
 public class Shooter extends SubsystemBase {
 
@@ -21,8 +22,10 @@ public class Shooter extends SubsystemBase {
 
   public ShooterEnumState m_ShooterEnumState;
 
+  public CandleSubsystem m_CandleSub;
+
   /** Creates a new Shooter. */
-  public Shooter(int frontId, int backId) {
+  public Shooter(int frontId, int backId, CandleSubsystem candleSub) {
     // Selects the intial state
     m_ShooterEnumState = ShooterEnumState.S_Shooting;
 
@@ -50,6 +53,8 @@ public class Shooter extends SubsystemBase {
     // Applying the configs to the motors, Voltage Limits
     m_FrontMotor.getConfigurator().apply(m_TalonFXConfig);
     m_BackMotor.getConfigurator().apply(m_TalonFXConfig);
+
+    m_CandleSub = candleSub;
   }
 
   // Uses PID to arrive at our shooting speed
@@ -82,9 +87,11 @@ public class Shooter extends SubsystemBase {
     switch (m_ShooterEnumState) {
       case S_Shooting:
         shooting();
+        m_CandleSub.shooterLED();
         break;
-      case S_Passing:
+      case S_Passing: 
         passing();
+        m_CandleSub.passingLED();
         break;
       case S_NotShooting:
         stopping();
