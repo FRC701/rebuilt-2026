@@ -21,6 +21,8 @@ import frc.robot.Constants.ClimberConstants;
 
 public class Climber extends SubsystemBase {
   /** Creates a new Climber. */
+  private final CANdiLimitSwitch m_limitSwitch;
+
   private TalonFX m_ClimberLeftMotor;
 
   private TalonFX m_ClimberRightMotor;
@@ -39,7 +41,8 @@ public class Climber extends SubsystemBase {
     S_Retract
   }
 
-  public Climber() {
+  public Climber(CANdiLimitSwitch limitSwitch) {
+    m_limitSwitch = limitSwitch;
 
     m_ClimberLeftMotor = new TalonFX(Constants.ClimberConstants.kClimberLeftMotor);
     m_ClimberRightMotor = new TalonFX(Constants.ClimberConstants.kClimberRightMotor);
@@ -99,7 +102,10 @@ public class Climber extends SubsystemBase {
   // Sets to the extended position, checks if set point reached then will switch to extend, and
   // holds position
   public void Extend() {
-
+    if (m_limitSwitch.isSwitch2Pressed()) {
+      m_ClimberState = ClimberState.S_Hold;
+      return;
+    }
     setPosition(inchesToRotation(ClimberConstants.kExtensionPosition));
     if (SetpointReached(ClimberConstants.kExtensionPosition)) m_ClimberState = ClimberState.S_Hold;
   }
@@ -107,6 +113,10 @@ public class Climber extends SubsystemBase {
   // Sets to the lock position, checks if set point reached then will switch to lock, and holds
   // position
   public void Lock() {
+    if (m_limitSwitch.isSwitch1Pressed()) {
+      m_ClimberState = ClimberState.S_Hold;
+      return;
+    }
     setPosition(inchesToRotation(ClimberConstants.kLockPosition));
     if (SetpointReached(ClimberConstants.kLockPosition)) m_ClimberState = ClimberState.S_Hold;
   }
