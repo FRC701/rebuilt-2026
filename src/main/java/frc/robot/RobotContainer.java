@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -17,6 +18,8 @@ import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.PassingCommand;
 import frc.robot.commands.Retract;
 import frc.robot.commands.ShootingCommand;
+import frc.robot.subsystems.Agitator;
+import frc.robot.subsystems.Agitator.AgitatorState;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Shooter;
@@ -30,16 +33,26 @@ import frc.robot.subsystems.Shooter;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final Agitator m_Agitator = new Agitator();
   private Shooter m_LeftShooter =
       new Shooter(ShooterConstants.kFrontLeftShooterId, ShooterConstants.kBackLeftShooterId);
   private Shooter m_RightShooter =
       new Shooter(ShooterConstants.kFrontRightShooterId, ShooterConstants.kBackRightShooterId);
+  // Created StartEnd Command for AggitatorToggle
+  private Command m_AgitatorToggle =
+      Commands.startEnd(
+          () -> m_Agitator.m_AgitatorState = AgitatorState.S_On,
+          () -> m_Agitator.m_AgitatorState = AgitatorState.S_Off,
+          m_Agitator);
 
   private final Climber m_Climber;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
+
+  private final CommandXboxController m_coDriverController =
+      new CommandXboxController(OperatorConstants.kCoDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -62,6 +75,8 @@ public class RobotContainer {
     new Trigger(m_exampleSubsystem::exampleCondition)
         .onTrue(new ExampleCommand(m_exampleSubsystem));
 
+    // binds the a-button to toggle the agitator
+    m_coDriverController.a().toggleOnTrue(m_AgitatorToggle);
     // Binds the x-button to shooting the shooters
     m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
     m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
