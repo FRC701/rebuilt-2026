@@ -12,17 +12,16 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.CANdiLimitSwitch;
 import frc.robot.commands.Extend;
 import frc.robot.commands.Lock;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.PassingCommand;
 import frc.robot.commands.Retract;
 import frc.robot.commands.ShootingCommand;
+import frc.robot.subsystems.CANdiLimitSwitch;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Shooter;
-
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -35,7 +34,7 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final CANdiLimitSwitch m_candiLimitSwitch =
       new CANdiLimitSwitch(CANdiConstants.kCANdiId, CANdiConstants.kCANdiBus);
-  //private final Climber m_climber = new Climber(m_candiLimitSwitch);
+  // private final Climber m_climber = new Climber(m_candiLimitSwitch);
   private Shooter m_LeftShooter =
       new Shooter(ShooterConstants.kFrontLeftShooterId, ShooterConstants.kBackLeftShooterId);
   private Shooter m_RightShooter =
