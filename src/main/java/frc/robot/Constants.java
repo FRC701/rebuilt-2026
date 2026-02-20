@@ -25,6 +25,12 @@ public final class Constants {
     public static final double kAgitatorVolt = 4;
   }
 
+  public static class FeederConstants {
+    public static final int kFeederMotor = 31;
+    // 3 is a placeholder for motor voltage
+    public static final double kFeederVolt = 3;
+  }
+
   public static class ClimberConstants {
     public static final int kClimberLeftMotor = 62;
     public static final int kClimberRightMotor = 61;
