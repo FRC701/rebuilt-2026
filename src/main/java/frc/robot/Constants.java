@@ -37,21 +37,19 @@ public final class Constants {
   public static class ShooterConstants {
     // Facing from the front of the shooters (For Left and Right)
     // Front is the closest to the edge, Back is the furthest inward
-    public static final int kFrontLeftShooterId = 41;
-    public static final int kBackLeftShooterId = 42;
-    public static final int kFrontRightShooterId = 43;
-    public static final int kBackRightShooterId = 44;
+    public static final int kLeftShooterId = 41;
+    public static final int kRightShooterId = 42;
 
     // PID Constants for Shooting
     public static final double kP = 0.1;
     public static final double kI = 0;
     public static final double kD = 0;
-    public static final double kV = 0.1;
-    public static final double kA = 100;
+    public static final double kV = 0.12;
+    public static final double kS = 0.1;
 
     /*Desired Rotations per second for shooter Motors
     WARNING: CURRENTLY TEMPORARY NUMBERS*/
-    public static final double shootRev = 2;
-    public static final double passRev = 1;
+    public static final double shootRev = 10;
+    public static final double passRev = 5;
   }
 }
