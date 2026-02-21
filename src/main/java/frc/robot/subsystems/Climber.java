@@ -28,8 +28,8 @@ public class Climber extends SubsystemBase {
 
   private TalonFXConfiguration m_TalonFXConfig;
 
-  public final double GearRatio = 0.16; // place holder
-  private final double kSproketCircumference = 2 * Math.PI; // place holder
+  public final double GearRatio = 6.1; // place holder 1.6
+  private final double kSproketCircumference = 2 * Math.PI;
 
   public enum ClimberState {
     S_Hold,
@@ -144,7 +144,7 @@ public class Climber extends SubsystemBase {
   // Setpoint inches extended from lock (desired location)
   // WARNING: 1s are placeholders (Act as our error from location)
   public boolean SetpointReached(double Setpoint) {
-    return (LimitCheck() - 1 <= Setpoint) && (LimitCheck() + 1 >= Setpoint);
+    return (LimitCheck() - 0.1 <= Setpoint) && (LimitCheck() + 0.1 >= Setpoint);
   }
 
   @Override

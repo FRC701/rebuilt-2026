@@ -48,8 +48,8 @@ public final class Constants {
     public static final int kClimberFollower = 61;
 
     // The position/height of the climber measured with built in encoders
-    public static final double kExtensionPosition = 270; // placeholder
-    public static final double kRetractPosition = 3; // placeholder
+    public static final double kExtensionPosition = 7.4; // placeholder
+    public static final double kRetractPosition = 0.75; // placeholder
     public static final double kLockPosition = 0;
 
     // PID Constants for Climbing
