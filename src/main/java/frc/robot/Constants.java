@@ -43,8 +43,9 @@ public final class Constants {
 
   // Climber Motor Ids = 60s
   public static class ClimberConstants {
-    public static final int kClimberLeftMotor = 62;
-    public static final int kClimberRightMotor = 61;
+    // Leader is currently the left motor (facing the climber side)
+    public static final int kClimberLeader = 62;
+    public static final int kClimberFollower = 61;
 
     // The position/height of the climber measured with built in encoders
     public static final double kExtensionPosition = 270; // placeholder
