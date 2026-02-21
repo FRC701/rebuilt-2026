@@ -55,17 +55,17 @@ public class Climber extends SubsystemBase {
 
     m_TalonFXConfig =
         new TalonFXConfiguration()
-            .withVoltage(new VoltageConfigs().withPeakForwardVoltage(2).withPeakReverseVoltage(-2));
+            .withVoltage(new VoltageConfigs().withPeakForwardVoltage(12).withPeakReverseVoltage(-12));
 
     m_ClimberLeftMotor.getConfigurator().apply(m_TalonFXConfig);
     m_ClimberRightMotor.getConfigurator().apply(m_TalonFXConfig);
 
     var Slot0Configs = new Slot0Configs();
-    Slot0Configs.kS = 0;
-    Slot0Configs.kG = 0;
-    Slot0Configs.kP = 0.1;
-    Slot0Configs.kI = 0.1;
-    Slot0Configs.kD = 0;
+    Slot0Configs.kS = ClimberConstants.kS;
+    Slot0Configs.kG = ClimberConstants.kG;
+    Slot0Configs.kP = ClimberConstants.kP;
+    Slot0Configs.kI = ClimberConstants.kI;
+    Slot0Configs.kD = ClimberConstants.kD;
 
     m_ClimberLeftMotor.getConfigurator().apply(Slot0Configs);
 

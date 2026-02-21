@@ -34,18 +34,29 @@ public final class Constants {
     public static final double kAgitatorVolt = 4;
   }
 
+  // Feeder Motor Ids = 30s
   public static class FeederConstants {
     public static final int kFeederMotor = 31;
     // 3 is a placeholder for motor voltage
     public static final double kFeederVolt = 3;
   }
 
+  // Climber Motor Ids = 60s
   public static class ClimberConstants {
     public static final int kClimberLeftMotor = 62;
     public static final int kClimberRightMotor = 61;
-    public static final double kExtensionPosition = 300; // placeholder in inches
-    public static final double kRetractPosition = 3; // placeholder in inches
+
+    // The position/height of the climber measured with built in encoders
+    public static final double kExtensionPosition = 270; // placeholder
+    public static final double kRetractPosition = 3; // placeholder
     public static final double kLockPosition = 0;
+
+    // PID Constants for Climbing
+    public static final double kP = 0.1;
+    public static final double kI = 0.1;
+    public static final double kD = 0;
+    public static final double kS = 0;
+    public static final double kG = 0;
   }
 
   // Shooter Motor Ids = 40s
