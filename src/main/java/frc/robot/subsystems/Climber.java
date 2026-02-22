@@ -116,10 +116,7 @@ public class Climber extends SubsystemBase {
   // Sets to the retract position, checks if set point reached then will switch to retract, and
   // holds position
   public void Retract() {
-
     setPosition(inchesToRotation(Constants.ClimberConstants.kRetractPosition));
-    if (SetpointReached(Constants.ClimberConstants.kRetractPosition))
-      m_ClimberState = ClimberState.S_Hold;
   }
 
   public double rotationsToInches(double angle) {
