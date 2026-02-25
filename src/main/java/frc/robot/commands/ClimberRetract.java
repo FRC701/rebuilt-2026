@@ -11,10 +11,10 @@ import frc.robot.subsystems.Climber.ClimberState;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class Retract extends InstantCommand {
+public class ClimberRetract extends InstantCommand {
   Climber m_Climber;
 
-  public Retract(Climber climber) {
+  public ClimberRetract(Climber climber) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_Climber = climber;
     addRequirements(m_Climber);

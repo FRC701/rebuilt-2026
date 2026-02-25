@@ -28,7 +28,7 @@ public class Climber extends SubsystemBase {
 
   private TalonFXConfiguration m_TalonFXConfig;
 
-  public final double GearRatio = 6.1; // place holder 1.6
+  public final double GearRatio = 6.1;
   private final double kSproketCircumference = 2 * Math.PI;
 
   public enum ClimberState {
