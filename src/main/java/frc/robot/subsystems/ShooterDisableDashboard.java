@@ -4,19 +4,17 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 
 public class ShooterDisableDashboard extends SubsystemBase {
   /** Creates a new ShooterDisableDashboard. */
-  private TalonFX m_LeftShooter;
+  public ShooterDisableDashboard() {}
 
-  private TalonFX m_RightShooter;
-
-  public ShooterDisableDashboard() {
-    m_LeftShooter = new TalonFX(ShooterConstants.kLeftShooterId);
-    m_RightShooter = new TalonFX(ShooterConstants.kRightShooterId);
+  private void GetSmartDashCons() {
+    SmartDashboard.putBoolean("LeftShooterStatus", ShooterConstants.kLeftShooterStatus);
+    SmartDashboard.putBoolean("RightShooterStatus", ShooterConstants.kRightShooterStatus);
   }
 
   @Override

@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -31,6 +32,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Feeder.FeederState;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Shooter.ShooterEnumState;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -159,12 +161,17 @@ public class RobotContainer {
 
     // binds the a-button to toggle the agitator
     m_coDriverController.a().toggleOnTrue(m_AgitatorToggle);
-    // Binds the x-button to shooting the shooters
-    m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
-    m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
 
-    m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
-    m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
+    // Checking Left Shooter Status
+    if (ShooterConstants.kLeftShooterStatus) {
+      // Binds the x-button to shooting the left shooter, y-button to passing, and b-button to not
+      // shoot
+      m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
+      m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
+      m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
+    } else {
+      m_LeftShooter.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
+    }
 
     m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
