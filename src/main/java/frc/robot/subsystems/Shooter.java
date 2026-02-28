@@ -24,17 +24,25 @@ public class Shooter extends SubsystemBase {
   public ShooterEnumState m_ShooterEnumState;
 
   // Boolean to track the enabled status
-  public boolean m_ShooterEnabled = true;
-
-  private String m_MotorName;
+  private boolean m_ShooterEnabled = true;
 
   // voltSpeed = desired amount of rotations per second
   private VelocityVoltage voltSpeed = new VelocityVoltage(0).withSlot(0);
 
   private StatusSignal<AngularVelocity> velocitySignal;
 
+  private String m_StateString;
+  private String m_EnabledString;
+  private String m_RevolutionsErrorString;
+  private String m_SpeedString;
+
   /** Creates a new Shooter. */
-  public Shooter(int motorId, String motorName) {
+  public Shooter(int motorId, String subsystemName) {
+    super(subsystemName);
+
+    //gives values to the Strings that are used for Shuffleboard
+    nameStrings();
+
     // Selects the intial state
     m_ShooterEnumState = ShooterEnumState.S_NotShooting;
 
@@ -65,8 +73,6 @@ public class Shooter extends SubsystemBase {
     m_ShooterMotor.getConfigurator().apply(shooterConfig);
 
     velocitySignal = m_ShooterMotor.getVelocity();
-
-    m_MotorName = motorName;
   }
 
   // Uses PID to arrive at our shooting speed
@@ -113,19 +119,26 @@ public class Shooter extends SubsystemBase {
     return m_ShooterEnabled;
   }
 
+  private void nameStrings(){
+    m_StateString = getName() + " State";
+    m_EnabledString = getName() + " Enabled";
+    m_RevolutionsErrorString = getName() + "Revolutions Error";
+    m_SpeedString = getName() + " Speed";
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     // The current State
-    SmartDashboard.putString(m_MotorName + " State", m_ShooterEnumState.toString());
-    SmartDashboard.putBoolean(m_MotorName + " Enabled", m_ShooterEnabled);
+    SmartDashboard.putString(m_StateString, m_ShooterEnumState.toString());
+    SmartDashboard.putBoolean(m_EnabledString, m_ShooterEnabled);
     SmartDashboard.putNumber(
-        m_MotorName + "RevolutionsError",
+        m_RevolutionsErrorString,
         m_ShooterMotor.getClosedLoopError().refresh().getValueAsDouble());
-    SmartDashboard.putNumber(m_MotorName + "ShooterSpeed", velocitySignal.getValueAsDouble());
+    SmartDashboard.putNumber(m_SpeedString, velocitySignal.getValueAsDouble());
     velocitySignal.refresh();
 
-    setEnabledStatus(SmartDashboard.getBoolean(m_MotorName + " Enabled", m_ShooterEnabled));
+    setEnabledStatus(SmartDashboard.getBoolean(m_EnabledString, m_ShooterEnabled));
     if (m_ShooterEnabled) {
       runShooterStates();
     }
