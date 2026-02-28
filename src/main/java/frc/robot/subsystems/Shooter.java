@@ -83,6 +83,11 @@ public class Shooter extends SubsystemBase {
     m_SpeedString = getName() + " Speed";
   }
 
+  // returns true if no balls in shooter
+  public boolean CurrentCHeck() {
+    return m_ShooterMotor.getStatorCurrent().getValueAsDouble() <= 1; // placeholder
+  }
+
   public enum ShooterEnumState {
     S_Shooting,
     S_Passing,
