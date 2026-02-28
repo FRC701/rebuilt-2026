@@ -14,6 +14,8 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.ReverseLimitValue;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,8 +35,9 @@ public class Climber extends SubsystemBase {
   private static final double FORWARD_LIMIT =
       100; // placeholder, for a soft limit switch, if needed?
 
-  private DigitalInput limitSwitch = new DigitalInput(0);
-
+  //private DigitalInput limitSwitch = new DigitalInput(0);
+  private boolean limitSwitch;
+  
   public final double GearRatio = 6.1;
   private final double kSproketCircumference = 2 * Math.PI;
 
@@ -110,7 +113,7 @@ public class Climber extends SubsystemBase {
   }
 
   public void ClimberHoming() {
-    if (limitSwitch.get() == true) {
+    if (limitSwitch == true) {
       m_ClimberLeader.setPosition(0);
       m_ClimberState = ClimberState.S_Hold;
     } else {
@@ -168,7 +171,8 @@ public class Climber extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-
+    limitSwitch = m_ClimberLeader.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround;
+    SmartDashboard.putBoolean("Climber Limit Switch", limitSwitch);
     Shuffleboard.getTab("Test");
     SmartDashboard.putNumber("ClimberMotorPosition", rotationsToInches());
     SmartDashboard.putNumber("ClimberMotorRaw", m_ClimberLeader.getPosition().getValueAsDouble());
