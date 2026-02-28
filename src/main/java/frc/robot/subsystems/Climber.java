@@ -13,9 +13,15 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.robot.Constants;
 
 public class Climber extends SubsystemBase {
@@ -30,6 +36,12 @@ public class Climber extends SubsystemBase {
 
   public final double GearRatio = 6.1;
   private final double kSproketCircumference = 2 * Math.PI;
+
+  private final SysIdRoutine m_SysID =
+      new SysIdRoutine(
+          // Config default is 1 volt/sec, 7V step, 10 sec timeout
+          new Config(Units.Volts.per(Units.Second).of(1), Units.Volts.of(7), Units.Seconds.of(10)),
+          new Mechanism(this::voltageCallback, this::logCallback, this));
 
   public enum ClimberState {
     S_Hold,
@@ -156,4 +168,8 @@ public class Climber extends SubsystemBase {
     SmartDashboard.putString("ClimberState", m_ClimberState.toString());
     runClimberState();
   }
+
+  private void voltageCallback(Voltage voltage) {}
+
+  private void logCallback(SysIdRoutineLog log) {}
 }
