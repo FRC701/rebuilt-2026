@@ -68,10 +68,6 @@ public final class Constants {
      */
     public static final double shootRev = 2;
     public static final double passRev = 1;
-
-    // Used for Smartdashboard to state if status of shooter motors are changed
-    public static boolean kLeftShooterStatus = true;
-    public static boolean kRightShooterStatus = true;
   }
 
   public static final class Vision {

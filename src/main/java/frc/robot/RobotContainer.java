@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -32,7 +31,6 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Feeder.FeederState;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Shooter.ShooterEnumState;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -68,8 +66,10 @@ public class RobotContainer {
 
   private final Agitator m_Agitator = new Agitator();
   private Feeder m_Feeder = new Feeder(FeederConstants.kFeederMotor);
-  private Shooter m_LeftShooter = new Shooter(Constants.ShooterConstants.kLeftShooterId);
-  private Shooter m_RightShooter = new Shooter(Constants.ShooterConstants.kRightShooterId);
+  private Shooter m_LeftShooter =
+      new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter");
+  private Shooter m_RightShooter =
+      new Shooter(Constants.ShooterConstants.kRightShooterId, "Right Shooter");
   // Created StartEnd Command for AggitatorToggle
   private Command m_AgitatorToggle =
       Commands.startEnd(
@@ -162,19 +162,17 @@ public class RobotContainer {
     // binds the a-button to toggle the agitator
     m_coDriverController.a().toggleOnTrue(m_AgitatorToggle);
 
-    // Checking Left Shooter Status
-    if (ShooterConstants.kLeftShooterStatus) {
-      // Binds the x-button to shooting the left shooter, y-button to passing, and b-button to not
-      // shoot
-      m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
-      m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
-      m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
-    } else {
-      m_LeftShooter.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
-    }
-
+    // Binds the x-button to shooting the left shooter, y-button to passing, and b-button to not
+    m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
+    m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
+
+    // Binds the x-button to shooting the right shooter, y-button to passing, and b-button to not
+    m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
+    m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
+
+    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
     // pressed,
     // cancelling on release.
     m_driverController.leftBumper().onTrue(new Extend(m_Climber));
