@@ -34,7 +34,7 @@ public class Climber extends SubsystemBase {
 
   private static final double FORWARD_LIMIT =
       100; // placeholder, for a soft limit switch, if needed?
-
+  private static final double REVERSE_LIMIT = -100;
   //private DigitalInput limitSwitch = new DigitalInput(0);
   private boolean limitSwitch;
   
@@ -76,6 +76,12 @@ public class Climber extends SubsystemBase {
                 new SoftwareLimitSwitchConfigs()
                     .withForwardSoftLimitThreshold(FORWARD_LIMIT)
                     .withForwardSoftLimitEnable(true));
+ m_TalonFXConfig =
+        new TalonFXConfiguration()
+            .withSoftwareLimitSwitch(
+                new SoftwareLimitSwitchConfigs()
+                    .withReverseSoftLimitThreshold(REVERSE_LIMIT)
+                    .withReverseSoftLimitEnable(true));
 
     m_ClimberLeader.getConfigurator().apply(m_TalonFXConfig);
     m_ClimberFollower.getConfigurator().apply(m_TalonFXConfig);
