@@ -17,8 +17,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FeederConstants;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.Extend;
 import frc.robot.commands.Lock;
 import frc.robot.commands.NotShootingCommand;
@@ -30,7 +28,6 @@ import frc.robot.subsystems.Agitator;
 import frc.robot.subsystems.Agitator.AgitatorState;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Feeder.FeederState;
 import frc.robot.subsystems.Shooter;
@@ -67,7 +64,6 @@ public class RobotContainer {
 
   public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
 
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final Agitator m_Agitator = new Agitator();
   private Feeder m_Feeder = new Feeder(FeederConstants.kFeederMotor);
   private Shooter m_LeftShooter = new Shooter(Constants.ShooterConstants.kLeftShooterId);
@@ -160,9 +156,6 @@ public class RobotContainer {
         .leftTrigger()
         .onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
     m_DriveTrain.registerTelemetry(logger::telemeterize);
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
 
     // binds the a-button to toggle the agitator
     m_coDriverController.a().toggleOnTrue(m_AgitatorToggle);
@@ -175,14 +168,11 @@ public class RobotContainer {
 
     m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
     // pressed,
     // cancelling on release.
-    // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
     m_driverController.leftBumper().onTrue(new Extend(m_Climber));
     m_driverController.a().onTrue(new Lock(m_Climber));
     m_driverController.rightBumper().onTrue(new Retract(m_Climber));
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
     m_driverController.y().toggleOnTrue(m_FeederToggle);
   }
 
@@ -191,10 +181,4 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    // Simple drive forward auton
-    return Autos.exampleSwerveAuto(m_DriveTrain, m_DriveField);
-    // return Autos.exampleAuto(m_exampleSubsystem);
-  }
 }
