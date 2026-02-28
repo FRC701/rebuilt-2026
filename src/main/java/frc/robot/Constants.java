@@ -17,12 +17,9 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
- 
   public static class IntakeConstants {
     public static final int kIntakeMotorArm = 11;
     public static final int kIntakeMotorRoller = 12;
-    // public static final int kIntakeMotorArm2 = 13;
-    // public static final int kIntakeMotorRoller2 = 14;
     // The number of rotations until fully extended from retract position (in degrees)
     public static final double kExtensionPosition = 37.5 / 360;
     public static final int kRetractPosition = 0; // Intake is retracted and in the bot
@@ -35,11 +32,14 @@ public final class Constants {
     public static final double kV = 0.1;
     public static final double kA = 100;
 
-    // Motion Magic Parameters 
-    public static final double MotionMagicCruiseVelocity = 80; // target cruise velocity of 80 rps 
-    public static final double MotionMagicAcceleration = 160; // target acceleration of 160 rps/s (0.5 seconds)
-    public static final double MotionMagicJerk = 1600; // target jerk of 1600 rps/s/s (0.1 seconds) *This is optional and is a derivative of acceleration*
-    // Jerk allows for an S-Curve with Motion Magic 
+    // Motion Magic Parameters
+    public static final double MotionMagicCruiseVelocity = 80; // target cruise velocity of 80 rps
+    public static final double MotionMagicAcceleration =
+        160; // target acceleration of 160 rps/s (0.5 seconds)
+    public static final double MotionMagicJerk =
+        1600; // target jerk of 1600 rps/s/s (0.1 seconds) *This is optional and is a derivative of
+    // acceleration*
+    // Jerk allows for an S-Curve with Motion Magic
 
   }
 

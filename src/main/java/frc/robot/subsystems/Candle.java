@@ -12,9 +12,6 @@ import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.signals.StripTypeValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
-
-
 // The Candle subsystem interacts directly with the CANdle device.
 // Other subsystems and commands can interact with this Candle Subsystem
 // in order to change the state of the LEDs
