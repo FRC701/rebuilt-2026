@@ -66,8 +66,10 @@ public class RobotContainer {
 
   private final Agitator m_Agitator = new Agitator();
   private Feeder m_Feeder = new Feeder(FeederConstants.kFeederMotor);
-  private Shooter m_LeftShooter = new Shooter(Constants.ShooterConstants.kLeftShooterId);
-  private Shooter m_RightShooter = new Shooter(Constants.ShooterConstants.kRightShooterId);
+  private Shooter m_LeftShooter =
+      new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter");
+  private Shooter m_RightShooter =
+      new Shooter(Constants.ShooterConstants.kRightShooterId, "Right Shooter");
   // Created StartEnd Command for AggitatorToggle
   private Command m_AgitatorToggle =
       Commands.startEnd(
@@ -159,15 +161,18 @@ public class RobotContainer {
 
     // binds the a-button to toggle the agitator
     m_coDriverController.a().toggleOnTrue(m_AgitatorToggle);
-    // Binds the x-button to shooting the shooters
+
+    // Binds the x-button to shooting the left shooter, y-button to passing, and b-button to not
     m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
-    m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
-
     m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
-    m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
-
     m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
+
+    // Binds the x-button to shooting the right shooter, y-button to passing, and b-button to not
+    m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
+    m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
+
+    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
     // pressed,
     // cancelling on release.
     m_driverController.leftBumper().onTrue(new ClimberExtend(m_Climber));

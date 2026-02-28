@@ -23,16 +23,33 @@ public class Shooter extends SubsystemBase {
 
   public ShooterEnumState m_ShooterEnumState;
 
+  // Boolean to track the enabled status
+  private boolean m_ShooterEnabled = true;
+
   // voltSpeed = desired amount of rotations per second
   private VelocityVoltage voltSpeed = new VelocityVoltage(0).withSlot(0);
 
   private StatusSignal<AngularVelocity> velocitySignal;
 
+  private String m_StateString;
+  private String m_EnabledString;
+  private String m_RevolutionsErrorString;
+  private String m_SpeedString;
+
   /** Creates a new Shooter. */
-  public Shooter(int motorId) {
+  public Shooter(int motorId, String subsystemName) {
+    super(subsystemName);
+
+    // gives values to the Strings that are used for Shuffleboard
+    nameStrings();
+
     // Selects the intial state
     m_ShooterEnumState = ShooterEnumState.S_NotShooting;
 
+    // Identifying of the motor
+    m_ShooterMotor = new TalonFX(motorId);
+
+    // Creates the Configs
     var m_TalonFXConfig =
         new TalonFXConfiguration()
             .withVoltage(
@@ -50,9 +67,6 @@ public class Shooter extends SubsystemBase {
     Slot0Configs.kS = Constants.ShooterConstants.kS;
     m_TalonFXConfig.withSlot0(Slot0Configs);
 
-    // Identifying of the motors and making the front one the leader
-    m_ShooterMotor = new TalonFX(motorId);
-
     // Applying the configs to the motors, PID
     // Applying the configs to the motors, Voltage Limits
     m_ShooterMotor.getConfigurator().apply(m_TalonFXConfig);
@@ -62,23 +76,11 @@ public class Shooter extends SubsystemBase {
     velocitySignal = m_ShooterMotor.getVelocity();
   }
 
-  // Uses PID to arrive at our shooting speed
-  public void shooting() {
-    m_ShooterMotor.setControl(voltSpeed.withVelocity(Constants.ShooterConstants.shootRev));
-  }
-
-  // Uses PID to arrive at our passing speed
-  public void passing() {
-    m_ShooterMotor.setControl(voltSpeed.withVelocity(Constants.ShooterConstants.passRev));
-  }
-
-  // Sets the speed to 0 by using a VelocityVotage object with 0 velocity
-  public void stopping() {
-    m_ShooterMotor.setControl(voltSpeed.withVelocity(0));
-  }
-
-  public double VoltageCheck() {
-    return m_ShooterMotor.getVelocity().getValueAsDouble();
+  private void nameStrings() {
+    m_StateString = getName() + " State";
+    m_EnabledString = getName() + " Enabled";
+    m_RevolutionsErrorString = getName() + "Revolutions Error";
+    m_SpeedString = getName() + " Speed";
   }
 
   public enum ShooterEnumState {
@@ -101,16 +103,44 @@ public class Shooter extends SubsystemBase {
     }
   }
 
+  // Uses PID to arrive at our shooting speed
+  public void shooting() {
+    m_ShooterMotor.setControl(voltSpeed.withVelocity(Constants.ShooterConstants.shootRev));
+  }
+
+  // Uses PID to arrive at our passing speed
+  public void passing() {
+    m_ShooterMotor.setControl(voltSpeed.withVelocity(Constants.ShooterConstants.passRev));
+  }
+
+  // Sets the speed to 0 by using a VelocityVotage object with 0 velocity
+  public void stopping() {
+    m_ShooterMotor.setControl(voltSpeed.withVelocity(0));
+  }
+
+  public double VoltageCheck() {
+    return m_ShooterMotor.getVelocity().getValueAsDouble();
+  }
+
+  private boolean setEnabledStatus(boolean shooterStatus) {
+    m_ShooterEnabled = shooterStatus;
+    return m_ShooterEnabled;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // Shuffleboard.getTab("ShooterTab").add("ShooterState", m_ShooterEnumState.toString());
-    SmartDashboard.putString("ShooterState", m_ShooterEnumState.toString());
+    // The current State
+    SmartDashboard.putString(m_StateString, m_ShooterEnumState.toString());
+    SmartDashboard.putBoolean(m_EnabledString, m_ShooterEnabled);
     SmartDashboard.putNumber(
-        "RevolutionsError", m_ShooterMotor.getClosedLoopError().refresh().getValueAsDouble());
-    SmartDashboard.putNumber("ShooterSpeed", velocitySignal.getValueAsDouble());
+        m_RevolutionsErrorString, m_ShooterMotor.getClosedLoopError().refresh().getValueAsDouble());
+    SmartDashboard.putNumber(m_SpeedString, velocitySignal.getValueAsDouble());
     velocitySignal.refresh();
 
-    runShooterStates();
+    setEnabledStatus(SmartDashboard.getBoolean(m_EnabledString, m_ShooterEnabled));
+    if (m_ShooterEnabled) {
+      runShooterStates();
+    }
   }
 }
