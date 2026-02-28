@@ -83,9 +83,9 @@ public final class Constants {
   }
 
   public static final class Vision {
-    // Camera name
+    // Forward camera name
     // Must match camera set in PhotonVision UI at photonvision.local:5800
-    public static final String kcameraName = "photonvision";
+    public static final String kForwardCameraName = "forwardPhotonvisionCamera";
     // Robot -> Camera transform (camera pose relative to robot origin).
     // WPILib coordinate convention: +X forward, +Y left, +Z up.
     // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
@@ -94,20 +94,23 @@ public final class Constants {
     // 90° is aligned with the positive Y axis, and -90° is aligned with the
     // negative Y axis.
 
-    public static final double kCameraMountPitchAngleRad = Units.degreesToRadians(30);
-    public static final double kCameraMountRollAngleRad = Units.degreesToRadians(0);
-    public static final double kCameraMountYawAngleRad = Units.degreesToRadians(0);
+    public static final double kForwardCameraMountPitchAngleRad = Units.degreesToRadians(30);
+    public static final double kForwardCameraMountRollAngleRad = Units.degreesToRadians(0);
+    public static final double kForwardCameraMountYawAngleRad = Units.degreesToRadians(0);
 
-    public static final double kCameraForwardMeters = Units.inchesToMeters(11);
-    public static final double kCameraLeftMeters = Units.inchesToMeters(11);
-    public static final double kCameraUpMeters = Units.inchesToMeters(5.504);
+    public static final double kForwardCameraForwardMeters = Units.inchesToMeters(11);
+    public static final double kForwardCameraLeftMeters = Units.inchesToMeters(11);
+    public static final double kForwardCameraUpMeters = Units.inchesToMeters(5.504);
 
-    // Robot to camera transform
-    public static final Transform3d kRobotToCam3d =
+    // Robot to forward camera transform
+    public static final Transform3d kForwardRobotToCam3d =
         new Transform3d(
-            new Translation3d(kCameraForwardMeters, kCameraLeftMeters, kCameraUpMeters),
+            new Translation3d(
+                kForwardCameraForwardMeters, kForwardCameraLeftMeters, kForwardCameraUpMeters),
             new Rotation3d(
-                kCameraMountRollAngleRad, kCameraMountPitchAngleRad, kCameraMountYawAngleRad));
+                kForwardCameraMountRollAngleRad,
+                kForwardCameraMountPitchAngleRad,
+                kForwardCameraMountYawAngleRad));
 
     // Vision trust assumptions (1σ)
     public static final double kVisionPosStdDevMeters = 0.7;

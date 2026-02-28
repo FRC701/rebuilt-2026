@@ -23,9 +23,9 @@ public class VisionSubsystem extends SubsystemBase {
   private Optional<VisionMeasurement> m_latestMeasurement = Optional.empty();
 
   public VisionSubsystem() {
-    m_camera = new PhotonCamera(Constants.Vision.kcameraName);
+    m_camera = new PhotonCamera(Constants.Vision.kForwardCameraName);
     m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
-    m_poseEstimator = new PhotonPoseEstimator(m_fieldLayout, Constants.Vision.kRobotToCam3d);
+    m_poseEstimator = new PhotonPoseEstimator(m_fieldLayout, Constants.Vision.kForwardRobotToCam3d);
   }
 
   public Optional<VisionMeasurement> getLatestMeasurement() {
