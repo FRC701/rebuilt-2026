@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.Follower;
@@ -13,6 +14,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.ReverseLimitValue;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,10 +30,17 @@ public class Climber extends SubsystemBase {
 
   private TalonFXConfiguration m_TalonFXConfig;
 
+  private static final double FORWARD_LIMIT =
+      100; // placeholder, for a soft limit switch, if needed?
+  private static final double REVERSE_LIMIT = -100;
+  // private DigitalInput limitSwitch = new DigitalInput(0);
+  private boolean limitSwitch;
+
   public final double GearRatio = 6.1;
   private final double kSproketCircumference = 2 * Math.PI;
 
   public enum ClimberState {
+    S_Home,
     S_Hold,
     S_Extend,
     S_Lock,
@@ -43,6 +52,7 @@ public class Climber extends SubsystemBase {
     m_ClimberLeader = new TalonFX(Constants.ClimberConstants.kClimberLeader);
     m_ClimberFollower = new TalonFX(Constants.ClimberConstants.kClimberFollower);
 
+    // Sets the initial state to hold
     m_ClimberState = ClimberState.S_Hold;
 
     var fx_cfg = new MotorOutputConfigs();
@@ -56,6 +66,20 @@ public class Climber extends SubsystemBase {
         new TalonFXConfiguration()
             .withVoltage(
                 new VoltageConfigs().withPeakForwardVoltage(12).withPeakReverseVoltage(-12));
+
+    // soft limit switch configurations
+    m_TalonFXConfig =
+        new TalonFXConfiguration()
+            .withSoftwareLimitSwitch(
+                new SoftwareLimitSwitchConfigs()
+                    .withForwardSoftLimitThreshold(FORWARD_LIMIT)
+                    .withForwardSoftLimitEnable(true));
+    m_TalonFXConfig =
+        new TalonFXConfiguration()
+            .withSoftwareLimitSwitch(
+                new SoftwareLimitSwitchConfigs()
+                    .withReverseSoftLimitThreshold(REVERSE_LIMIT)
+                    .withReverseSoftLimitEnable(true));
 
     m_ClimberLeader.getConfigurator().apply(m_TalonFXConfig);
     m_ClimberFollower.getConfigurator().apply(m_TalonFXConfig);
@@ -92,6 +116,15 @@ public class Climber extends SubsystemBase {
     }
   }
 
+  public void ClimberHoming() {
+    if (limitSwitch == true) {
+      m_ClimberLeader.setPosition(0);
+      m_ClimberState = ClimberState.S_Hold;
+    } else {
+      m_ClimberLeader.setVoltage(-2); // placeholder
+    }
+  }
+
   public void HoldPosition() {
     m_ClimberLeader.setVoltage(0);
   }
@@ -119,13 +152,8 @@ public class Climber extends SubsystemBase {
     setPosition(inchesToRotation(Constants.ClimberConstants.kRetractPosition));
   }
 
-  public double rotationsToInches(double angle) {
-    return angle * kSproketCircumference;
-  }
-
-  // Position = Current distance from lock (inches)
-  public double LimitCheck() {
-    return rotationsToInches(m_ClimberLeader.getPosition().getValueAsDouble() / GearRatio);
+  public double rotationsToInches() {
+    return (m_ClimberLeader.getPosition().getValueAsDouble() / GearRatio) * kSproketCircumference;
   }
 
   public void setPosition(double position) {
@@ -141,15 +169,16 @@ public class Climber extends SubsystemBase {
   // Setpoint inches extended from lock (desired location)
   // WARNING: 1s are placeholders (Act as our error from location)
   public boolean SetpointReached(double Setpoint) {
-    return (LimitCheck() - 0.1 <= Setpoint) && (LimitCheck() + 0.1 >= Setpoint);
+    return (rotationsToInches() - 0.1 <= Setpoint) && (rotationsToInches() + 0.1 >= Setpoint);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-
+    limitSwitch = m_ClimberLeader.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround;
+    SmartDashboard.putBoolean("Climber Limit Switch", limitSwitch);
     Shuffleboard.getTab("Test");
-    SmartDashboard.putNumber("ClimberMotorPosition", LimitCheck());
+    SmartDashboard.putNumber("ClimberMotorPosition", rotationsToInches());
     SmartDashboard.putNumber("ClimberMotorRaw", m_ClimberLeader.getPosition().getValueAsDouble());
     SmartDashboard.putBoolean(
         "SetpointReached", SetpointReached(Constants.ClimberConstants.kExtensionPosition));
