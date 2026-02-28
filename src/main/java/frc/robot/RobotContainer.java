@@ -16,11 +16,17 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FeederConstants;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.commands.Autos;
+import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.ExtendIntake;
 import frc.robot.commands.ClimberExtend;
 import frc.robot.commands.ClimberLock;
 import frc.robot.commands.ClimberRetract;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.SequentialShoot;
+import frc.robot.commands.PassingCommand;
+import frc.robot.commands.RetractIntake;
 import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
@@ -29,6 +35,8 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Feeder.FeederState;
+import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -80,6 +88,8 @@ public class RobotContainer {
           () -> m_Feeder.m_FeederState = FeederState.S_On,
           () -> m_Feeder.m_FeederState = FeederState.S_Off,
           m_Feeder);
+
+  private Intake m_intake = new Intake();
 
   private final Climber m_Climber;
 
@@ -167,6 +177,11 @@ public class RobotContainer {
     m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter, m_RightShooter));
     // m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
 
+    m_driverController.leftTrigger().onTrue(new ExtendIntake(m_intake));
+    m_driverController.rightTrigger().onTrue(new RetractIntake(m_intake));
+
+    m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
+    m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
     // AutoShootCommand
     m_driverController.b().onTrue(new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder));
     // m_driverController.b().onTrue(new ShootCommand(m_RightShooter));
