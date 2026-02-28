@@ -15,8 +15,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
-
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -35,9 +33,9 @@ public class Climber extends SubsystemBase {
   private static final double FORWARD_LIMIT =
       100; // placeholder, for a soft limit switch, if needed?
   private static final double REVERSE_LIMIT = -100;
-  //private DigitalInput limitSwitch = new DigitalInput(0);
+  // private DigitalInput limitSwitch = new DigitalInput(0);
   private boolean limitSwitch;
-  
+
   public final double GearRatio = 6.1;
   private final double kSproketCircumference = 2 * Math.PI;
 
@@ -76,7 +74,7 @@ public class Climber extends SubsystemBase {
                 new SoftwareLimitSwitchConfigs()
                     .withForwardSoftLimitThreshold(FORWARD_LIMIT)
                     .withForwardSoftLimitEnable(true));
- m_TalonFXConfig =
+    m_TalonFXConfig =
         new TalonFXConfiguration()
             .withSoftwareLimitSwitch(
                 new SoftwareLimitSwitchConfigs()
