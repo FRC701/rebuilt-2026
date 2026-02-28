@@ -3,18 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
-import frc.robot.Constants; 
 
 import com.ctre.phoenix6.configs.Slot0Configs;
-// import com.ctre.phoenix6.configs.Slot1Configs;
-// import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-// import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-// import com.ctre.phoenix6.configs.TalonFXSConfiguration;
-
-// import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
@@ -23,30 +17,28 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   private TalonFX m_IntakeMotorArm;
 
-  private TalonFX m_IntakeMotorArm2;
-
   private TalonFX m_IntakeMotorRoller;
-  // private TalonFX m_IntakeMotorRoller2;
+
   private static IntakeState intakeState;
+
+  private double FORWARD_LIMIT = 100; // Placeholder
+  private double REVERSE_LIMIT = 0;
 
   public Intake() {
     // Created Two Motors
-    m_IntakeMotorArm = new TalonFX(Constants.IntakeConstants.kIntakeMotorArm);
-    m_IntakeMotorRoller = new TalonFX(Constants.IntakeConstants.kIntakeMotorRoller);
-    // m_IntakeMotorArm2 = new TalonFX(Constants.IntakeConstants.kIntakeMotorArm2);
-    // m_IntakeMotorRoller2 = new TalonFX(Constants.IntakeConstants.kIntakeMotorRoller2);
+    m_IntakeMotorArm = new TalonFX(IntakeConstants.kIntakeMotorArm);
+    m_IntakeMotorRoller = new TalonFX(IntakeConstants.kIntakeMotorRoller);
 
-    // Made two motors to follow the other ones if needed
-    /*
-    m_IntakeMotorArm2.setControl(
-        new Follower(m_IntakeMotorArm.getDeviceID(), MotorAlignmentValue.Opposed));
-
-    m_IntakeMotorRoller2.setControl(
-        new Follower(m_IntakeMotorRoller.getDeviceID(), MotorAlignmentValue.Opposed));
-    */
     // Configs that use the PID values to help with motor speed
-    var talonFXConfigs = new TalonFXConfiguration();
-  
+    var talonFXConfigs =
+        new TalonFXConfiguration()
+            .withSoftwareLimitSwitch(
+                new SoftwareLimitSwitchConfigs()
+                    .withForwardSoftLimitThreshold(FORWARD_LIMIT)
+                    .withForwardSoftLimitEnable(true)
+                    .withReverseSoftLimitThreshold(REVERSE_LIMIT)
+                    .withReverseSoftLimitEnable(true));
+
     var Slot0Configs = new Slot0Configs();
     Slot0Configs.kP = Constants.IntakeConstants.kP;
     Slot0Configs.kI = Constants.IntakeConstants.kI;
@@ -55,17 +47,16 @@ public class Intake extends SubsystemBase {
     Slot0Configs.kA = Constants.IntakeConstants.kA;
 
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
-    motionMagicConfigs.MotionMagicCruiseVelocity = Constants.IntakeConstants.MotionMagicCruiseVelocity;
+    motionMagicConfigs.MotionMagicCruiseVelocity =
+        Constants.IntakeConstants.MotionMagicCruiseVelocity;
     motionMagicConfigs.MotionMagicAcceleration = Constants.IntakeConstants.MotionMagicAcceleration;
     motionMagicConfigs.MotionMagicJerk = Constants.IntakeConstants.MotionMagicJerk;
 
-
-
     // Apply the Configs to the Motor Objects
-    m_IntakeMotorArm.getConfigurator().apply(Slot0Configs);
-    m_IntakeMotorArm2.getConfigurator().apply(Slot0Configs);
     m_IntakeMotorArm.getConfigurator().apply(talonFXConfigs);
-    m_IntakeMotorArm2.getConfigurator().apply(talonFXConfigs);
+    m_IntakeMotorArm.getConfigurator().apply(Slot0Configs);
+
+    m_IntakeMotorArm.setPosition(0);
   }
 
   public enum IntakeState {
@@ -102,16 +93,16 @@ public class Intake extends SubsystemBase {
   }
 
   // A method that returns true if the arm is at its destination
-  public boolean S_Extended(double Setpoint){
-  double position = getPosition();
-    return (position - 1 /180 <= Setpoint)
-      && (position + 1/180 >= Setpoint); // subject to change
+  public boolean checkExtended(double Setpoint) {
+    double position = getPosition();
+    return (position - 1 / 180 <= Setpoint)
+        && (position + 1 / 180 >= Setpoint); // subject to change
   }
 
   // Extends the intake out and starts the rollers
   public void ExtendPosition() {
     // If motor has reached its destination the stop the arm and start the rollers
-    if (S_Extended(IntakeConstants.kExtensionPosition)) {
+    if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeMotorArm.setVoltage(0);
       m_IntakeMotorRoller.setVoltage(4);
       Intake.intakeState = intakeState.S_Extended;
@@ -126,7 +117,7 @@ public class Intake extends SubsystemBase {
     // When retracting we want to rollers to stay off
     m_IntakeMotorRoller.setVoltage(0);
     // If the arm has reached its destination stop the motor
-    if (S_Extended(IntakeConstants.kRetractPosition)) {
+    if (checkExtended(IntakeConstants.kRetractPosition)) {
       m_IntakeMotorArm.setVoltage(0);
       Intake.intakeState = intakeState.S_Retracted;
     } else {
@@ -139,7 +130,7 @@ public class Intake extends SubsystemBase {
   public void Outtake() {
     // If motor has reached its destination the stop the arm and start the rollers moving backwards
     // (ejecting)
-    if (S_Extended(IntakeConstants.kExtensionPosition)) {
+    if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeMotorArm.setVoltage(0);
       m_IntakeMotorRoller.setVoltage(-4);
     } else {
