@@ -9,6 +9,7 @@ import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
@@ -19,7 +20,7 @@ public class Intake extends SubsystemBase {
 
   private TalonFX m_IntakeMotorRoller;
 
-  private static IntakeState intakeState;
+  public IntakeState intakeState;
 
   private double FORWARD_LIMIT = 100; // Placeholder
   private double REVERSE_LIMIT = 0;
@@ -105,7 +106,7 @@ public class Intake extends SubsystemBase {
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeMotorArm.setVoltage(0);
       m_IntakeMotorRoller.setVoltage(4);
-      Intake.intakeState = intakeState.S_Extended;
+      intakeState = intakeState.S_Extended;
     } else {
       // Move the arm until it reaches its destination
       setPosition(IntakeConstants.kExtensionPosition);
@@ -119,7 +120,7 @@ public class Intake extends SubsystemBase {
     // If the arm has reached its destination stop the motor
     if (checkExtended(IntakeConstants.kRetractPosition)) {
       m_IntakeMotorArm.setVoltage(0);
-      Intake.intakeState = intakeState.S_Retracted;
+      intakeState = intakeState.S_Retracted;
     } else {
       // Move the arm until it reaches the destination
       setPosition(IntakeConstants.kRetractPosition);
@@ -141,6 +142,13 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putBoolean("CheckExtended", checkExtended(IntakeConstants.kExtensionPosition));
+    SmartDashboard.putBoolean("CheckRetracted", checkExtended(IntakeConstants.kRetractPosition));
+    SmartDashboard.putNumber("ForwardSoftLimit", FORWARD_LIMIT);
+    SmartDashboard.putNumber("ReverseSoftLimit", REVERSE_LIMIT);
+    SmartDashboard.putNumber(
+        "RawIntakePosition", m_IntakeMotorArm.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("IntakePose", getPosition());
     // This method will be called once per scheduler run
     RunIntakeState();
   }

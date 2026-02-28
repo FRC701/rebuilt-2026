@@ -11,10 +11,13 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.ExtendIntake;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.PassingCommand;
+import frc.robot.commands.RetractIntake;
 import frc.robot.commands.ShootingCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -30,6 +33,8 @@ public class RobotContainer {
       new Shooter(ShooterConstants.kFrontLeftShooterId, ShooterConstants.kBackLeftShooterId);
   private Shooter m_RightShooter =
       new Shooter(ShooterConstants.kFrontRightShooterId, ShooterConstants.kBackRightShooterId);
+
+  private Intake m_intake = new Intake();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
@@ -58,6 +63,9 @@ public class RobotContainer {
     // Binds the x-button to shooting the shooters
     m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
     m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
+
+    m_driverController.leftTrigger().onTrue(new ExtendIntake(m_intake));
+    m_driverController.rightTrigger().onTrue(new RetractIntake(m_intake));
 
     m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
     m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
