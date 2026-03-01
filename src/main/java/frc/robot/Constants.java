@@ -116,8 +116,10 @@ public final class Constants {
     public static final double kSingleTagBaseHeadingStdDev =
         Double.MAX_VALUE; // don't trust single-tag heading
     public static final double kMultiTagBaseXYStdDev = 0.3; // base error in meters at 1m distance
-    public static final double kMultiTagBaseHeadingStdDev = 0.1; // base error in radians at 1m (~5.7 deg)
-    // Use different exponents for single vs multi case because in multi tag you have more corners of april tags (4 each) to rely on 
+    public static final double kMultiTagBaseHeadingStdDev =
+        0.1; // base error in radians at 1m (~5.7 deg)
+    // Use different exponents for single vs multi case because in multi tag you have more corners
+    // of april tags (4 each) to rely on
     public static final double kSingleTagDistanceExponent = 2.0; // quadratic scaling
     public static final double kMultiTagDistanceExponent = 1.0; // linear scaling
 
@@ -131,5 +133,11 @@ public final class Constants {
     public static final double kFieldBoundaryMarginMeters =
         0.5; // allow slightly outside field edge
     public static final double kMaxSingleTagDistanceMeters = 4.0; // max reliable single-tag range
+
+    // Speed filters — reject vision when robot is moving too fast (motion blur)
+    // These will only filter out extreme motion blur. Can tighten based on testing.
+    public static final double kMaxVisionTranslationSpeed = 4.0; // m/s
+    public static final double kMaxVisionRotationSpeed =
+        Math.toRadians(720); // rad/s (2 full rotations)
   }
 }
