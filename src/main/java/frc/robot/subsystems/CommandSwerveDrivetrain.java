@@ -155,7 +155,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     m_field.setRobotPose(currentPose);
 
     m_visionSubsystem
-        .getLatestMeasurement()
+        .getLatestForwardVisionMeasurement()
         .ifPresent(
             m -> {
               addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());

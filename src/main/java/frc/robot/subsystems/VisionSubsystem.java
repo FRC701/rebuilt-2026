@@ -20,7 +20,7 @@ public class VisionSubsystem extends SubsystemBase {
   private final PhotonPoseEstimator m_ForwardPoseEstimator;
   private final AprilTagFieldLayout m_FieldLayout;
 
-  private Optional<VisionMeasurement> m_LatestMeasurement = Optional.empty();
+  private Optional<VisionMeasurement> m_LatestForwardVisionMeasurement = Optional.empty();
 
   public VisionSubsystem() {
     m_ForwardCamera = new PhotonCamera(Constants.Vision.kForwardCameraName);
@@ -29,16 +29,16 @@ public class VisionSubsystem extends SubsystemBase {
         new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kForwardRobotToCam3d);
   }
 
-  public Optional<VisionMeasurement> getLatestMeasurement() {
-    return m_LatestMeasurement;
+  public Optional<VisionMeasurement> getLatestForwardVisionMeasurement() {
+    return m_LatestForwardVisionMeasurement;
   }
 
   @Override
   public void periodic() {
-    m_LatestMeasurement = processCamera(m_ForwardCamera, m_ForwardPoseEstimator);
+    m_LatestForwardVisionMeasurement = processCamera(m_ForwardCamera, m_ForwardPoseEstimator);
 
-    SmartDashboard.putBoolean("Vision/Accepted", m_LatestMeasurement.isPresent());
-    m_LatestMeasurement.ifPresent(
+    SmartDashboard.putBoolean("Vision/Accepted", m_LatestForwardVisionMeasurement.isPresent());
+    m_LatestForwardVisionMeasurement.ifPresent(
         m -> {
           SmartDashboard.putNumber("Vision/PoseX_m", m.pose().getX());
           SmartDashboard.putNumber("Vision/PoseY_m", m.pose().getY());
