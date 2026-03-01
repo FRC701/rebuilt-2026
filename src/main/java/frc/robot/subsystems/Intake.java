@@ -79,10 +79,18 @@ public class Intake extends SubsystemBase {
       case S_Outtake:
         Outtake();
         break;
+      case S_Extended:
+        Neutral();
+        break;
+      case S_Retracted:
+        Neutral();
+        break;
     }
   }
 
   // returns the Arm Position as a double (rotations)
+  public void Neutral() {}
+
   public double getPosition() {
     return m_IntakeMotorArm.getPosition().getValueAsDouble() / IntakeConstants.GearRatio;
   }
