@@ -4,13 +4,9 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -112,15 +108,18 @@ public final class Constants {
                 kForwardCameraMountPitchAngleRad,
                 kForwardCameraMountYawAngleRad));
 
-    // Vision trust assumptions (1σ)
-    public static final double kVisionPosStdDevMeters = 0.7;
-    public static final double kVisionHeadingStdDevDeg = 10.0;
-
-    public static final Matrix<N3, N1> kVisionStdDevs =
-        VecBuilder.fill(
-            kVisionPosStdDevMeters,
-            kVisionPosStdDevMeters,
-            Math.toRadians(kVisionHeadingStdDevDeg));
+    // Dynamic std-dev scaling constants
+    // Formula: stdDev = base * (avgDistance ^ exponent)
+    // If the robot snaps/jumps to vision poses too aggressively → increase the base
+    // If vision corrections feel sluggish or ignored → decrease the base
+    public static final double kSingleTagBaseXYStdDev = 0.5; // base error in meters at 1m distance
+    public static final double kSingleTagBaseHeadingStdDev =
+        Double.MAX_VALUE; // don't trust single-tag heading
+    public static final double kMultiTagBaseXYStdDev = 0.3; // base error in meters at 1m distance
+    public static final double kMultiTagBaseHeadingStdDev = 0.1; // base error in radians at 1m (~5.7 deg)
+    // Use different exponents for single vs multi case because in multi tag you have more corners of april tags (4 each) to rely on 
+    public static final double kSingleTagDistanceExponent = 2.0; // quadratic scaling
+    public static final double kMultiTagDistanceExponent = 1.0; // linear scaling
 
     // Acceptance rules
     public static final int kMinAprilTagsForPose = 1;

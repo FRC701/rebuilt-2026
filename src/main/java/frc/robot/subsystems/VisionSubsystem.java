@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -43,6 +44,9 @@ public class VisionSubsystem extends SubsystemBase {
           SmartDashboard.putNumber("Vision/PoseX_m", m.pose().getX());
           SmartDashboard.putNumber("Vision/PoseY_m", m.pose().getY());
           SmartDashboard.putNumber("Vision/PoseHeading_deg", m.pose().getRotation().getDegrees());
+          SmartDashboard.putNumber("Vision/StdDevXY", m.stdDevs().get(0, 0));
+          SmartDashboard.putNumber(
+              "Vision/StdDevHeading_deg", Math.toDegrees(m.stdDevs().get(2, 0)));
         });
   }
 
@@ -85,10 +89,39 @@ public class VisionSubsystem extends SubsystemBase {
               new VisionMeasurement(
                   robotPose,
                   estimatedPose.get().timestampSeconds,
-                  Constants.Vision.kVisionStdDevs));
+                  computeDynamicStdDevs(estimatedPose.get())));
     }
 
     return measurement;
+  }
+
+  private static Matrix<N3, N1> computeDynamicStdDevs(EstimatedRobotPose estimatedPose) {
+    boolean isMultiTag = estimatedPose.targetsUsed.size() > 1;
+
+    double totalDistance = 0.0;
+    for (var target : estimatedPose.targetsUsed) {
+      totalDistance += target.getBestCameraToTarget().getTranslation().getNorm();
+    }
+    double avgDistance = totalDistance / estimatedPose.targetsUsed.size();
+
+    double baseXY;
+    double baseHeading;
+    double exponent;
+    if (isMultiTag) {
+      baseXY = Constants.Vision.kMultiTagBaseXYStdDev;
+      baseHeading = Constants.Vision.kMultiTagBaseHeadingStdDev;
+      exponent = Constants.Vision.kMultiTagDistanceExponent;
+    } else {
+      baseXY = Constants.Vision.kSingleTagBaseXYStdDev;
+      baseHeading = Constants.Vision.kSingleTagBaseHeadingStdDev;
+      exponent = Constants.Vision.kSingleTagDistanceExponent;
+    }
+
+    double distanceFactor = Math.pow(avgDistance, exponent);
+    double xyStdDev = baseXY * distanceFactor;
+    double headingStdDev = baseHeading * distanceFactor;
+
+    return VecBuilder.fill(xyStdDev, xyStdDev, headingStdDev);
   }
 
   public static record VisionMeasurement(
