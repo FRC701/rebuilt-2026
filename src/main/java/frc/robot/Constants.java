@@ -89,7 +89,9 @@ public final class Constants {
     // and 180° is aligned with the negative X axis. CCW rotation is positive, so
     // 90° is aligned with the positive Y axis, and -90° is aligned with the
     // negative Y axis.
-    //three options- single camera in between shooters, single camera on mast forward (3.8,11,17.5,0,0,0), two on mast forwards (11,11,27.9,0,0,0)/ backwards (7.14,11,27.9,0,0,-180)
+    // three options- single camera in between shooters, single camera on mast forward
+    // (3.8,11,17.5,0,0,0), two on mast forwards (11,11,27.9,0,0,0)/ backwards
+    // (7.14,11,27.9,0,0,-180)
 
     public static final double kForwardCameraMountPitchAngleRad = Units.degreesToRadians(0);
     public static final double kForwardCameraMountRollAngleRad = Units.degreesToRadians(0);
