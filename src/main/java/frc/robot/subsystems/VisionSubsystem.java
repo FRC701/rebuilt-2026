@@ -46,8 +46,20 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_LatestForwardVisionMeasurement = processCamera(m_ForwardCamera, m_ForwardPoseEstimator);
-    m_LatestReverseVisionMeasurement = processCamera(m_ReverseCamera, m_ReversePoseEstimator);
+    boolean forwardConnected = m_ForwardCamera.isConnected();
+    boolean reverseConnected = m_ReverseCamera.isConnected();
+
+    SmartDashboard.putBoolean("Vision/Forward/Connected", forwardConnected);
+    SmartDashboard.putBoolean("Vision/Reverse/Connected", reverseConnected);
+
+    m_LatestForwardVisionMeasurement =
+        forwardConnected
+            ? processCamera(m_ForwardCamera, m_ForwardPoseEstimator)
+            : Optional.empty();
+    m_LatestReverseVisionMeasurement =
+        reverseConnected
+            ? processCamera(m_ReverseCamera, m_ReversePoseEstimator)
+            : Optional.empty();
 
     publishMeasurementTelemetry("Forward", m_LatestForwardVisionMeasurement);
     publishMeasurementTelemetry("Reverse", m_LatestReverseVisionMeasurement);
