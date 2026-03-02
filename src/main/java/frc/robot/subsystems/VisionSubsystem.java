@@ -84,6 +84,7 @@ public class VisionSubsystem extends SubsystemBase {
       PhotonCamera camera, PhotonPoseEstimator poseEstimator) {
     Optional<VisionMeasurement> measurement = Optional.empty();
 
+    // Process all queued frames, keeping only the most recent valid measurement
     for (PhotonPipelineResult result : camera.getAllUnreadResults()) {
       if (!result.hasTargets()) continue;
 
@@ -99,10 +100,12 @@ public class VisionSubsystem extends SubsystemBase {
             result.getBestTarget().getBestCameraToTarget().getTranslation().getNorm();
         if (distanceToTag > Constants.Vision.kMaxSingleTagDistanceMeters) continue;
       }
+
       // Fallback strategy: always prefer multi-tag when available to solve ambiguity problem
       Optional<EstimatedRobotPose> estimatedPose = poseEstimator.estimateCoprocMultiTagPose(result);
-      if (estimatedPose.isEmpty())
+      if (estimatedPose.isEmpty()) {
         estimatedPose = poseEstimator.estimateLowestAmbiguityPose(result);
+      }
       if (estimatedPose.isEmpty()) continue;
 
       // Z-height sanity: robot must be near the floor
