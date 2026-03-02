@@ -49,30 +49,22 @@ public class VisionSubsystem extends SubsystemBase {
     m_LatestForwardVisionMeasurement = processCamera(m_ForwardCamera, m_ForwardPoseEstimator);
     m_LatestReverseVisionMeasurement = processCamera(m_ReverseCamera, m_ReversePoseEstimator);
 
-    SmartDashboard.putBoolean(
-        "Vision/Forward/Accepted", m_LatestForwardVisionMeasurement.isPresent());
-    m_LatestForwardVisionMeasurement.ifPresent(
-        m -> {
-          SmartDashboard.putNumber("Vision/Forward/PoseX_m", m.pose().getX());
-          SmartDashboard.putNumber("Vision/Forward/PoseY_m", m.pose().getY());
-          SmartDashboard.putNumber(
-              "Vision/Forward/PoseHeading_deg", m.pose().getRotation().getDegrees());
-          SmartDashboard.putNumber("Vision/Forward/StdDevXY", m.stdDevs().get(0, 0));
-          SmartDashboard.putNumber(
-              "Vision/Forward/StdDevHeading_deg", Math.toDegrees(m.stdDevs().get(2, 0)));
-        });
+    publishMeasurementTelemetry("Forward", m_LatestForwardVisionMeasurement);
+    publishMeasurementTelemetry("Reverse", m_LatestReverseVisionMeasurement);
+  }
 
-    SmartDashboard.putBoolean(
-        "Vision/Reverse/Accepted", m_LatestReverseVisionMeasurement.isPresent());
-    m_LatestReverseVisionMeasurement.ifPresent(
+  private void publishMeasurementTelemetry(
+      String cameraName, Optional<VisionMeasurement> measurement) {
+    String prefix = "Vision/" + cameraName + "/";
+    SmartDashboard.putBoolean(prefix + "Accepted", measurement.isPresent());
+    measurement.ifPresent(
         m -> {
-          SmartDashboard.putNumber("Vision/Reverse/PoseX_m", m.pose().getX());
-          SmartDashboard.putNumber("Vision/Reverse/PoseY_m", m.pose().getY());
+          SmartDashboard.putNumber(prefix + "PoseX_m", m.pose().getX());
+          SmartDashboard.putNumber(prefix + "PoseY_m", m.pose().getY());
+          SmartDashboard.putNumber(prefix + "PoseHeading_deg", m.pose().getRotation().getDegrees());
+          SmartDashboard.putNumber(prefix + "StdDevXY", m.stdDevs().get(0, 0));
           SmartDashboard.putNumber(
-              "Vision/Reverse/PoseHeading_deg", m.pose().getRotation().getDegrees());
-          SmartDashboard.putNumber("Vision/Reverse/StdDevXY", m.stdDevs().get(0, 0));
-          SmartDashboard.putNumber(
-              "Vision/Reverse/StdDevHeading_deg", Math.toDegrees(m.stdDevs().get(2, 0)));
+              prefix + "StdDevHeading_deg", Math.toDegrees(m.stdDevs().get(2, 0)));
         });
   }
 
@@ -82,15 +74,18 @@ public class VisionSubsystem extends SubsystemBase {
 
     for (PhotonPipelineResult result : camera.getAllUnreadResults()) {
       if (!result.hasTargets()) continue;
-      if (result.targets.size() < Constants.Vision.kMinAprilTagsForPose) continue;
-      if (result.targets.size() == 1
+
+      int targetCount = result.targets.size();
+      if (targetCount < Constants.Vision.kMinAprilTagsForPose) continue;
+      if (targetCount == 1
           && result.getBestTarget().getPoseAmbiguity()
               > Constants.Vision.kMaxAcceptableSingleTagAmbiguity) continue;
 
       // Single-tag distance limit: PnP (Perspective-n-Point) becomes unreliable at range
-      if (result.targets.size() == 1) {
-        double dist = result.getBestTarget().getBestCameraToTarget().getTranslation().getNorm();
-        if (dist > Constants.Vision.kMaxSingleTagDistanceMeters) continue;
+      if (targetCount == 1) {
+        double distanceToTag =
+            result.getBestTarget().getBestCameraToTarget().getTranslation().getNorm();
+        if (distanceToTag > Constants.Vision.kMaxSingleTagDistanceMeters) continue;
       }
       // Fallback strategy: always prefer multi-tag when available to solve ambiguity problem
       Optional<EstimatedRobotPose> estimatedPose = poseEstimator.estimateCoprocMultiTagPose(result);
