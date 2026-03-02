@@ -89,17 +89,18 @@ public final class Constants {
     // and 180° is aligned with the negative X axis. CCW rotation is positive, so
     // 90° is aligned with the positive Y axis, and -90° is aligned with the
     // negative Y axis.
-    // three options- single camera in between shooters, single camera on mast forward
-    // (3.8,11,17.5,0,0,0), two on mast forwards (11,11,27.9,0,0,0)/ backwards
+    // three options- single camera in between shooters (3.8,11,17.5,0,0,0), single camera on mast
+    // forward
+    //  two on mast forwards (11,11,27.9,0,0,0) backwards
     // (7.14,11,27.9,0,0,-180)
 
     public static final double kForwardCameraMountPitchAngleRad = Units.degreesToRadians(0);
     public static final double kForwardCameraMountRollAngleRad = Units.degreesToRadians(0);
     public static final double kForwardCameraMountYawAngleRad = Units.degreesToRadians(0);
 
-    public static final double kForwardCameraForwardMeters = Units.inchesToMeters(3.8);
+    public static final double kForwardCameraForwardMeters = Units.inchesToMeters(11);
     public static final double kForwardCameraLeftMeters = Units.inchesToMeters(11);
-    public static final double kForwardCameraUpMeters = Units.inchesToMeters(17.5);
+    public static final double kForwardCameraUpMeters = Units.inchesToMeters(27.9);
 
     // Robot to forward camera transform
     public static final Transform3d kForwardRobotToCam3d =
@@ -110,6 +111,28 @@ public final class Constants {
                 kForwardCameraMountRollAngleRad,
                 kForwardCameraMountPitchAngleRad,
                 kForwardCameraMountYawAngleRad));
+
+    // Reverse camera name
+    // Must match camera set in PhotonVision UI
+    public static final String kReverseCameraName = "reversePhotonvisionCamera";
+
+    public static final double kReverseCameraMountPitchAngleRad = Units.degreesToRadians(0);
+    public static final double kReverseCameraMountRollAngleRad = Units.degreesToRadians(0);
+    public static final double kReverseCameraMountYawAngleRad = Units.degreesToRadians(-180);
+
+    public static final double kReverseCameraForwardMeters = Units.inchesToMeters(7.14);
+    public static final double kReverseCameraLeftMeters = Units.inchesToMeters(11);
+    public static final double kReverseCameraUpMeters = Units.inchesToMeters(27.9);
+
+    // Robot to reverse camera transform
+    public static final Transform3d kReverseRobotToCam3d =
+        new Transform3d(
+            new Translation3d(
+                kReverseCameraForwardMeters, kReverseCameraLeftMeters, kReverseCameraUpMeters),
+            new Rotation3d(
+                kReverseCameraMountRollAngleRad,
+                kReverseCameraMountPitchAngleRad,
+                kReverseCameraMountYawAngleRad));
 
     // Dynamic std-dev scaling constants
     // Formula: stdDev = base * (avgDistance ^ exponent)
