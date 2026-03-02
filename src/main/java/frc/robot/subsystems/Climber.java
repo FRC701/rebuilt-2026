@@ -4,6 +4,12 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -14,7 +20,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
@@ -171,5 +181,23 @@ public class Climber extends SubsystemBase {
 
   private void voltageCallback(Voltage voltage) {}
 
-  private void logCallback(SysIdRoutineLog log) {}
+  // Values needed for sysid logging only.
+  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+  private final MutVoltage m_SysId_AppliedVoltage = Volts.mutable(0);
+  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+  private final MutAngle m_SysId_Angle = Radians.mutable(0);
+  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+  private final MutAngularVelocity m_SysId_Velocity = RadiansPerSecond.mutable(0);
+
+  private void logCallback(SysIdRoutineLog log) {
+    log.motor("climber")
+        .voltage(
+            m_SysId_AppliedVoltage.mut_replace(
+                m_ClimberLeader.get() * RobotController.getBatteryVoltage(), Volts))
+        .angularPosition(
+            m_SysId_Angle.mut_replace(m_ClimberLeader.getPosition().getValueAsDouble(), Rotations))
+        .angularVelocity(
+            m_SysId_Velocity.mut_replace(
+                m_ClimberLeader.getVelocity().getValueAsDouble(), RotationsPerSecond));
+  }
 }
