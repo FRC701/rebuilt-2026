@@ -16,6 +16,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -179,7 +180,11 @@ public class Climber extends SubsystemBase {
     runClimberState();
   }
 
-  private void voltageCallback(Voltage voltage) {}
+  // A (resusable) voltage out for driving the moter during sysId
+  private VoltageOut m_SysId_VoltageRequest = new VoltageOut(0);
+  private void voltageCallback(Voltage voltage) {
+    m_ClimberLeader.setControl(m_SysId_VoltageRequest.withOutput(voltage));
+  }
 
   // Values needed for sysid logging only.
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
