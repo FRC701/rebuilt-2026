@@ -92,7 +92,7 @@ public class VisionSubsystem extends SubsystemBase {
         double dist = result.getBestTarget().getBestCameraToTarget().getTranslation().getNorm();
         if (dist > Constants.Vision.kMaxSingleTagDistanceMeters) continue;
       }
-      // Use a fall back strategy: always prefer multi-tag when available to solve ambiguity problem
+      // Fallback strategy: always prefer multi-tag when available to solve ambiguity problem
       Optional<EstimatedRobotPose> estimatedPose = poseEstimator.estimateCoprocMultiTagPose(result);
       if (estimatedPose.isEmpty())
         estimatedPose = poseEstimator.estimateLowestAmbiguityPose(result);
