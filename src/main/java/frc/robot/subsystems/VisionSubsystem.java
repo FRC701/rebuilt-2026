@@ -87,7 +87,7 @@ public class VisionSubsystem extends SubsystemBase {
           && result.getBestTarget().getPoseAmbiguity()
               > Constants.Vision.kMaxAcceptableSingleTagAmbiguity) continue;
 
-      // Single-tag distance limit: PnP (Perspective-n-Poin) becomes unreliable at range
+      // Single-tag distance limit: PnP (Perspective-n-Point) becomes unreliable at range
       if (result.targets.size() == 1) {
         double dist = result.getBestTarget().getBestCameraToTarget().getTranslation().getNorm();
         if (dist > Constants.Vision.kMaxSingleTagDistanceMeters) continue;
