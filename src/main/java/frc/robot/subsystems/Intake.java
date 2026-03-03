@@ -10,7 +10,13 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 
@@ -24,6 +30,12 @@ public class Intake extends SubsystemBase {
 
   private double FORWARD_LIMIT = 100; // Placeholder
   private double REVERSE_LIMIT = 0;
+
+  private final SysIdRoutine m_SysID =
+      new SysIdRoutine(
+          // Config default is 1 volt/sec, 7V step, 10 sec timeout
+          new Config(Units.Volts.per(Units.Second).of(1), Units.Volts.of(7), Units.Seconds.of(10)),
+          new Mechanism(this::voltageCallback, this::logCallback, this));
 
   public Intake() {
     // Created Two Motors
@@ -162,4 +174,8 @@ public class Intake extends SubsystemBase {
     // This method will be called once per scheduler run
     RunIntakeState();
   }
+
+  private void voltageCallback(Voltage voltage) {}
+
+  private void logCallback(SysIdRoutineLog log) {}
 }
