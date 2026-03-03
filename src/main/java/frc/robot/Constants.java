@@ -23,7 +23,6 @@ public final class Constants {
     // The number of rotations until fully extended from retract position (in degrees)
     public static final double kExtensionPosition = 37.5 / 360;
     public static final int kRetractPosition = 0; // Intake is retracted and in the bot
-    public static final double GearRatio = 88 / 3; // Arm Teeth:Motor Teeth
 
     // PID Constants for Intake Extension
     public static final double kP = 0.1;
@@ -33,11 +32,11 @@ public final class Constants {
     public static final double kA = 100;
 
     // Motion Magic Parameters
-    public static final double MotionMagicCruiseVelocity = 80; // target cruise velocity of 80 rps
+    public static final double MotionMagicCruiseVelocity = 40; // target cruise velocity of 40 rps
     public static final double MotionMagicAcceleration =
-        160; // target acceleration of 160 rps/s (0.5 seconds)
+        80; // target acceleration of 80 rps/s (0.5 seconds)
     public static final double MotionMagicJerk =
-        1600; // target jerk of 1600 rps/s/s (0.1 seconds) *This is optional and is a derivative of
+        4000; // target jerk of 5 rps/s/s (0.1 seconds) *This is optional and is a derivative of
     // acceleration*
     // Jerk allows for an S-Curve with Motion Magic
 
