@@ -8,11 +8,13 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.FeederConstants;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
@@ -197,7 +199,7 @@ public class RobotContainer {
     m_driverController.a().onTrue(new ClimberLock(m_Climber));
     m_driverController.rightBumper().onTrue(new ClimberRetract(m_Climber));
     m_driverController.y().toggleOnTrue(m_FeederToggle);
-  }
+  
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
