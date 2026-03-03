@@ -23,6 +23,7 @@ import frc.robot.commands.ClimberLock;
 import frc.robot.commands.ClimberRetract;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.PassingCommand;
+import frc.robot.commands.ShootCommand;
 import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
@@ -173,6 +174,12 @@ public class RobotContainer {
 
     // Binds the x-button to shooting the right shooter, y-button to passing, and b-button to not
     m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
+
+    // AutoShootCommand
+    m_driverController.a().onTrue(new ShootCommand(m_LeftShooter));
+    m_driverController.a().onTrue(new ShootCommand(m_RightShooter));
+
+    m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
     m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
 

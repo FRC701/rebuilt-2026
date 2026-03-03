@@ -85,7 +85,12 @@ public class Shooter extends SubsystemBase {
 
   // returns true if no balls in shooter
   public boolean CurrentCHeck() {
-    return m_ShooterMotor.getStatorCurrent().getValueAsDouble() <= 1; // placeholder
+    return m_ShooterMotor.getStatorCurrent().getValueAsDouble() <= 30; // placeholder
+  }
+
+  public boolean UpToSpeed() {
+    return (VoltageCheck() <= Constants.ShooterConstants.shootRev + 2
+        && VoltageCheck() >= Constants.ShooterConstants.shootRev - 2);
   }
 
   public enum ShooterEnumState {
@@ -139,8 +144,12 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putString(m_StateString, m_ShooterEnumState.toString());
     SmartDashboard.putBoolean(m_EnabledString, m_ShooterEnabled);
     SmartDashboard.putNumber(
-        m_RevolutionsErrorString, m_ShooterMotor.getClosedLoopError().refresh().getValueAsDouble());
-    SmartDashboard.putNumber(m_SpeedString, velocitySignal.getValueAsDouble());
+        "RevolutionsError", m_ShooterMotor.getClosedLoopError().refresh().getValueAsDouble());
+    SmartDashboard.putNumber("ShooterSpeed", velocitySignal.getValueAsDouble());
+    SmartDashboard.putNumber(
+        "ShooterCurrent", m_ShooterMotor.getStatorCurrent().getValueAsDouble());
+    SmartDashboard.putBoolean("NoBallsInShooter", CurrentCHeck());
+    SmartDashboard.putBoolean("ShooterUpToSpeed", UpToSpeed());
     velocitySignal.refresh();
 
     setEnabledStatus(SmartDashboard.getBoolean(m_EnabledString, m_ShooterEnabled));
