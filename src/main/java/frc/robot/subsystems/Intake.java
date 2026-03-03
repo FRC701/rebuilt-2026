@@ -7,7 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -56,7 +56,7 @@ public class Intake extends SubsystemBase {
     // Apply the Configs to the Motor Objects
     m_IntakeMotorArm.getConfigurator().apply(talonFXConfigs);
     m_IntakeMotorArm.getConfigurator().apply(Slot0Configs);
-
+    // m_IntakeMotorArm.getConfigurator().apply(motionMagicConfigs);
     m_IntakeMotorArm.setPosition(0);
   }
 
@@ -92,13 +92,15 @@ public class Intake extends SubsystemBase {
   public void Neutral() {}
 
   public double getPosition() {
-    return m_IntakeMotorArm.getPosition().getValueAsDouble() / IntakeConstants.GearRatio;
+    return m_IntakeMotorArm.getPosition().getValueAsDouble();
   }
 
   // Gives the motor velocity using arm position
   public void setPosition(double position) {
-    PositionVoltage pos = new PositionVoltage(position * IntakeConstants.GearRatio).withSlot(0);
-    m_IntakeMotorArm.setControl(pos);
+    // PositionVoltage pos = new PositionVoltage(position * IntakeConstants.GearRatio).withSlot(0);
+    // m_IntakeMotorArm.setControl(pos); - PID way of setting a postition
+    final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
+    m_IntakeMotorArm.setControl(m_request.withPosition(position));
   }
 
   // A method that returns true if the arm is at its destination
