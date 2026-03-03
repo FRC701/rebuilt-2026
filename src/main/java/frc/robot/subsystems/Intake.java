@@ -14,6 +14,8 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.units.Units;
@@ -185,7 +187,11 @@ public class Intake extends SubsystemBase {
     RunIntakeState();
   }
 
-  private void voltageCallback(Voltage voltage) {}
+    // A (resusable) voltage out for driving the motor during sysId
+  private VoltageOut m_SysId_VoltageRequest = new VoltageOut(0);
+  private void voltageCallback(Voltage voltage) {
+    m_IntakeMotorArm.setControl(m_SysId_VoltageRequest.withOutput(voltage));
+  }
 
   // Values needed for sysid logging only.
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
