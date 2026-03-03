@@ -18,11 +18,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FeederConstants;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Extend;
-import frc.robot.commands.Lock;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.PassingCommand;
-import frc.robot.commands.Retract;
+import frc.robot.commands.ShootCommand;
 import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
@@ -167,6 +165,10 @@ public class RobotContainer {
     m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
     m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
 
+    // AutoShootCommand
+    m_driverController.a().onTrue(new ShootCommand(m_LeftShooter));
+    m_driverController.a().onTrue(new ShootCommand(m_RightShooter));
+
     m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
     m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
 
@@ -174,10 +176,10 @@ public class RobotContainer {
     m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
     // pressed,
     // cancelling on release.
-    m_driverController.leftBumper().onTrue(new Extend(m_Climber));
-    m_driverController.a().onTrue(new Lock(m_Climber));
-    m_driverController.rightBumper().onTrue(new Retract(m_Climber));
-    m_driverController.y().toggleOnTrue(m_FeederToggle);
+    // m_driverController.leftBumper().onTrue(new Extend(m_Climber));
+    // m_driverController.a().onTrue(new Lock(m_Climber));
+    // m_driverController.rightBumper().onTrue(new Retract(m_Climber));
+    // m_driverController.y().toggleOnTrue(m_FeederToggle);
   }
 
   /**
