@@ -73,11 +73,7 @@ public class Climber extends SubsystemBase {
             .withSoftwareLimitSwitch(
                 new SoftwareLimitSwitchConfigs()
                     .withForwardSoftLimitThreshold(FORWARD_LIMIT)
-                    .withForwardSoftLimitEnable(true));
-    m_TalonFXConfig =
-        new TalonFXConfiguration()
-            .withSoftwareLimitSwitch(
-                new SoftwareLimitSwitchConfigs()
+                    .withForwardSoftLimitEnable(true)
                     .withReverseSoftLimitThreshold(REVERSE_LIMIT)
                     .withReverseSoftLimitEnable(true));
 
@@ -101,6 +97,9 @@ public class Climber extends SubsystemBase {
 
   public void runClimberState() {
     switch (m_ClimberState) {
+      case S_Home:
+        ClimberHoming();
+        break;
       case S_Hold:
         HoldPosition();
         break;
@@ -117,7 +116,7 @@ public class Climber extends SubsystemBase {
   }
 
   public void ClimberHoming() {
-    if (limitSwitch == true) {
+    if (limitSwitch) {
       m_ClimberLeader.setPosition(0);
       m_ClimberState = ClimberState.S_Hold;
     } else {
