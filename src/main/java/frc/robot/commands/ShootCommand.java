@@ -6,7 +6,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Feeder.FeederState;
 import frc.robot.subsystems.Shooter;
@@ -35,8 +34,10 @@ public class ShootCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (m_ShooterSubsystem.VoltageCheck() + 1 >= Constants.ShooterConstants.shootRev) {
+    if (m_ShooterSubsystem.UpToSpeed()) {
       m_Feeder.m_FeederState = FeederState.S_On;
+    } else {
+      m_Feeder.m_FeederState = FeederState.S_Off;
     }
   }
 
