@@ -24,6 +24,6 @@ public class ExtendIntake extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    mIntake.intakeState = IntakeState.S_Extend;
+    mIntake.m_IntakeState = IntakeState.S_Extend;
   }
 }
