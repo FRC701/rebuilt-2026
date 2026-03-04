@@ -20,15 +20,17 @@ public class Intake extends SubsystemBase {
 
   private TalonFX m_IntakeMotorRoller;
 
-  public IntakeState intakeState;
+  public IntakeState m_IntakeState;
 
-  private double FORWARD_LIMIT = 100; // Placeholder
-  private double REVERSE_LIMIT = 0;
+  private double FORWARD_LIMIT = 0; // Placeholder
+  private double REVERSE_LIMIT = -5.2;
 
   public Intake() {
     // Created Two Motors
     m_IntakeMotorArm = new TalonFX(IntakeConstants.kIntakeMotorArm);
     m_IntakeMotorRoller = new TalonFX(IntakeConstants.kIntakeMotorRoller);
+
+    m_IntakeState = IntakeState.S_Retracted;
 
     // Configs that use the PID values to help with motor speed
     var talonFXConfigs =
@@ -40,6 +42,9 @@ public class Intake extends SubsystemBase {
                     .withReverseSoftLimitThreshold(REVERSE_LIMIT)
                     .withReverseSoftLimitEnable(true));
 
+    // Apply the Configs to the Motor Objects
+    m_IntakeMotorArm.getConfigurator().apply(talonFXConfigs);
+
     var Slot0Configs = new Slot0Configs();
     Slot0Configs.kP = Constants.IntakeConstants.kP;
     Slot0Configs.kI = Constants.IntakeConstants.kI;
@@ -47,15 +52,14 @@ public class Intake extends SubsystemBase {
     Slot0Configs.kV = Constants.IntakeConstants.kV;
     Slot0Configs.kA = Constants.IntakeConstants.kA;
 
+    m_IntakeMotorArm.getConfigurator().apply(Slot0Configs);
+
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity =
         Constants.IntakeConstants.MotionMagicCruiseVelocity;
     motionMagicConfigs.MotionMagicAcceleration = Constants.IntakeConstants.MotionMagicAcceleration;
     motionMagicConfigs.MotionMagicJerk = Constants.IntakeConstants.MotionMagicJerk;
 
-    // Apply the Configs to the Motor Objects
-    m_IntakeMotorArm.getConfigurator().apply(talonFXConfigs);
-    m_IntakeMotorArm.getConfigurator().apply(Slot0Configs);
     // m_IntakeMotorArm.getConfigurator().apply(motionMagicConfigs);
     m_IntakeMotorArm.setPosition(0);
   }
@@ -69,7 +73,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void RunIntakeState() {
-    switch (intakeState) {
+    switch (m_IntakeState) {
       case S_Extend:
         ExtendPosition();
         break;
@@ -89,34 +93,31 @@ public class Intake extends SubsystemBase {
   }
 
   // returns the Arm Position as a double (rotations)
-  public void Neutral() {}
-
-  public double getPosition() {
-    return m_IntakeMotorArm.getPosition().getValueAsDouble();
+  public void Neutral() {
+    m_IntakeMotorArm.setVoltage(0);
   }
 
   // Gives the motor velocity using arm position
   public void setPosition(double position) {
-    // PositionVoltage pos = new PositionVoltage(position * IntakeConstants.GearRatio).withSlot(0);
-    // m_IntakeMotorArm.setControl(pos); - PID way of setting a postition
-    final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
+    // PositionVoltage pos = new PositionVoltage(position).withSlot(0);
+    // m_IntakeMotorArm.setControl(pos);
+    MotionMagicVoltage m_request = new MotionMagicVoltage(0);
     m_IntakeMotorArm.setControl(m_request.withPosition(position));
   }
 
   // A method that returns true if the arm is at its destination
   public boolean checkExtended(double Setpoint) {
-    double position = getPosition();
-    return (position - 1 / 180 <= Setpoint)
-        && (position + 1 / 180 >= Setpoint); // subject to change
+    double position = m_IntakeMotorArm.getPosition().getValueAsDouble();
+    return (position - 0.2 <= Setpoint) && (position + 0.2 >= Setpoint); // subject to change
   }
 
   // Extends the intake out and starts the rollers
   public void ExtendPosition() {
     // If motor has reached its destination the stop the arm and start the rollers
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
-      m_IntakeMotorArm.setVoltage(0);
-      m_IntakeMotorRoller.setVoltage(4);
-      intakeState = intakeState.S_Extended;
+      // m_IntakeMotorArm.setVoltage(0);
+      m_IntakeMotorRoller.setVoltage(-4);
+      // m_IntakeState = IntakeState.S_Extended;
     } else {
       // Move the arm until it reaches its destination
       setPosition(IntakeConstants.kExtensionPosition);
@@ -130,7 +131,7 @@ public class Intake extends SubsystemBase {
     // If the arm has reached its destination stop the motor
     if (checkExtended(IntakeConstants.kRetractPosition)) {
       m_IntakeMotorArm.setVoltage(0);
-      intakeState = intakeState.S_Retracted;
+      m_IntakeState = IntakeState.S_Retracted;
     } else {
       // Move the arm until it reaches the destination
       setPosition(IntakeConstants.kRetractPosition);
@@ -143,7 +144,7 @@ public class Intake extends SubsystemBase {
     // (ejecting)
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeMotorArm.setVoltage(0);
-      m_IntakeMotorRoller.setVoltage(-4);
+      m_IntakeMotorRoller.setVoltage(4);
     } else {
       // Move the arm until it reaches its destination
       setPosition(IntakeConstants.kExtensionPosition);
@@ -152,14 +153,14 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
+    RunIntakeState();
     SmartDashboard.putBoolean("CheckExtended", checkExtended(IntakeConstants.kExtensionPosition));
     SmartDashboard.putBoolean("CheckRetracted", checkExtended(IntakeConstants.kRetractPosition));
     SmartDashboard.putNumber("ForwardSoftLimit", FORWARD_LIMIT);
     SmartDashboard.putNumber("ReverseSoftLimit", REVERSE_LIMIT);
-    SmartDashboard.putNumber(
-        "RawIntakePosition", m_IntakeMotorArm.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber("IntakePose", getPosition());
+    SmartDashboard.putNumber("IntakePose", m_IntakeMotorArm.getPosition().getValueAsDouble());
+    SmartDashboard.putString("IntakeState", m_IntakeState.toString());
     // This method will be called once per scheduler run
-    RunIntakeState();
+
   }
 }
