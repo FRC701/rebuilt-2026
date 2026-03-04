@@ -4,13 +4,31 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 
@@ -24,6 +42,12 @@ public class Intake extends SubsystemBase {
 
   private double FORWARD_LIMIT = 0; // Placeholder
   private double REVERSE_LIMIT = -5.2;
+
+  private final SysIdRoutine m_SysID =
+      new SysIdRoutine(
+          // Config default is 1 volt/sec, 7V step, 10 sec timeout
+          new Config(Units.Volts.per(Units.Second).of(1), Units.Volts.of(7), Units.Seconds.of(10)),
+          new Mechanism(this::voltageCallback, this::logCallback, this));
 
   public Intake() {
     // Created Two Motors
@@ -162,5 +186,40 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putString("IntakeState", m_IntakeState.toString());
     // This method will be called once per scheduler run
 
+  }
+
+  // A (resusable) voltage out for driving the motor during sysId
+  private VoltageOut m_SysId_VoltageRequest = new VoltageOut(0);
+
+  private void voltageCallback(Voltage voltage) {
+    m_IntakeMotorArm.setControl(m_SysId_VoltageRequest.withOutput(voltage));
+  }
+
+  // Values needed for sysid logging only.
+  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+  private final MutVoltage m_SysId_AppliedVoltage = Volts.mutable(0);
+  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+  private final MutAngle m_SysId_Angle = Radians.mutable(0);
+  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+  private final MutAngularVelocity m_SysId_Velocity = RadiansPerSecond.mutable(0);
+
+  private void logCallback(SysIdRoutineLog log) {
+    log.motor("intake")
+        .voltage(
+            m_SysId_AppliedVoltage.mut_replace(
+                m_IntakeMotorArm.get() * RobotController.getBatteryVoltage(), Volts))
+        .angularPosition(
+            m_SysId_Angle.mut_replace(m_IntakeMotorArm.getPosition().getValueAsDouble(), Rotations))
+        .angularVelocity(
+            m_SysId_Velocity.mut_replace(
+                m_IntakeMotorArm.getVelocity().getValueAsDouble(), RotationsPerSecond));
+  }
+
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return m_SysID.quasistatic(direction);
+  }
+
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return m_SysID.dynamic(direction);
   }
 }
