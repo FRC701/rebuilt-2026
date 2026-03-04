@@ -179,3 +179,5 @@ public class CandleSubsystem extends SubsystemBase {;
     // This method will be called once per scheduler run
   }
 }
+
+import com.ctre.phoenix6.controls.LarsonAnimation;
