@@ -87,7 +87,7 @@ public class Shooter extends SubsystemBase {
     switch (m_ShooterEnumState) {
       case S_Shooting:
         shooting();
-        m_CandleSub.shooterLED();
+        m_CandleSub.shootingLED();
         break;
       case S_Passing: 
         passing();
@@ -95,6 +95,7 @@ public class Shooter extends SubsystemBase {
         break;
       case S_NotShooting:
         stopping();
+        m_CandleSub.notShootingLED();
         break;
     }
   }

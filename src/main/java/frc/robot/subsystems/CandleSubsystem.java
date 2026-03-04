@@ -118,7 +118,7 @@ public class CandleSubsystem extends SubsystemBase {;
       });
     }
 
-    public Command shooterLED(){
+    public Command shootingLED(){
       return run(() -> {
         m_Candle.setControl(m_slot0Animation);
       });
@@ -144,7 +144,7 @@ public class CandleSubsystem extends SubsystemBase {;
       });
     }
 
-    public Command agitatorLED(){
+    public Command notShootingLED(){
       return run (() -> {
         m_Candle.setControl(m_slot6Animation);
       });
