@@ -66,17 +66,12 @@ public class Intake extends SubsystemBase {
                     .withReverseSoftLimitThreshold(REVERSE_LIMIT)
                     .withReverseSoftLimitEnable(true));
 
-    // Apply the Configs to the Motor Objects
-    m_IntakeMotorArm.getConfigurator().apply(talonFXConfigs);
-
-    var Slot0Configs = new Slot0Configs();
+    var Slot0Configs = talonFXConfigs.Slot0;
     Slot0Configs.kP = Constants.IntakeConstants.kP;
     Slot0Configs.kI = Constants.IntakeConstants.kI;
     Slot0Configs.kD = Constants.IntakeConstants.kD;
     Slot0Configs.kV = Constants.IntakeConstants.kV;
     Slot0Configs.kA = Constants.IntakeConstants.kA;
-
-    m_IntakeMotorArm.getConfigurator().apply(Slot0Configs);
 
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity =
@@ -84,7 +79,9 @@ public class Intake extends SubsystemBase {
     motionMagicConfigs.MotionMagicAcceleration = Constants.IntakeConstants.MotionMagicAcceleration;
     motionMagicConfigs.MotionMagicJerk = Constants.IntakeConstants.MotionMagicJerk;
 
-    // m_IntakeMotorArm.getConfigurator().apply(motionMagicConfigs);
+    // Apply the Configs to the Motor Objects
+    m_IntakeMotorArm.getConfigurator().apply(talonFXConfigs);
+
     m_IntakeMotorArm.setPosition(0);
   }
 
