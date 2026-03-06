@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FeederConstants;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.ClimberLock;
+import frc.robot.commands.ClimberUpDownToggle;
 import frc.robot.commands.ExtendIntake;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.RetractIntake;
@@ -26,7 +28,6 @@ import frc.robot.subsystems.Agitator.AgitatorState;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
-import frc.robot.subsystems.Feeder.FeederState;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
@@ -63,6 +64,7 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
 
   private final Agitator m_Agitator = new Agitator();
+  private Climber m_Climber = new Climber();
   private Feeder m_Feeder = new Feeder(FeederConstants.kFeederMotor);
   private Shooter m_LeftShooter =
       new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter");
@@ -74,11 +76,6 @@ public class RobotContainer {
           () -> m_Agitator.m_AgitatorState = AgitatorState.S_On,
           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Off,
           m_Agitator);
-  private Command m_FeederToggle =
-      Commands.startEnd(
-          () -> m_Feeder.m_FeederState = FeederState.S_On,
-          () -> m_Feeder.m_FeederState = FeederState.S_Off,
-          m_Feeder);
 
   private Intake m_intake = new Intake();
 
@@ -163,10 +160,9 @@ public class RobotContainer {
     m_DriveTrain.registerTelemetry(logger::telemeterize);
 
     // binds the a-button to toggle the agitator
-    m_driverController.a().toggleOnTrue(m_AgitatorToggle);
+    m_driverController.povDown().toggleOnTrue(m_AgitatorToggle);
     // Binds the x-button to shooting the shooters
-    // m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter, m_RightShooter));
-    // m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
+    m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter, m_RightShooter));
 
     m_driverController.leftTrigger().onTrue(new ExtendIntake(m_intake));
     m_driverController.rightTrigger().onTrue(new RetractIntake(m_intake));
@@ -177,22 +173,15 @@ public class RobotContainer {
     m_driverController.b().onTrue(new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder));
     // m_driverController.b().onTrue(new ShootCommand(m_RightShooter));
 
-    // m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
-    // m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
-
-    m_driverController.x().onTrue(new NotShootingCommand(m_LeftShooter));
-    m_driverController.x().onTrue(new NotShootingCommand(m_RightShooter));
-    // pressed,
-    // cancelling on release.
-    // m_driverController.leftBumper().onTrue(new ClimberExtend(m_Climber));
-    // m_driverController.a().onTrue(new ClimberLock(m_Climber));
-    // m_driverController.rightBumper().onTrue(new ClimberRetract(m_Climber));
+    // Climber Bindings
+    m_driverController
+        .a()
+        .onTrue(
+            new ClimberUpDownToggle(
+                m_Climber, m_Agitator, m_Feeder, m_LeftShooter, m_RightShooter));
+    m_driverController.b().onTrue(new ClimberLock(m_Climber));
+    m_driverController.a().onTrue(new NotShootingCommand(m_LeftShooter));
+    m_driverController.a().onTrue(new NotShootingCommand(m_RightShooter));
     m_driverController.y().toggleOnTrue(m_FeederToggle);
-
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
   }
 }
