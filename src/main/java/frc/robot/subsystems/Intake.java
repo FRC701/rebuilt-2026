@@ -40,8 +40,8 @@ public class Intake extends SubsystemBase {
 
   public IntakeState m_IntakeState;
 
-  private double FORWARD_LIMIT = 0; // Placeholder
-  private double REVERSE_LIMIT = -5.2;
+  private double FORWARD_LIMIT = IntakeConstants.kExtensionPosition; // Placeholder
+  private double REVERSE_LIMIT = IntakeConstants.kRetractPosition;
 
   private final SysIdRoutine m_SysID =
       new SysIdRoutine(
