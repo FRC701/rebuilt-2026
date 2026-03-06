@@ -39,7 +39,12 @@ public class Shooter extends SubsystemBase {
                 new VoltageConfigs().withPeakForwardVoltage(10).withPeakReverseVoltage(-10));
 
     MotorOutputConfigs shooterConfig = new MotorOutputConfigs();
-    shooterConfig.Inverted = InvertedValue.Clockwise_Positive;
+
+    if (motorId == Constants.ShooterConstants.kRightShooterId) {
+      shooterConfig.Inverted = InvertedValue.CounterClockwise_Positive;
+    } else {
+      shooterConfig.Inverted = InvertedValue.Clockwise_Positive;
+    }
 
     // Configs that use the PID values to help with motor speed
     Slot0Configs Slot0Configs = new Slot0Configs();
@@ -87,8 +92,8 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean UpToSpeed() {
-    return (VoltageCheck() <= Constants.ShooterConstants.shootRev + 2
-        && VoltageCheck() >= Constants.ShooterConstants.shootRev - 2);
+    return (VoltageCheck() <= Constants.ShooterConstants.shootRev + 3
+        && VoltageCheck() >= Constants.ShooterConstants.shootRev - 3);
   }
 
   public enum ShooterEnumState {
