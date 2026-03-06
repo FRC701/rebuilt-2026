@@ -17,9 +17,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FeederConstants;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.ClimberExtend;
 import frc.robot.commands.ClimberLock;
-import frc.robot.commands.ClimberRetract;
+import frc.robot.commands.ClimberUpDownToggle;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.PassingCommand;
 import frc.robot.commands.ShootingCommand;
@@ -29,7 +28,6 @@ import frc.robot.subsystems.Agitator.AgitatorState;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
-import frc.robot.subsystems.Feeder.FeederState;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -65,6 +63,7 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
 
   private final Agitator m_Agitator = new Agitator();
+  private Climber m_Climber = new Climber();
   private Feeder m_Feeder = new Feeder(FeederConstants.kFeederMotor);
   private Shooter m_LeftShooter =
       new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter");
@@ -76,13 +75,6 @@ public class RobotContainer {
           () -> m_Agitator.m_AgitatorState = AgitatorState.S_On,
           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Off,
           m_Agitator);
-  private Command m_FeederToggle =
-      Commands.startEnd(
-          () -> m_Feeder.m_FeederState = FeederState.S_On,
-          () -> m_Feeder.m_FeederState = FeederState.S_Off,
-          m_Feeder);
-
-  private final Climber m_Climber;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
@@ -160,7 +152,7 @@ public class RobotContainer {
     m_DriveTrain.registerTelemetry(logger::telemeterize);
 
     // binds the a-button to toggle the agitator
-    m_coDriverController.a().toggleOnTrue(m_AgitatorToggle);
+    m_driverController.povDown().toggleOnTrue(m_AgitatorToggle);
 
     // Binds the x-button to shooting the left shooter, y-button to passing, and b-button to not
     m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
@@ -172,13 +164,13 @@ public class RobotContainer {
     m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-    // pressed,
-    // cancelling on release.
-    m_driverController.leftBumper().onTrue(new ClimberExtend(m_Climber));
-    m_driverController.a().onTrue(new ClimberLock(m_Climber));
-    m_driverController.rightBumper().onTrue(new ClimberRetract(m_Climber));
-    m_driverController.y().toggleOnTrue(m_FeederToggle);
+    // Climber Bindings
+    m_driverController
+        .a()
+        .onTrue(
+            new ClimberUpDownToggle(
+                m_Climber, m_Agitator, m_Feeder, m_LeftShooter, m_RightShooter));
+    m_driverController.b().onTrue(new ClimberLock(m_Climber));
   }
 
   /**
