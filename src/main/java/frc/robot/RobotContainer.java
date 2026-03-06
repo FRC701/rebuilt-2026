@@ -77,13 +77,14 @@ public class RobotContainer {
 
     // Climber SysID in the dashboard
     SmartDashboard.putData(
-        "SysID Intake Static Forward ", m_intake.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        "SysID Intake Static Forward ", m_intake.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     SmartDashboard.putData(
-        "SysID Intake Static Reverse ", m_intake.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        "SysID Intake Static Reverse ", m_intake.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     SmartDashboard.putData(
-        "SysID Intake Dynamic Forward ", m_intake.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        "SysID Intake Dynamic Forward ", m_intake.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     SmartDashboard.putData(
-        "SysID Intake Dynamic Reverse ", m_intake.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        "SysID Intake Dynamic Reverse ", m_intake.sysIdDynamic(SysIdRoutine.Direction.kForward));
+
   }
 
   /**
