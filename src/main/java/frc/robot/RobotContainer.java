@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -22,7 +21,7 @@ import frc.robot.commands.ClimberExtend;
 import frc.robot.commands.ClimberLock;
 import frc.robot.commands.ClimberRetract;
 import frc.robot.commands.NotShootingCommand;
-import frc.robot.commands.PassingCommand;
+import frc.robot.commands.SequentialShoot;
 import frc.robot.commands.ShootCommand;
 import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
@@ -99,8 +98,8 @@ public class RobotContainer {
     m_Climber = new Climber();
     configureBindings();
 
-    NamedCommands.registerCommand("ShootLeft", new ShootingCommand(m_LeftShooter));
-    NamedCommands.registerCommand("ShootRight", new ShootingCommand(m_RightShooter));
+    // NamedCommands.registerCommand("ShootLeft", new ShootingCommand(m_LeftShooter));
+    // NamedCommands.registerCommand("ShootRight", new ShootingCommand(m_RightShooter));
   }
 
   /**
@@ -116,40 +115,40 @@ public class RobotContainer {
 
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
-    m_DriveTrain.setDefaultCommand(
-        // Drivetrain will execute this command periodically
-        m_DriveTrain.applyRequest(
-            () ->
-                m_DriveField
-                    .withVelocityX(-m_driverController.getLeftY() * MaxSpeed) // Drive
-                    // forward
-                    // with
-                    // negative
-                    // Y
-                    // (forward)
-                    .withVelocityY(
-                        -m_driverController.getLeftX()
-                            * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(
-                        -m_driverController.getRightX()
-                            * MaxAngularRate) // Drive counterclockwise with
-            // negative X (left)
-            ));
+    // m_DriveTrain.setDefaultCommand(
+    //     // Drivetrain will execute this command periodically
+    //     m_DriveTrain.applyRequest(
+    //         () ->
+    //             m_DriveField
+    //                 .withVelocityX(-m_driverController.getLeftY() * MaxSpeed) // Drive
+    //                 // forward
+    //                 // with
+    //                 // negative
+    //                 // Y
+    //                 // (forward)
+    //                 .withVelocityY(
+    //                     -m_driverController.getLeftX()
+    //                         * MaxSpeed) // Drive left with negative X (left)
+    //                 .withRotationalRate(
+    //                     -m_driverController.getRightX()
+    //                         * MaxAngularRate) // Drive counterclockwise with
+    //         // negative X (left)
+    //         ));
     // Idle while the robot is disabled. This ensures the configured
     // neutral mode is applied to the drive motors while disabled.
     final var idle = new SwerveRequest.Idle();
     RobotModeTriggers.disabled()
         .whileTrue(m_DriveTrain.applyRequest(() -> idle).ignoringDisable(true));
 
-    m_driverController.a().whileTrue(m_DriveTrain.applyRequest(() -> brake));
-    m_driverController
-        .b()
-        .whileTrue(
-            m_DriveTrain.applyRequest(
-                () ->
-                    point.withModuleDirection(
-                        new Rotation2d(
-                            -m_driverController.getLeftY(), -m_driverController.getLeftX()))));
+    // m_driverController.a().whileTrue(m_DriveTrain.applyRequest(() -> brake));
+    // m_driverController
+    //     .b()
+    //     .whileTrue(
+    //         m_DriveTrain.applyRequest(
+    //             () ->
+    //                 point.withModuleDirection(
+    //                     new Rotation2d(
+    //                         -m_driverController.getLeftY(), -m_driverController.getLeftX()))));
 
     // Run SysId routines when holding back/start and X/Y. (FOR TUNING)
     // Note that each routine should be run exactly once in a single log.
@@ -166,24 +165,19 @@ public class RobotContainer {
 
     // binds the a-button to toggle the agitator
     m_coDriverController.a().toggleOnTrue(m_AgitatorToggle);
-
-    // Binds the x-button to shooting the left shooter, y-button to passing, and b-button to not
-    m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
-    m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
-    m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
-
-    // Binds the x-button to shooting the right shooter, y-button to passing, and b-button to not
-    m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
+    // Binds the x-button to shooting the shooters
+     m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter, m_RightShooter));
+    // m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
 
     // AutoShootCommand
-    m_driverController.a().onTrue(new ShootCommand(m_LeftShooter));
-    m_driverController.a().onTrue(new ShootCommand(m_RightShooter));
+    m_driverController.b().onTrue(new SequentialShoot(m_LeftShooter,m_RightShooter,m_Feeder));
+    //m_driverController.b().onTrue(new ShootCommand(m_RightShooter));
 
-    m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
-    m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
-    m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
+    // m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
+    // m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
+    m_driverController.a().onTrue(new NotShootingCommand(m_LeftShooter));
+    m_driverController.a().onTrue(new NotShootingCommand(m_RightShooter));
     // pressed,
     // cancelling on release.
     m_driverController.leftBumper().onTrue(new ClimberExtend(m_Climber));
