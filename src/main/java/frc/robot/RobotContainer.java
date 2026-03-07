@@ -9,11 +9,15 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.FeederConstants;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
@@ -148,10 +152,20 @@ public class RobotContainer {
 
     // Run SysId routines when holding back/start and X/Y. (FOR TUNING)
     // Note that each routine should be run exactly once in a single log.
-    // m_driverController.back().and(m_driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-    // m_driverController.back().and(m_driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-    // m_driverController.start().and(m_driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-    // m_driverController.start().and(m_driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+    ShuffleboardTab Drivetab = Shuffleboard.getTab("DriveTrain Tab");
+    Drivetab.add("SysID DriveTrain Static Forward", m_DriveTrain.sysIdQuasistatic(Direction.kForward));
+    Drivetab.add("SysID Drivetrain Static Reverse", m_DriveTrain.sysIdQuasistatic(Direction.kReverse));
+    Drivetab.add("SysID Drivetrain Dynamic Forward", m_DriveTrain.sysIdDynamic(Direction.kForward));
+    Drivetab.add("SysTD Drivetrain Dynamic Reverse", m_DriveTrain.sysIdDynamic(Direction.kReverse));
+   
+    // SmartDashboard.putData("SysID DriveTrain Static Forward", m_DriveTrain.sysIdQuasistatic(Direction.kForward));
+    // SmartDashboard.putData("SysID Drivetrain Static Reverse", m_DriveTrain.sysIdQuasistatic(Direction.kReverse));
+    // SmartDashboard.putData("SysID Drivetrain Dynamic Forward", m_DriveTrain.sysIdDynamic(Direction.kForward));
+    // SmartDashboard.putData("SysTD Drivetrain Dynamic Reverse", m_DriveTrain.sysIdDynamic(Direction.kReverse));
+    // m_driverController.back().and(m_driverController.y()).whileTrue(m_DriveTrain.sysIdDynamic(Direction.kForward));
+    // m_driverController.back().and(m_driverController.x()).whileTrue(m_DriveTrain.sysIdDynamic(Direction.kReverse));
+    // m_driverController.start().and(m_driverController.y()).whileTrue(m_DriveTrain.sysIdQuasistatic(Direction.kForward));
+    // m_driverController.start().and(m_driverController.x()).whileTrue(m_DriveTrain.sysIdQuasistatic(Direction.kReverse));
 
     // Reset the field-centric heading on left bumper press.
     m_driverController
