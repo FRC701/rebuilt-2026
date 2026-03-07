@@ -116,12 +116,9 @@ public class RobotContainer {
         m_DriveTrain.applyRequest(
             () ->
                 m_DriveField
-                    .withVelocityX(-m_driverController.getLeftY() * MaxSpeed) // Drive
-                    // forward
-                    // with
-                    // negative
-                    // Y
-                    // (forward)
+                    .withVelocityX(
+                        -m_driverController.getLeftY()
+                            * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(
                         -m_driverController.getLeftX()
                             * MaxSpeed) // Drive left with negative X (left)
@@ -135,16 +132,6 @@ public class RobotContainer {
     final var idle = new SwerveRequest.Idle();
     RobotModeTriggers.disabled()
         .whileTrue(m_DriveTrain.applyRequest(() -> idle).ignoringDisable(true));
-
-    // m_driverController.a().whileTrue(m_DriveTrain.applyRequest(() -> brake));
-    // m_driverController
-    //     .b()
-    //     .whileTrue(
-    //         m_DriveTrain.applyRequest(
-    //             () ->
-    //                 point.withModuleDirection(
-    //                     new Rotation2d(
-    //                         -m_driverController.getLeftY(), -m_driverController.getLeftX()))));
 
     // Run SysId routines when holding back/start and X/Y. (FOR TUNING)
     // Note that each routine should be run exactly once in a single log.

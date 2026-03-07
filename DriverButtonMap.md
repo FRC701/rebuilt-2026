@@ -2,12 +2,10 @@ Driver
 
 | Button       | Action                |
 | ------------ | ----------------------|
-| a            | brake (?)             |
 | a            | Extend/Retract Climber|
 | b            | Lock Climber          |
-| b            | Drive Rotate          |
 | b            | Not Shooting          |
-| left Trigger | seedFieldCentric      |
+| left Bumper  | seedFieldCentric      |
 | LeftX        | Velocity Y            |
 | LeftY        | Velocity X            |
 | RightX       | Rotate                |
