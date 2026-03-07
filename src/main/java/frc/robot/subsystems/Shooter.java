@@ -55,7 +55,7 @@ public class Shooter extends SubsystemBase {
             .withVoltage(
                 new VoltageConfigs().withPeakForwardVoltage(10).withPeakReverseVoltage(-10));
 
-    MotorOutputConfigs shooterConfig = new MotorOutputConfigs();
+    MotorOutputConfigs shooterConfig = m_TalonFXConfig.MotorOutput;
 
     if (motorId == Constants.ShooterConstants.kRightShooterId) {
       shooterConfig.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -64,19 +64,17 @@ public class Shooter extends SubsystemBase {
     }
 
     // Configs that use the PID values to help with motor speed
-    Slot0Configs Slot0Configs = new Slot0Configs();
+    Slot0Configs Slot0Configs = m_TalonFXConfig.Slot0;
     Slot0Configs.kP = Constants.ShooterConstants.kP;
     Slot0Configs.kI = Constants.ShooterConstants.kI;
     Slot0Configs.kD = Constants.ShooterConstants.kD;
     Slot0Configs.kV = Constants.ShooterConstants.kV;
     Slot0Configs.kS = Constants.ShooterConstants.kS;
-    m_TalonFXConfig.withSlot0(Slot0Configs);
+    
 
     // Applying the configs to the motors, PID
     // Applying the configs to the motors, Voltage Limits
     m_ShooterMotor.getConfigurator().apply(m_TalonFXConfig);
-
-    m_ShooterMotor.getConfigurator().apply(shooterConfig);
 
     velocitySignal = m_ShooterMotor.getVelocity();
   }
