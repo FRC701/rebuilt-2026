@@ -10,8 +10,8 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -19,6 +19,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
@@ -41,7 +42,7 @@ public class Intake extends SubsystemBase {
 
   private TalonFX m_IntakeMotorRoller;
   private MotionMagicVoltage m_request = new MotionMagicVoltage(0);
-  
+
   public IntakeState m_IntakeState;
 
   private double FORWARD_LIMIT = 4.7; // Placeholder
@@ -61,16 +62,19 @@ public class Intake extends SubsystemBase {
     m_IntakeState = IntakeState.S_Retract;
 
     // Configs that use the PID values to help with motor speed
-    var talonFXConfigs =
+    var m_talonFXConfigs =
         new TalonFXConfiguration()
             .withSoftwareLimitSwitch(
                 new SoftwareLimitSwitchConfigs()
                     .withForwardSoftLimitThreshold(FORWARD_LIMIT)
                     .withForwardSoftLimitEnable(true)
                     .withReverseSoftLimitThreshold(REVERSE_LIMIT)
-                    .withReverseSoftLimitEnable(true));
+                    .withReverseSoftLimitEnable(true))
+            .withHardwareLimitSwitch(
+                new HardwareLimitSwitchConfigs()
+                    .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin));
 
-    var Slot0Configs = talonFXConfigs.Slot0;
+    var Slot0Configs = m_talonFXConfigs.Slot0;
     Slot0Configs.kP = Constants.IntakeConstants.kP;
     Slot0Configs.kI = Constants.IntakeConstants.kI;
     Slot0Configs.kD = Constants.IntakeConstants.kD;
@@ -79,19 +83,17 @@ public class Intake extends SubsystemBase {
     Slot0Configs.kA = Constants.IntakeConstants.kA;
     Slot0Configs.kG = Constants.IntakeConstants.kG;
 
-    var motionMagicConfigs = talonFXConfigs.MotionMagic;
+    var motionMagicConfigs = m_talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity =
         Constants.IntakeConstants.MotionMagicCruiseVelocity;
     motionMagicConfigs.MotionMagicAcceleration = Constants.IntakeConstants.MotionMagicAcceleration;
     motionMagicConfigs.MotionMagicJerk = Constants.IntakeConstants.MotionMagicJerk;
 
-    MotorOutputConfigs IntakeConfig = new MotorOutputConfigs();
+    MotorOutputConfigs IntakeConfig = m_talonFXConfigs.MotorOutput;
     IntakeConfig.Inverted = InvertedValue.Clockwise_Positive;
 
     // Apply the Configs to the Motor Objects
-    m_IntakeMotorArm.getConfigurator().apply(talonFXConfigs);
-    m_IntakeMotorArm.getConfigurator().apply(IntakeConfig);
-
+    m_IntakeMotorArm.getConfigurator().apply(m_talonFXConfigs);
 
     m_IntakeMotorArm.setPosition(0);
   }
@@ -115,12 +117,12 @@ public class Intake extends SubsystemBase {
       case S_Outtake:
         Outtake();
         break;
-      // case S_Extended:
-      //   Neutral();
-      //   break;
-      // case S_Retracted:
-      //   Neutral();
-      //   break;
+        // case S_Extended:
+        //   Neutral();
+        //   break;
+        // case S_Retracted:
+        //   Neutral();
+        //   break;
     }
   }
 
@@ -131,8 +133,8 @@ public class Intake extends SubsystemBase {
 
   // Gives the motor velocity using arm position
   public void setPosition(double position) {
-     PositionVoltage pos = new PositionVoltage(position).withSlot(0);
-     m_IntakeMotorArm.setControl(pos);
+    PositionVoltage pos = new PositionVoltage(position).withSlot(0);
+    m_IntakeMotorArm.setControl(pos);
   }
 
   // A method that returns true if the arm is at its destination
@@ -146,10 +148,10 @@ public class Intake extends SubsystemBase {
     // If motor has reached its destination the stop the arm and start the rollers
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeMotorRoller.setVoltage(4);
-    //   // m_IntakeState = IntakeState.S_Extended;
+      //   // m_IntakeState = IntakeState.S_Extended;
     }
-      // Move the arm until it reaches its destination
-      setPosition(IntakeConstants.kExtensionPosition);
+    // Move the arm until it reaches its destination
+    setPosition(IntakeConstants.kExtensionPosition);
   }
 
   // Pulls the intake back in and stops the rollers
@@ -160,7 +162,7 @@ public class Intake extends SubsystemBase {
     // if (checkExtended(IntakeConstants.kRetractPosition)) {
     //   //m_IntakeState = IntakeState.S_Retracted;
     // }
-      // Move the arm until it reaches the destination
+    // Move the arm until it reaches the destination
     setPosition(IntakeConstants.kRetractPosition);
   }
 

@@ -65,12 +65,12 @@ public final class Constants {
 
     // PID Constants for Intake Extension
     public static final double kP = 1.51337;
-    public static final double kI = 0;  
+    public static final double kI = 0;
     public static final double kD = 0.1;
     public static final double kS = 2.4686;
     public static final double kV = 1;
     public static final double kA = 1.01164;
-    public static final double kG = 1;   //0.46724;
+    public static final double kG = 1; // 0.46724;
 
     // Motion Magic Parameters
     public static final double MotionMagicCruiseVelocity = 100; // target cruise velocity of 40 rps
