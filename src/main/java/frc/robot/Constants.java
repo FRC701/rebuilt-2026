@@ -21,20 +21,22 @@ public final class Constants {
     public static final int kIntakeMotorArm = 11;
     public static final int kIntakeMotorRoller = 12;
     // The number of rotations using the falcon's encoder
-    public static final double kExtensionPosition = -4.66;
+    public static final double kExtensionPosition = 4.7;
     public static final int kRetractPosition = 0; // Intake is retracted and in the bot
 
     // PID Constants for Intake Extension
-    public static final double kP = 0.1;
-    public static final double kI = 0.1;
-    public static final double kD = 0;
-    public static final double kV = 0.1;
-    public static final double kA = 100;
+    public static final double kP = 1.51337;
+    public static final double kI = 0;  
+    public static final double kD = 0.1;
+    public static final double kS = 2.4686;
+    public static final double kV = 1;
+    public static final double kA = 1.01164;
+    public static final double kG = 1;   //0.46724;
 
     // Motion Magic Parameters
-    public static final double MotionMagicCruiseVelocity = 1000; // target cruise velocity of 40 rps
+    public static final double MotionMagicCruiseVelocity = 100; // target cruise velocity of 40 rps
     public static final double MotionMagicAcceleration =
-        200; // target acceleration of 80 rps/s (0.5 seconds)
+        20; // target acceleration of 80 rps/s (0.5 seconds)
     public static final double MotionMagicJerk =
         10; // target jerk of 5 rps/s/s (0.1 seconds) *This is optional and is a derivative of
     // acceleration*

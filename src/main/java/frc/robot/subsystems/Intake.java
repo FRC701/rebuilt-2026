@@ -10,12 +10,15 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
@@ -37,11 +40,12 @@ public class Intake extends SubsystemBase {
   private TalonFX m_IntakeMotorArm;
 
   private TalonFX m_IntakeMotorRoller;
-
+  private MotionMagicVoltage m_request = new MotionMagicVoltage(0);
+  
   public IntakeState m_IntakeState;
 
-  private double FORWARD_LIMIT = IntakeConstants.kExtensionPosition; // Placeholder
-  private double REVERSE_LIMIT = IntakeConstants.kRetractPosition;
+  private double FORWARD_LIMIT = 4.7; // Placeholder
+  private double REVERSE_LIMIT = 0.1;
 
   private final SysIdRoutine m_SysID =
       new SysIdRoutine(
@@ -54,7 +58,7 @@ public class Intake extends SubsystemBase {
     m_IntakeMotorArm = new TalonFX(IntakeConstants.kIntakeMotorArm);
     m_IntakeMotorRoller = new TalonFX(IntakeConstants.kIntakeMotorRoller);
 
-    m_IntakeState = IntakeState.S_Retracted;
+    m_IntakeState = IntakeState.S_Retract;
 
     // Configs that use the PID values to help with motor speed
     var talonFXConfigs =
@@ -70,8 +74,10 @@ public class Intake extends SubsystemBase {
     Slot0Configs.kP = Constants.IntakeConstants.kP;
     Slot0Configs.kI = Constants.IntakeConstants.kI;
     Slot0Configs.kD = Constants.IntakeConstants.kD;
+    Slot0Configs.kS = Constants.IntakeConstants.kS;
     Slot0Configs.kV = Constants.IntakeConstants.kV;
     Slot0Configs.kA = Constants.IntakeConstants.kA;
+    Slot0Configs.kG = Constants.IntakeConstants.kG;
 
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity =
@@ -79,8 +85,13 @@ public class Intake extends SubsystemBase {
     motionMagicConfigs.MotionMagicAcceleration = Constants.IntakeConstants.MotionMagicAcceleration;
     motionMagicConfigs.MotionMagicJerk = Constants.IntakeConstants.MotionMagicJerk;
 
+    MotorOutputConfigs IntakeConfig = new MotorOutputConfigs();
+    IntakeConfig.Inverted = InvertedValue.Clockwise_Positive;
+
     // Apply the Configs to the Motor Objects
     m_IntakeMotorArm.getConfigurator().apply(talonFXConfigs);
+    m_IntakeMotorArm.getConfigurator().apply(IntakeConfig);
+
 
     m_IntakeMotorArm.setPosition(0);
   }
@@ -89,8 +100,8 @@ public class Intake extends SubsystemBase {
     S_Extend,
     S_Retract,
     S_Outtake,
-    S_Extended,
-    S_Retracted
+    // S_Extended,
+    // S_Retracted
   }
 
   public void RunIntakeState() {
@@ -104,26 +115,24 @@ public class Intake extends SubsystemBase {
       case S_Outtake:
         Outtake();
         break;
-      case S_Extended:
-        Neutral();
-        break;
-      case S_Retracted:
-        Neutral();
-        break;
+      // case S_Extended:
+      //   Neutral();
+      //   break;
+      // case S_Retracted:
+      //   Neutral();
+      //   break;
     }
   }
 
   // returns the Arm Position as a double (rotations)
-  public void Neutral() {
-    m_IntakeMotorArm.setVoltage(0);
-  }
+  // public void Neutral() {
+  //   m_IntakeMotorArm.setVoltage(0);
+  // }
 
   // Gives the motor velocity using arm position
   public void setPosition(double position) {
-    // PositionVoltage pos = new PositionVoltage(position).withSlot(0);
-    // m_IntakeMotorArm.setControl(pos);
-    MotionMagicVoltage m_request = new MotionMagicVoltage(0);
-    m_IntakeMotorArm.setControl(m_request.withPosition(position));
+     PositionVoltage pos = new PositionVoltage(position).withSlot(0);
+     m_IntakeMotorArm.setControl(pos);
   }
 
   // A method that returns true if the arm is at its destination
@@ -136,27 +145,23 @@ public class Intake extends SubsystemBase {
   public void ExtendPosition() {
     // If motor has reached its destination the stop the arm and start the rollers
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
-      // m_IntakeMotorArm.setVoltage(0);
-      m_IntakeMotorRoller.setVoltage(-4);
-      // m_IntakeState = IntakeState.S_Extended;
-    } else {
+      m_IntakeMotorRoller.setVoltage(4);
+    //   // m_IntakeState = IntakeState.S_Extended;
+    }
       // Move the arm until it reaches its destination
       setPosition(IntakeConstants.kExtensionPosition);
-    }
   }
 
   // Pulls the intake back in and stops the rollers
   public void RetractPosition() {
     // When retracting we want to rollers to stay off
     m_IntakeMotorRoller.setVoltage(0);
-    // If the arm has reached its destination stop the motor
-    if (checkExtended(IntakeConstants.kRetractPosition)) {
-      m_IntakeMotorArm.setVoltage(0);
-      m_IntakeState = IntakeState.S_Retracted;
-    } else {
+    // // If the arm has reached its destination stop the motor
+    // if (checkExtended(IntakeConstants.kRetractPosition)) {
+    //   //m_IntakeState = IntakeState.S_Retracted;
+    // }
       // Move the arm until it reaches the destination
-      setPosition(IntakeConstants.kRetractPosition);
-    }
+    setPosition(IntakeConstants.kRetractPosition);
   }
 
   // Extends the intake if it is not out and reverses the rollers to eject pieces
