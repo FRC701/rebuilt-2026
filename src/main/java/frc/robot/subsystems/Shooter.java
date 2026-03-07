@@ -53,7 +53,6 @@ public class Shooter extends SubsystemBase {
     Slot0Configs.kD = Constants.ShooterConstants.kD;
     Slot0Configs.kV = Constants.ShooterConstants.kV;
     Slot0Configs.kS = Constants.ShooterConstants.kS;
-    
 
     // Identifying of the motors and making the front one the leader
     m_ShooterMotor = new TalonFX(motorId);
