@@ -43,6 +43,8 @@ public final class Constants {
     public static final int kClimberLeader = 62;
     public static final int kClimberFollower = 61;
 
+    public static final int kLimitSwitchPin = 0; // Placeholder
+
     // The position/height of the climber measured with built in encoders
     public static final double kExtensionPosition = 7.4; // Inches
     public static final double kRetractPosition = 0.75; // Inches
