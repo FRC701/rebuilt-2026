@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -108,12 +107,9 @@ public class RobotContainer {
         m_DriveTrain.applyRequest(
             () ->
                 m_DriveField
-                    .withVelocityX(-m_driverController.getLeftY() * MaxSpeed) // Drive
-                    // forward
-                    // with
-                    // negative
-                    // Y
-                    // (forward)
+                    .withVelocityX(
+                        -m_driverController.getLeftY()
+                            * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(
                         -m_driverController.getLeftX()
                             * MaxSpeed) // Drive left with negative X (left)
@@ -128,16 +124,6 @@ public class RobotContainer {
     RobotModeTriggers.disabled()
         .whileTrue(m_DriveTrain.applyRequest(() -> idle).ignoringDisable(true));
 
-    m_driverController.a().whileTrue(m_DriveTrain.applyRequest(() -> brake));
-    m_driverController
-        .b()
-        .whileTrue(
-            m_DriveTrain.applyRequest(
-                () ->
-                    point.withModuleDirection(
-                        new Rotation2d(
-                            -m_driverController.getLeftY(), -m_driverController.getLeftX()))));
-
     // Run SysId routines when holding back/start and X/Y. (FOR TUNING)
     // Note that each routine should be run exactly once in a single log.
     // m_driverController.back().and(m_driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
@@ -147,7 +133,7 @@ public class RobotContainer {
 
     // Reset the field-centric heading on left bumper press.
     m_driverController
-        .leftTrigger()
+        .leftBumper()
         .onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
     m_DriveTrain.registerTelemetry(logger::telemeterize);
 
