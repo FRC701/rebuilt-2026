@@ -70,7 +70,6 @@ public class Shooter extends SubsystemBase {
     Slot0Configs.kD = Constants.ShooterConstants.kD;
     Slot0Configs.kV = Constants.ShooterConstants.kV;
     Slot0Configs.kS = Constants.ShooterConstants.kS;
-    
 
     // Applying the configs to the motors, PID
     // Applying the configs to the motors, Voltage Limits

@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -22,7 +21,6 @@ import frc.robot.commands.ClimberLock;
 import frc.robot.commands.ClimberRetract;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.SequentialShoot;
-import frc.robot.commands.ShootCommand;
 import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
@@ -166,12 +164,12 @@ public class RobotContainer {
     // binds the a-button to toggle the agitator
     m_coDriverController.a().toggleOnTrue(m_AgitatorToggle);
     // Binds the x-button to shooting the shooters
-     m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter, m_RightShooter));
+    m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter, m_RightShooter));
     // m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
 
     // AutoShootCommand
-    m_driverController.b().onTrue(new SequentialShoot(m_LeftShooter,m_RightShooter,m_Feeder));
-    //m_driverController.b().onTrue(new ShootCommand(m_RightShooter));
+    m_driverController.b().onTrue(new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder));
+    // m_driverController.b().onTrue(new ShootCommand(m_RightShooter));
 
     // m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
     // m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
