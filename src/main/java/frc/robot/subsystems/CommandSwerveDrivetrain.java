@@ -90,7 +90,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
               null,
               this));
 
-  private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
+  private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation; 
+  //m_sysIdRoutineTranslation m_sysIdRoutineSteer m_sysIdRoutineRotation
 
   public CommandSwerveDrivetrain(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {

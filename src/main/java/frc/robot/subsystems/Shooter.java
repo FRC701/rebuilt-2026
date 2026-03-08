@@ -11,9 +11,12 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+<<<<<<< Updated upstream
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+=======
+>>>>>>> Stashed changes
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -23,8 +26,15 @@ public class Shooter extends SubsystemBase {
 
   public ShooterEnumState m_ShooterEnumState;
 
+<<<<<<< Updated upstream
   // Boolean to track the enabled status
   private boolean m_ShooterEnabled = true;
+=======
+  /** Creates a new Shooter. */
+  public Shooter(int motorId) {
+    // Selects the intial state
+    m_ShooterEnumState = ShooterEnumState.S_Shooting;
+>>>>>>> Stashed changes
 
   // voltSpeed = desired amount of rotations per second
   private VelocityVoltage voltSpeed = new VelocityVoltage(0).withSlot(0);
@@ -64,6 +74,7 @@ public class Shooter extends SubsystemBase {
     Slot0Configs.kI = Constants.ShooterConstants.kI;
     Slot0Configs.kD = Constants.ShooterConstants.kD;
     Slot0Configs.kV = Constants.ShooterConstants.kV;
+<<<<<<< Updated upstream
     Slot0Configs.kS = Constants.ShooterConstants.kS;
     m_TalonFXConfig.withSlot0(Slot0Configs);
 
@@ -81,6 +92,38 @@ public class Shooter extends SubsystemBase {
     m_EnabledString = getName() + " Enabled";
     m_RevolutionsErrorString = getName() + "Revolutions Error";
     m_SpeedString = getName() + " Speed";
+=======
+    Slot0Configs.kA = Constants.ShooterConstants.kA;
+
+    // Identifying of the motors and making the front one the leader
+    m_ShooterMotor = new TalonFX(motorId);
+
+    // Applying the configs to the motors, PID
+    m_ShooterMotor.getConfigurator().apply(Slot0Configs);
+
+    // Applying the configs to the motors, Voltage Limits
+    m_ShooterMotor.getConfigurator().apply(m_TalonFXConfig);
+  }
+
+  // Uses PID to arrive at our shooting speed
+  public void shooting() {
+    // voltSpeed = desired amount of rotations per second
+    VelocityVoltage voltSpeed =
+        new VelocityVoltage(Constants.ShooterConstants.shootRev).withSlot(0);
+    m_ShooterMotor.setControl(voltSpeed);
+  }
+
+  // Uses PID to arrive at our passing speed
+  public void passing() {
+    // voltSpeed = desired amount of rotations per second
+    VelocityVoltage voltSpeed = new VelocityVoltage(Constants.ShooterConstants.passRev).withSlot(0);
+    m_ShooterMotor.setControl(voltSpeed);
+  }
+
+  // Sets the speed to 0 by creating a VelocityVotage object with 0 velocity
+  public void stopping() {
+    m_ShooterMotor.setControl(new VelocityVoltage(0).withSlot(0));
+>>>>>>> Stashed changes
   }
 
   public enum ShooterEnumState {

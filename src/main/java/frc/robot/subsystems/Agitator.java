@@ -21,7 +21,7 @@ public class Agitator extends SubsystemBase {
     m_AgitatorLeftMotor = new TalonFX(Constants.AgitatorConstants.kAgitatorLeftMotor);
     m_AgitatorRightMotor = new TalonFX(Constants.AgitatorConstants.kAgitatorRightMotor);
 
-    m_AgitatorState = AgitatorState.S_On;
+    m_AgitatorState = AgitatorState.S_Off; //On should be default
 
     m_AgitatorRightMotor.setControl(
         new Follower(m_AgitatorLeftMotor.getDeviceID(), MotorAlignmentValue.Opposed));

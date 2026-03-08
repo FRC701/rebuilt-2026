@@ -23,6 +23,7 @@ public final class Constants {
     public static final int kCoDriverControllerPort = 1;
   }
 
+<<<<<<< Updated upstream
   // Agitator IDs : 20s
   public static class AgitatorConstants {
     public static final int kAgitatorLeftMotor = 21;
@@ -36,6 +37,23 @@ public final class Constants {
     // 3 is a placeholder for motor voltage
     public static final double kFeederVolt = 3;
   }
+=======
+  public static class IntakeConstants {
+    public static final int kIntakeMotorArm = 11;
+    public static final int kIntakeMotorRoller = 12;
+    // The number of rotations using the falcon's encoder
+    public static final double kExtensionPosition = 4.7;
+    public static final double kRetractPosition = 0; // Intake is retracted and in the bot
+
+    // PID Constants for Intake Extension
+    public static final double kP = 1.21337;
+    public static final double kI = 0.001;
+    public static final double kD = 0.1;
+    public static final double kS = 0.27635;
+    public static final double kV = 0.01335;
+    public static final double kA = 1.01164;
+    public static final double kG = 0.25853; // 0.46724;
+>>>>>>> Stashed changes
 
   // Climber Motor Ids = 60s
   public static class ClimberConstants {
