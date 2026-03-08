@@ -19,6 +19,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
+import com.ctre.phoenix6.signals.ReverseLimitValue;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
@@ -44,7 +45,7 @@ public class Intake extends SubsystemBase {
   public IntakeState m_IntakeState;
 
   private double FORWARD_LIMIT = 4.7; // Placeholder
-  private double REVERSE_LIMIT = 0.1;
+  private double REVERSE_LIMIT = 0;
 
   private final SysIdRoutine m_SysID =
       new SysIdRoutine(
@@ -57,7 +58,7 @@ public class Intake extends SubsystemBase {
     m_IntakeMotorArm = new TalonFX(IntakeConstants.kIntakeMotorArm);
     m_IntakeMotorRoller = new TalonFX(IntakeConstants.kIntakeMotorRoller);
 
-    m_IntakeState = IntakeState.S_Retract;
+    m_IntakeState = IntakeState.S_Empty;
 
     // Configs that use the PID values to help with motor speed
     var m_talonFXConfigs =
@@ -93,7 +94,8 @@ public class Intake extends SubsystemBase {
   public enum IntakeState {
     S_Extend,
     S_Retract,
-    S_Outtake
+    S_Outtake,
+    S_Empty
   }
 
   public void RunIntakeState() {
@@ -107,7 +109,14 @@ public class Intake extends SubsystemBase {
       case S_Outtake:
         Outtake();
         break;
+      case S_Empty:
+        empty();
+        break;
     }
+  }
+
+  public void empty(){
+    m_IntakeMotorArm.setVoltage(0);
   }
 
   // Gives the motor velocity using arm position
@@ -119,14 +128,14 @@ public class Intake extends SubsystemBase {
   // A method that returns true if the arm is at its destination
   public boolean checkExtended(double Setpoint) {
     double position = m_IntakeMotorArm.getPosition().getValueAsDouble();
-    return (position - 0.2 <= Setpoint) && (position + 0.2 >= Setpoint); // subject to change
+    return (position - 0.05 <= Setpoint) && (position + 0.05 >= Setpoint); // subject to change
   }
 
   // Extends the intake out and starts the rollers
   public void ExtendPosition() {
     // If motor has reached its destination the stop the arm and start the rollers
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
-      m_IntakeMotorRoller.setVoltage(4);
+      m_IntakeMotorRoller.setVoltage(0);
     }
     // Move the arm until it reaches its destination
     setPosition(IntakeConstants.kExtensionPosition);
@@ -154,6 +163,9 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (m_IntakeMotorArm.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
+      m_IntakeMotorArm.setPosition(0);
+    }
     RunIntakeState();
     SmartDashboard.putBoolean("CheckExtended", checkExtended(IntakeConstants.kExtensionPosition));
     SmartDashboard.putBoolean("CheckRetracted", checkExtended(IntakeConstants.kRetractPosition));

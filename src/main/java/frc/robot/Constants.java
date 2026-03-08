@@ -22,16 +22,16 @@ public final class Constants {
     public static final int kIntakeMotorRoller = 12;
     // The number of rotations using the falcon's encoder
     public static final double kExtensionPosition = 4.7;
-    public static final int kRetractPosition = 0; // Intake is retracted and in the bot
+    public static final double kRetractPosition = 0; // Intake is retracted and in the bot
 
     // PID Constants for Intake Extension
-    public static final double kP = 1.51337;
-    public static final double kI = 0;
+    public static final double kP = 1.21337;
+    public static final double kI = 0.001;
     public static final double kD = 0.1;
-    public static final double kS = 2.4686;
-    public static final double kV = 1;
+    public static final double kS = 0.27635;
+    public static final double kV = 0.01335;
     public static final double kA = 1.01164;
-    public static final double kG = 1; // 0.46724;
+    public static final double kG = 0.25853; // 0.46724;
 
     // Motion Magic Parameters
     public static final double MotionMagicCruiseVelocity = 100; // target cruise velocity of 40 rps
@@ -48,10 +48,8 @@ public final class Constants {
   public static class ShooterConstants {
     // Facing from the front of the shooters (For Left and Right)
     // Front is the closest to the edge, Back is the furthest inward
-    public static final int kFrontLeftShooterId = 41;
-    public static final int kBackLeftShooterId = 42;
-    public static final int kFrontRightShooterId = 43;
-    public static final int kBackRightShooterId = 44;
+    public static final int kLeftShooterId = 41;
+    public static final int kRightShooterId = 42;
 
     // PID Constants for Shooting
     public static final double kP = 0.1;

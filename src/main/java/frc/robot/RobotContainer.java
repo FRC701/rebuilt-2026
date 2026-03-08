@@ -14,10 +14,7 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.ExtendIntake;
-import frc.robot.commands.NotShootingCommand;
-import frc.robot.commands.PassingCommand;
 import frc.robot.commands.RetractIntake;
-import frc.robot.commands.ShootingCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -31,10 +28,8 @@ import frc.robot.subsystems.Shooter;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private Shooter m_LeftShooter =
-      new Shooter(ShooterConstants.kFrontLeftShooterId, ShooterConstants.kBackLeftShooterId);
-  private Shooter m_RightShooter =
-      new Shooter(ShooterConstants.kFrontRightShooterId, ShooterConstants.kBackRightShooterId);
+  private Shooter m_LeftShooter = new Shooter(ShooterConstants.kLeftShooterId);
+  private Shooter m_RightShooter = new Shooter(ShooterConstants.kRightShooterId);
 
   private Intake m_intake = new Intake();
 
@@ -63,17 +58,17 @@ public class RobotContainer {
         .onTrue(new ExampleCommand(m_exampleSubsystem));
 
     // Binds the x-button to shooting the shooters
-    m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
-    m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
+    // m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
+    // m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
 
     m_driverController.leftTrigger().onTrue(new ExtendIntake(m_intake));
     m_driverController.rightTrigger().onTrue(new RetractIntake(m_intake));
 
-    m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
-    m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
+    // m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
+    // m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
 
-    m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
-    m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
+    // m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
+    // m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
 
     // Climber SysID in the dashboard
     SmartDashboard.putData(
