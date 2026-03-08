@@ -43,10 +43,12 @@ public final class Constants {
     public static final int kClimberLeader = 62;
     public static final int kClimberFollower = 61;
 
+    public static final int kLimitSwitchPin = 0; // Placeholder
+
     // The position/height of the climber measured with built in encoders
-    public static final double kExtensionPosition = 7.4; // Inches
-    public static final double kRetractPosition = 0.75; // Inches
-    public static final double kLockPosition = 0;
+    public static final double kExtensionPosition = 5.64; // Inches from limit switch
+    public static final double kRetractPosition = 0; // Inches from limit switch
+    public static final double kLockPosition = -0.34;
 
     // PID Constants for Climbing
     public static final double kP = 0.1;
