@@ -105,7 +105,7 @@ public class Climber extends SubsystemBase {
   }
 
   public void ClimberHoming() {
-    if (m_LimitSwitch.get()) {
+    if (!m_LimitSwitch.get()) {
       m_ClimberState = ClimberState.S_Hold;
     } else {
       m_ClimberLeader.setVoltage(-2); // placeholder
@@ -135,6 +135,9 @@ public class Climber extends SubsystemBase {
   // Sets to the retract position, checks if set point reached then will switch to retract, and
   // holds position
   public void Retract() {
+    if (!m_LimitSwitch.get()) {
+      m_ClimberState = ClimberState.S_Hold;
+    }
     setPosition(inchesToRotation(Constants.ClimberConstants.kRetractPosition));
   }
 
@@ -148,6 +151,7 @@ public class Climber extends SubsystemBase {
     m_ClimberLeader.setControl(pos);
   }
 
+  // Currently off by a little amount
   public double inchesToRotation(double Length) {
     return (Length * GearRatio) / kSproketCircumference;
   }
@@ -161,10 +165,10 @@ public class Climber extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    if (m_LimitSwitch.get()) {
-      m_ClimberLeader.setPosition(0.75);
+    if (!m_LimitSwitch.get()) {
+      m_ClimberLeader.setPosition(0);
     }
-    SmartDashboard.putBoolean("Climber Limit Switch", m_LimitSwitch.get());
+    SmartDashboard.putBoolean("Climber Limit Switch", !m_LimitSwitch.get());
     Shuffleboard.getTab("Test");
     SmartDashboard.putNumber("ClimberMotorPosition", rotationsToInches());
     SmartDashboard.putNumber("ClimberMotorRaw", m_ClimberLeader.getPosition().getValueAsDouble());
