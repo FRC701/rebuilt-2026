@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -14,6 +15,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -92,6 +94,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
 
+    private final Pigeon2 pidgey = new Pigeon2(0, "*");
+
+  // Defines gyro 
   public CommandSwerveDrivetrain(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
     super(drivetrainConstants, modules);
@@ -151,7 +156,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
               });
     }
-
+    //Shuffleboard.putNumber("GyroYaw",pidgey.getYaw().getValueAsDouble());
+    // Calls gyro to shuffleboard
     Pose2d currentPose = getState().Pose;
     m_field.setRobotPose(currentPose);
 
@@ -198,4 +204,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   public Optional<Pose2d> samplePoseAt(double timestamp) {
     return super.samplePoseAt(Utils.fpgaToCurrentTime(timestamp));
   }
+
+
 }
