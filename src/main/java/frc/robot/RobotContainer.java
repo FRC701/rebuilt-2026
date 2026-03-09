@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -77,10 +79,9 @@ public class RobotContainer {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+      new CommandXboxController(OperatorConstants.kXboxControllerPort);
+    private final CommandPS4Controller m_ps4Controller = new CommandPS4Controller(OperatorConstants.kPs4ControllerPort);
 
-  private final CommandXboxController m_coDriverController =
-      new CommandXboxController(OperatorConstants.kCoDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -131,24 +132,42 @@ public class RobotContainer {
     // m_driverController.start().and(m_driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     // m_driverController.start().and(m_driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-    // Reset the field-centric heading on left bumper press.
+    // Reset the field-centric heading on left bumper press for Xbox
     m_driverController
         .leftBumper()
         .onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
     m_DriveTrain.registerTelemetry(logger::telemeterize);
 
-    // binds the a-button to toggle the agitator
-    m_driverController.povDown().toggleOnTrue(m_AgitatorToggle);
+    //Playstation variant of ^^^
+    m_ps4Controller
+        .L1()
+        .onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
 
-    // Binds the x-button to shooting the left shooter, y-button to passing, and b-button to not
-    m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
-    m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
+    // binds the dpad down to toggle the agitator for Xbox
+    m_driverController.povDown().toggleOnTrue(m_AgitatorToggle);
+ 
+    //Playstation variant of ^^^
+    m_ps4Controller.povDown().toggleOnTrue(m_AgitatorToggle);
+
+    // Binds the x-button to shooting the left shooter, y-button to passing, and b-button to not for Xbox
+    m_driverController.rightTrigger().onTrue(new ShootingCommand(m_LeftShooter));
+    m_driverController.rightBumper().onTrue(new PassingCommand(m_LeftShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
 
-    // Binds the x-button to shooting the right shooter, y-button to passing, and b-button to not
-    m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
-    m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
+    //Playstation variant of ^^^
+    m_ps4Controller.R2().onTrue(new ShootingCommand(m_LeftShooter));
+    m_ps4Controller.R1().onTrue(new PassingCommand(m_LeftShooter));
+    m_ps4Controller.circle().onTrue(new NotShootingCommand(m_LeftShooter));
+
+    // Binds the x-button to shooting the right shooter, y-button to passing, and b-button to not for Xbox
+    m_driverController.rightTrigger().onTrue(new ShootingCommand(m_RightShooter));
+    m_driverController.rightBumper().onTrue(new PassingCommand(m_RightShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
+
+    //Playstation variant of ^^^
+    m_ps4Controller.R2().onTrue(new ShootingCommand(m_RightShooter));
+    m_ps4Controller.R1().onTrue(new PassingCommand(m_RightShooter));
+    m_ps4Controller.circle().onTrue(new NotShootingCommand(m_RightShooter));
 
     // Climber Bindings
     m_driverController

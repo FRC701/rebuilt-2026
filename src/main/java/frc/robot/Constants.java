@@ -19,8 +19,8 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
   public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
-    public static final int kCoDriverControllerPort = 1;
+    public static final int kXboxControllerPort = 0;
+    public static final int kPs4ControllerPort = 1;
   }
 
   // Agitator IDs : 20s
