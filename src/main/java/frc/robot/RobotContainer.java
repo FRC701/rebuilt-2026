@@ -10,6 +10,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -79,14 +80,11 @@ public class RobotContainer {
 
   private Intake m_intake = new Intake();
 
-  private final Climber m_Climber;
-
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
-
-  private final CommandXboxController m_coDriverController =
-      new CommandXboxController(OperatorConstants.kCoDriverControllerPort);
+      new CommandXboxController(OperatorConstants.kXboxControllerPort);
+  private final CommandPS4Controller m_ps4Controller =
+      new CommandPS4Controller(OperatorConstants.kPs4ControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -140,25 +138,44 @@ public class RobotContainer {
     // m_driverController.start().and(m_driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     // m_driverController.start().and(m_driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-    // Reset the field-centric heading on left bumper press.
+    // Reset the field-centric heading on left bumper press for Xbox
     m_driverController
         .leftBumper()
         .onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
     m_DriveTrain.registerTelemetry(logger::telemeterize);
 
-    // binds the a-button to toggle the agitator
+    // Playstation variant of ^^^
+    m_ps4Controller.L1().onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
+
+    // binds the dpad down to toggle the agitator for Xbox
     m_driverController.povDown().toggleOnTrue(m_AgitatorToggle);
+
+    // Playstation variant of ^^^
+    m_ps4Controller.povDown().toggleOnTrue(m_AgitatorToggle);
+
     // Binds the x-button to shooting the shooters
     m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter, m_RightShooter));
 
+    // Binds the y-button to passing the left shooter and b-button to not for Xbox
+    m_driverController.rightBumper().onTrue(new PassingCommand(m_LeftShooter));
+    m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
+
+    // Playstation variant of ^^^
+    m_ps4Controller.R1().onTrue(new PassingCommand(m_LeftShooter));
+    m_ps4Controller.circle().onTrue(new NotShootingCommand(m_LeftShooter));
+
+    // Binds the x-button to shooting the right shooter, y-button to passing, and b-button to not
+    // for Xbox
+    m_driverController.rightBumper().onTrue(new PassingCommand(m_RightShooter));
+    m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
+
+    // Playstation variant of ^^^
+    m_ps4Controller.R1().onTrue(new PassingCommand(m_RightShooter));
+    m_ps4Controller.circle().onTrue(new NotShootingCommand(m_RightShooter));
+
     m_driverController.leftTrigger().onTrue(new ExtendIntake(m_intake));
     m_driverController.rightTrigger().onTrue(new RetractIntake(m_intake));
-
-    // m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
-    //  m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
-    // AutoShootCommand
     m_driverController.b().onTrue(new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder));
-    // m_driverController.b().onTrue(new ShootCommand(m_RightShooter));
 
     // Climber Bindings
     m_driverController
@@ -169,6 +186,5 @@ public class RobotContainer {
     m_driverController.b().onTrue(new ClimberLock(m_Climber));
     m_driverController.a().onTrue(new NotShootingCommand(m_LeftShooter));
     m_driverController.a().onTrue(new NotShootingCommand(m_RightShooter));
-    m_driverController.y().toggleOnTrue(m_FeederToggle);
   }
 }
