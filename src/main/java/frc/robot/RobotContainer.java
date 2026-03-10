@@ -8,28 +8,26 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FeederConstants;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.ClimberExtend;
 import frc.robot.commands.ClimberLock;
-import frc.robot.commands.ClimberRetract;
+import frc.robot.commands.ClimberUpDownToggle;
+import frc.robot.commands.LaunchToggle;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.PassingCommand;
-import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
 import frc.robot.subsystems.Agitator.AgitatorState;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
-import frc.robot.subsystems.Feeder.FeederState;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -65,6 +63,7 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
 
   private final Agitator m_Agitator = new Agitator();
+  private Climber m_Climber = new Climber();
   private Feeder m_Feeder = new Feeder(FeederConstants.kFeederMotor);
   private Shooter m_LeftShooter =
       new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter");
@@ -76,20 +75,12 @@ public class RobotContainer {
           () -> m_Agitator.m_AgitatorState = AgitatorState.S_On,
           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Off,
           m_Agitator);
-  private Command m_FeederToggle =
-      Commands.startEnd(
-          () -> m_Feeder.m_FeederState = FeederState.S_On,
-          () -> m_Feeder.m_FeederState = FeederState.S_Off,
-          m_Feeder);
-
-  private final Climber m_Climber;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
-
-  private final CommandXboxController m_coDriverController =
-      new CommandXboxController(OperatorConstants.kCoDriverControllerPort);
+      new CommandXboxController(OperatorConstants.kXboxControllerPort);
+  private final CommandPS4Controller m_ps4Controller =
+      new CommandPS4Controller(OperatorConstants.kPs4ControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -116,12 +107,9 @@ public class RobotContainer {
         m_DriveTrain.applyRequest(
             () ->
                 m_DriveField
-                    .withVelocityX(-m_driverController.getLeftY() * MaxSpeed) // Drive
-                    // forward
-                    // with
-                    // negative
-                    // Y
-                    // (forward)
+                    .withVelocityX(
+                        -m_driverController.getLeftY()
+                            * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(
                         -m_driverController.getLeftX()
                             * MaxSpeed) // Drive left with negative X (left)
@@ -136,16 +124,6 @@ public class RobotContainer {
     RobotModeTriggers.disabled()
         .whileTrue(m_DriveTrain.applyRequest(() -> idle).ignoringDisable(true));
 
-    m_driverController.a().whileTrue(m_DriveTrain.applyRequest(() -> brake));
-    m_driverController
-        .b()
-        .whileTrue(
-            m_DriveTrain.applyRequest(
-                () ->
-                    point.withModuleDirection(
-                        new Rotation2d(
-                            -m_driverController.getLeftY(), -m_driverController.getLeftX()))));
-
     // Run SysId routines when holding back/start and X/Y. (FOR TUNING)
     // Note that each routine should be run exactly once in a single log.
     // m_driverController.back().and(m_driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
@@ -153,32 +131,52 @@ public class RobotContainer {
     // m_driverController.start().and(m_driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     // m_driverController.start().and(m_driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-    // Reset the field-centric heading on left bumper press.
+    // Reset the field-centric heading on left bumper press for Xbox
     m_driverController
-        .leftTrigger()
+        .leftBumper()
         .onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
     m_DriveTrain.registerTelemetry(logger::telemeterize);
 
-    // binds the a-button to toggle the agitator
-    m_coDriverController.a().toggleOnTrue(m_AgitatorToggle);
+    // Playstation variant of ^^^
+    m_ps4Controller.L1().onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
 
-    // Binds the x-button to shooting the left shooter, y-button to passing, and b-button to not
-    m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter));
-    m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
+    // binds the dpad down to toggle the agitator for Xbox
+    m_driverController.povDown().toggleOnTrue(m_AgitatorToggle);
+
+    // Playstation variant of ^^^
+    m_ps4Controller.povDown().toggleOnTrue(m_AgitatorToggle);
+
+    // Binds the x-button to shooting the left shooter, y-button to passing, and b-button to not for
+    // Xbox
+    m_driverController
+        .rightTrigger()
+        .onTrue(new LaunchToggle(m_Feeder, m_LeftShooter, m_RightShooter));
+    m_driverController.rightBumper().onTrue(new PassingCommand(m_LeftShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
 
+    // Playstation variant of ^^^
+    m_ps4Controller.R2().onTrue(new LaunchToggle(m_Feeder, m_LeftShooter, m_RightShooter));
+    m_ps4Controller.R1().onTrue(new PassingCommand(m_LeftShooter));
+    m_ps4Controller.circle().onTrue(new NotShootingCommand(m_LeftShooter));
+
     // Binds the x-button to shooting the right shooter, y-button to passing, and b-button to not
-    m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
-    m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
+    // for Xbox
+    // m_driverController.rightTrigger().onTrue(new ShootingCommand(m_RightShooter));
+    m_driverController.rightBumper().onTrue(new PassingCommand(m_RightShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-    // pressed,
-    // cancelling on release.
-    m_driverController.leftBumper().onTrue(new ClimberExtend(m_Climber));
-    m_driverController.a().onTrue(new ClimberLock(m_Climber));
-    m_driverController.rightBumper().onTrue(new ClimberRetract(m_Climber));
-    m_driverController.y().toggleOnTrue(m_FeederToggle);
+    // Playstation variant of ^^^
+    // m_ps4Controller.R2().onTrue(new ShootingCommand(m_RightShooter));
+    m_ps4Controller.R1().onTrue(new PassingCommand(m_RightShooter));
+    m_ps4Controller.circle().onTrue(new NotShootingCommand(m_RightShooter));
+
+    // Climber Bindings
+    m_driverController
+        .a()
+        .onTrue(
+            new ClimberUpDownToggle(
+                m_Climber, m_Agitator, m_Feeder, m_LeftShooter, m_RightShooter));
+    m_driverController.b().onTrue(new ClimberLock(m_Climber));
   }
 
   /**
