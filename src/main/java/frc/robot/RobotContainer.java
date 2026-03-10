@@ -8,10 +8,9 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
-import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -20,9 +19,9 @@ import frc.robot.Constants.FeederConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.ClimberLock;
 import frc.robot.commands.ClimberUpDownToggle;
+import frc.robot.commands.LaunchToggle;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.PassingCommand;
-import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
 import frc.robot.subsystems.Agitator.AgitatorState;
@@ -80,8 +79,8 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kXboxControllerPort);
-    private final CommandPS4Controller m_ps4Controller = new CommandPS4Controller(OperatorConstants.kPs4ControllerPort);
-
+  private final CommandPS4Controller m_ps4Controller =
+      new CommandPS4Controller(OperatorConstants.kPs4ControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -138,34 +137,36 @@ public class RobotContainer {
         .onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
     m_DriveTrain.registerTelemetry(logger::telemeterize);
 
-    //Playstation variant of ^^^
-    m_ps4Controller
-        .L1()
-        .onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
+    // Playstation variant of ^^^
+    m_ps4Controller.L1().onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
 
     // binds the dpad down to toggle the agitator for Xbox
     m_driverController.povDown().toggleOnTrue(m_AgitatorToggle);
- 
-    //Playstation variant of ^^^
+
+    // Playstation variant of ^^^
     m_ps4Controller.povDown().toggleOnTrue(m_AgitatorToggle);
 
-    // Binds the x-button to shooting the left shooter, y-button to passing, and b-button to not for Xbox
-    m_driverController.rightTrigger().onTrue(new ShootingCommand(m_LeftShooter));
+    // Binds the x-button to shooting the left shooter, y-button to passing, and b-button to not for
+    // Xbox
+    m_driverController
+        .rightTrigger()
+        .onTrue(new LaunchToggle(m_Feeder, m_LeftShooter, m_RightShooter));
     m_driverController.rightBumper().onTrue(new PassingCommand(m_LeftShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
 
-    //Playstation variant of ^^^
-    m_ps4Controller.R2().onTrue(new ShootingCommand(m_LeftShooter));
+    // Playstation variant of ^^^
+    m_ps4Controller.R2().onTrue(new LaunchToggle(m_Feeder, m_LeftShooter, m_RightShooter));
     m_ps4Controller.R1().onTrue(new PassingCommand(m_LeftShooter));
     m_ps4Controller.circle().onTrue(new NotShootingCommand(m_LeftShooter));
 
-    // Binds the x-button to shooting the right shooter, y-button to passing, and b-button to not for Xbox
-    m_driverController.rightTrigger().onTrue(new ShootingCommand(m_RightShooter));
+    // Binds the x-button to shooting the right shooter, y-button to passing, and b-button to not
+    // for Xbox
+    // m_driverController.rightTrigger().onTrue(new ShootingCommand(m_RightShooter));
     m_driverController.rightBumper().onTrue(new PassingCommand(m_RightShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
 
-    //Playstation variant of ^^^
-    m_ps4Controller.R2().onTrue(new ShootingCommand(m_RightShooter));
+    // Playstation variant of ^^^
+    // m_ps4Controller.R2().onTrue(new ShootingCommand(m_RightShooter));
     m_ps4Controller.R1().onTrue(new PassingCommand(m_RightShooter));
     m_ps4Controller.circle().onTrue(new NotShootingCommand(m_RightShooter));
 
