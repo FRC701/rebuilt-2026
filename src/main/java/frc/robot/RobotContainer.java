@@ -153,9 +153,6 @@ public class RobotContainer {
     // Playstation variant of ^^^
     m_ps4Controller.povDown().toggleOnTrue(m_AgitatorToggle);
 
-    // Binds the x-button to shooting the shooters
-    m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter, m_RightShooter));
-
     // Binds the y-button to passing the left shooter and b-button to not for Xbox
     m_driverController.rightBumper().onTrue(new PassingCommand(m_LeftShooter));
     m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
@@ -175,6 +172,7 @@ public class RobotContainer {
 
     m_driverController.leftTrigger().onTrue(new ExtendIntake(m_intake));
     m_driverController.rightTrigger().onTrue(new RetractIntake(m_intake));
+
     m_driverController.b().onTrue(new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder));
 
     // Climber Bindings
