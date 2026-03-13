@@ -95,6 +95,20 @@ public class Shooter extends SubsystemBase {
         && VoltageCheck() >= Constants.ShooterConstants.shootRev - 3);
   }
 
+  public double VoltageCheck() {
+    return m_ShooterMotor.getVelocity().getValueAsDouble();
+  }
+
+  // returns true if no balls in shooter
+  public boolean CurrentCHeck() {
+    return m_ShooterMotor.getStatorCurrent().getValueAsDouble() <= 30; // placeholder
+  }
+
+  public boolean UpToSpeed() {
+    return (VoltageCheck() <= Constants.ShooterConstants.shootRev + 3
+        && VoltageCheck() >= Constants.ShooterConstants.shootRev - 3);
+  }
+
   public enum ShooterEnumState {
     S_Shooting,
     S_Passing,
