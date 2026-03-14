@@ -64,23 +64,21 @@ public final class Constants {
     public static final double kRetractPosition = 0; // Intake is retracted and in the bot
 
     // PID Constants for Intake Extension
-    public static final double kP = 1.21337;
-    public static final double kI = 0.001;
-    public static final double kD = 0.1;
-    public static final double kS = 0.27635;
-    public static final double kV = 0.01335;
-    public static final double kA = 1.01164;
-    public static final double kG = 0.25853; // 0.46724;
+    public static final double ExtendkP = 1.51337;
+    public static final double ExtendkI = 0;
+    public static final double ExtendkD = 0.3;
+    public static final double ExtendkS = 2.4686;
+    public static final double ExtendkV = 1;
+    public static final double ExtendkA = 1.01164;
+    public static final double ExtendkG = 1; // 0.46724;
 
-    // Motion Magic Parameters
-    public static final double MotionMagicCruiseVelocity = 100; // target cruise velocity of 40 rps
-    public static final double MotionMagicAcceleration =
-        20; // target acceleration of 80 rps/s (0.5 seconds)
-    public static final double MotionMagicJerk =
-        10; // target jerk of 5 rps/s/s (0.1 seconds) *This is optional and is a derivative of
-    // acceleration*
-    // Jerk allows for an S-Curve with Motion Magic
-
+    public static final double RetractkP = 3.0;
+    public static final double RetractkI = 0;
+    public static final double RetractkD = 0.3;
+    public static final double RetractkS = 2.4686;
+    public static final double RetractkV = 1;
+    public static final double RetractkA = 1.01164;
+    public static final double RetractkG = 1;
   }
 
   // Shooter Motor Ids = 40s

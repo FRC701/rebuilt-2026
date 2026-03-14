@@ -73,20 +73,34 @@ public class Intake extends SubsystemBase {
                 new HardwareLimitSwitchConfigs()
                     .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin));
 
-    var Slot0Configs = m_talonFXConfigs.Slot0;
-    Slot0Configs.kP = Constants.IntakeConstants.kP;
-    Slot0Configs.kI = Constants.IntakeConstants.kI;
-    Slot0Configs.kD = Constants.IntakeConstants.kD;
-    Slot0Configs.kS = Constants.IntakeConstants.kS;
-    Slot0Configs.kV = Constants.IntakeConstants.kV;
-    Slot0Configs.kA = Constants.IntakeConstants.kA;
-    Slot0Configs.kG = Constants.IntakeConstants.kG;
+    var Slot0Configs = talonFXConfigs.Slot0;
+    Slot0Configs.kP = Constants.IntakeConstants.ExtendkP;
+    Slot0Configs.kI = Constants.IntakeConstants.ExtendkI;
+    Slot0Configs.kD = Constants.IntakeConstants.ExtendkD;
+    Slot0Configs.kS = Constants.IntakeConstants.ExtendkS;
+    Slot0Configs.kV = Constants.IntakeConstants.ExtendkV;
+    Slot0Configs.kA = Constants.IntakeConstants.ExtendkA;
+    Slot0Configs.kG = Constants.IntakeConstants.ExtendkG;
 
-    MotorOutputConfigs IntakeConfig = m_talonFXConfigs.MotorOutput;
+    var Slot1Configs = talonFXConfigs.Slot1;
+    Slot1Configs.kP = Constants.IntakeConstants.RetractkP;
+    Slot1Configs.kI = Constants.IntakeConstants.RetractkI;
+    Slot1Configs.kD = Constants.IntakeConstants.RetractkD;
+    Slot1Configs.kS = Constants.IntakeConstants.RetractkS;
+    Slot1Configs.kV = Constants.IntakeConstants.RetractkV;
+    Slot1Configs.kA = Constants.IntakeConstants.RetractkA;
+    Slot1Configs.kG = Constants.IntakeConstants.RetractkG;
+
+    MotorOutputConfigs IntakeConfig = new MotorOutputConfigs();
     IntakeConfig.Inverted = InvertedValue.Clockwise_Positive;
 
+    MotorOutputConfigs RollerIntakeConfig = new MotorOutputConfigs();
+    RollerIntakeConfig.Inverted = InvertedValue.Clockwise_Positive;
+
     // Apply the Configs to the Motor Objects
-    m_IntakeMotorArm.getConfigurator().apply(m_talonFXConfigs);
+    m_IntakeMotorArm.getConfigurator().apply(talonFXConfigs);
+    m_IntakeMotorArm.getConfigurator().apply(IntakeConfig);
+    m_IntakeMotorRoller.getConfigurator().apply(RollerIntakeConfig);
 
     m_IntakeMotorArm.setPosition(0);
   }
@@ -109,19 +123,16 @@ public class Intake extends SubsystemBase {
       case S_Outtake:
         Outtake();
         break;
-      case S_Empty:
-        empty();
-        break;
     }
   }
 
-  public void empty(){
+  public void empty() {
     m_IntakeMotorArm.setVoltage(0);
   }
 
   // Gives the motor velocity using arm position
-  public void setPosition(double position) {
-    PositionVoltage pos = new PositionVoltage(position).withSlot(0);
+  public void setPosition(double position, int slot) {
+    PositionVoltage pos = new PositionVoltage(position).withSlot(slot);
     m_IntakeMotorArm.setControl(pos);
   }
 
@@ -135,18 +146,22 @@ public class Intake extends SubsystemBase {
   public void ExtendPosition() {
     // If motor has reached its destination the stop the arm and start the rollers
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
-      m_IntakeMotorRoller.setVoltage(0);
+      m_IntakeMotorRoller.setVoltage(8);
     }
     // Move the arm until it reaches its destination
-    setPosition(IntakeConstants.kExtensionPosition);
+    setPosition(IntakeConstants.kExtensionPosition, 0);
   }
 
   // Pulls the intake back in and stops the rollers
   public void RetractPosition() {
     // When retracting we want to rollers to stay off
     m_IntakeMotorRoller.setVoltage(0);
+    // // If the arm has reached its destination stop the motor
+    // if (checkExtended(IntakeConstants.kRetractPosition)) {
+    //   //m_IntakeState = IntakeState.S_Retracted;
+    // }
     // Move the arm until it reaches the destination
-    setPosition(IntakeConstants.kRetractPosition);
+    setPosition(IntakeConstants.kRetractPosition, 1);
   }
 
   // Extends the intake if it is not out and reverses the rollers to eject pieces
@@ -154,10 +169,11 @@ public class Intake extends SubsystemBase {
     // If motor has reached its destination the stop the arm and start the rollers moving backwards
     // (ejecting)
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
-      m_IntakeMotorRoller.setVoltage(4);
+      m_IntakeMotorArm.setVoltage(0);
+      m_IntakeMotorRoller.setVoltage(8);
     } else {
       // Move the arm until it reaches its destination
-      setPosition(IntakeConstants.kExtensionPosition);
+      setPosition(IntakeConstants.kExtensionPosition, 0);
     }
   }
 
