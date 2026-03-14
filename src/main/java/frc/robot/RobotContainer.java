@@ -167,14 +167,14 @@ public class RobotContainer {
     // binds the a-button to toggle the agitator
     m_coDriverController.a().toggleOnTrue(m_AgitatorToggle);
     // Binds the x-button to shooting the shooters
-    m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter, m_RightShooter));
+   // m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter, m_RightShooter));
     // m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
 
     m_driverController.leftTrigger().onTrue(new ExtendIntake(m_intake));
     m_driverController.rightTrigger().onTrue(new RetractIntake(m_intake));
 
-    m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
-    m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
+    //m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
+  //  m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
     // AutoShootCommand
     m_driverController.b().onTrue(new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder));
     // m_driverController.b().onTrue(new ShootCommand(m_RightShooter));
@@ -182,8 +182,8 @@ public class RobotContainer {
     // m_driverController.y().onTrue(new PassingCommand(m_LeftShooter));
     // m_driverController.y().onTrue(new PassingCommand(m_RightShooter));
 
-    m_driverController.a().onTrue(new NotShootingCommand(m_LeftShooter));
-    m_driverController.a().onTrue(new NotShootingCommand(m_RightShooter));
+    m_driverController.x().onTrue(new NotShootingCommand(m_LeftShooter));
+    m_driverController.x().onTrue(new NotShootingCommand(m_RightShooter));
     // pressed,
     // cancelling on release.
     // m_driverController.leftBumper().onTrue(new ClimberExtend(m_Climber));
