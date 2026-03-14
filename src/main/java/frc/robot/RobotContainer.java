@@ -116,25 +116,25 @@ public class RobotContainer {
 
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
-    // m_DriveTrain.setDefaultCommand(
-    //     // Drivetrain will execute this command periodically
-    //     m_DriveTrain.applyRequest(
-    //         () ->
-    //             m_DriveField
-    //                 .withVelocityX(-m_driverController.getLeftY() * MaxSpeed) // Drive
-    //                 // forward
-    //                 // with
-    //                 // negative
-    //                 // Y
-    //                 // (forward)
-    //                 .withVelocityY(
-    //                     -m_driverController.getLeftX()
-    //                         * MaxSpeed) // Drive left with negative X (left)
-    //                 .withRotationalRate(
-    //                     -m_driverController.getRightX()
-    //                         * MaxAngularRate) // Drive counterclockwise with
-    //         // negative X (left)
-    //         ));
+    m_DriveTrain.setDefaultCommand(
+        // Drivetrain will execute this command periodically
+        m_DriveTrain.applyRequest(
+            () ->
+                m_DriveField
+                    .withVelocityX(-m_driverController.getLeftY() * MaxSpeed) // Drive
+                    // forward
+                    // with
+                    // negative
+                    // Y
+                    // (forward)
+                    .withVelocityY(
+                        -m_driverController.getLeftX()
+                            * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(
+                        -m_driverController.getRightX()
+                            * MaxAngularRate) // Drive counterclockwise with
+            // negative X (left)
+            ));
     // Idle while the robot is disabled. This ensures the configured
     // neutral mode is applied to the drive motors while disabled.
     final var idle = new SwerveRequest.Idle();
