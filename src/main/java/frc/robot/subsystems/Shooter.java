@@ -85,16 +85,6 @@ public class Shooter extends SubsystemBase {
     m_SpeedString = getName() + " Speed";
   }
 
-  // returns true if no balls in shooter
-  public boolean CurrentCHeck() {
-    return m_ShooterMotor.getStatorCurrent().getValueAsDouble() <= 30; // placeholder
-  }
-
-  public boolean UpToSpeed() {
-    return (VoltageCheck() <= Constants.ShooterConstants.shootRev + 3
-        && VoltageCheck() >= Constants.ShooterConstants.shootRev - 3);
-  }
-
   public double VoltageCheck() {
     return m_ShooterMotor.getVelocity().getValueAsDouble();
   }
@@ -142,10 +132,6 @@ public class Shooter extends SubsystemBase {
   // Sets the speed to 0 by using a VelocityVotage object with 0 velocity
   public void stopping() {
     m_ShooterMotor.setControl(voltSpeed.withVelocity(0));
-  }
-
-  public double VoltageCheck() {
-    return m_ShooterMotor.getVelocity().getValueAsDouble();
   }
 
   private boolean setEnabledStatus(boolean shooterStatus) {
