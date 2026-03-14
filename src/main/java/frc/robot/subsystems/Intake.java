@@ -73,7 +73,7 @@ public class Intake extends SubsystemBase {
                 new HardwareLimitSwitchConfigs()
                     .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin));
 
-    var Slot0Configs = talonFXConfigs.Slot0;
+    var Slot0Configs = m_talonFXConfigs.Slot0;
     Slot0Configs.kP = Constants.IntakeConstants.ExtendkP;
     Slot0Configs.kI = Constants.IntakeConstants.ExtendkI;
     Slot0Configs.kD = Constants.IntakeConstants.ExtendkD;
@@ -82,7 +82,7 @@ public class Intake extends SubsystemBase {
     Slot0Configs.kA = Constants.IntakeConstants.ExtendkA;
     Slot0Configs.kG = Constants.IntakeConstants.ExtendkG;
 
-    var Slot1Configs = talonFXConfigs.Slot1;
+    var Slot1Configs = m_talonFXConfigs.Slot1;
     Slot1Configs.kP = Constants.IntakeConstants.RetractkP;
     Slot1Configs.kI = Constants.IntakeConstants.RetractkI;
     Slot1Configs.kD = Constants.IntakeConstants.RetractkD;
@@ -98,7 +98,7 @@ public class Intake extends SubsystemBase {
     RollerIntakeConfig.Inverted = InvertedValue.Clockwise_Positive;
 
     // Apply the Configs to the Motor Objects
-    m_IntakeMotorArm.getConfigurator().apply(talonFXConfigs);
+    m_IntakeMotorArm.getConfigurator().apply(m_talonFXConfigs);
     m_IntakeMotorArm.getConfigurator().apply(IntakeConfig);
     m_IntakeMotorRoller.getConfigurator().apply(RollerIntakeConfig);
 
