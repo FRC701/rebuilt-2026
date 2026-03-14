@@ -56,6 +56,31 @@ public final class Constants {
     public static final double kG = 0;
   }
 
+  public static class IntakeConstants {
+    public static final int kIntakeMotorArm = 11;
+    public static final int kIntakeMotorRoller = 12;
+    // The number of rotations using the falcon's encoder
+    public static final double kExtensionPosition = 4.7;
+    public static final double kRetractPosition = 0; // Intake is retracted and in the bot
+
+    // PID Constants for Intake Extension
+    public static final double ExtendkP = 1.51337;
+    public static final double ExtendkI = 0;
+    public static final double ExtendkD = 0.3;
+    public static final double ExtendkS = 2.4686;
+    public static final double ExtendkV = 1;
+    public static final double ExtendkA = 1.01164;
+    public static final double ExtendkG = 1; // 0.46724;
+
+    public static final double RetractkP = 3.0;
+    public static final double RetractkI = 0;
+    public static final double RetractkD = 0.3;
+    public static final double RetractkS = 2.4686;
+    public static final double RetractkV = 1;
+    public static final double RetractkA = 1.01164;
+    public static final double RetractkG = 1;
+  }
+
   // Shooter Motor Ids = 40s
   public static class ShooterConstants {
     // Facing from the front of the shooters (For Left and Right)
