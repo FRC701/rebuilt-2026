@@ -21,7 +21,7 @@ public class Agitator extends SubsystemBase {
     m_AgitatorLeftMotor = new TalonFX(Constants.AgitatorConstants.kAgitatorLeftMotor);
     m_AgitatorRightMotor = new TalonFX(Constants.AgitatorConstants.kAgitatorRightMotor);
 
-    m_AgitatorState = AgitatorState.S_On;
+    m_AgitatorState = AgitatorState.S_Off;
 
     m_AgitatorRightMotor.setControl(
         new Follower(m_AgitatorLeftMotor.getDeviceID(), MotorAlignmentValue.Opposed));
@@ -52,11 +52,13 @@ public class Agitator extends SubsystemBase {
   // method for when motor is in motion
   public void spinAgitatorMotor() {
     m_AgitatorLeftMotor.setVoltage(Constants.AgitatorConstants.kAgitatorVolt);
+    m_AgitatorRightMotor.setVoltage(-Constants.AgitatorConstants.kAgitatorVolt);
   }
 
   // method for when motor is not in motion
   public void stopAgitatorMotor() {
     m_AgitatorLeftMotor.setVoltage(0);
+    m_AgitatorRightMotor.setVoltage(0);
   }
 
   @Override

@@ -25,7 +25,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   public VisionSubsystem() {
     m_ForwardCamera = new PhotonCamera(Constants.Vision.kForwardCameraName);
-    m_FieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+    m_FieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     m_ForwardPoseEstimator =
         new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kForwardRobotToCam3d);
   }
