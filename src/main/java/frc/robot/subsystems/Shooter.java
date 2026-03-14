@@ -55,23 +55,25 @@ public class Shooter extends SubsystemBase {
             .withVoltage(
                 new VoltageConfigs().withPeakForwardVoltage(10).withPeakReverseVoltage(-10));
 
-    MotorOutputConfigs shooterConfig = new MotorOutputConfigs();
-    shooterConfig.Inverted = InvertedValue.Clockwise_Positive;
+    MotorOutputConfigs shooterConfig = m_TalonFXConfig.MotorOutput;
+
+    if (motorId == Constants.ShooterConstants.kRightShooterId) {
+      shooterConfig.Inverted = InvertedValue.CounterClockwise_Positive;
+    } else {
+      shooterConfig.Inverted = InvertedValue.Clockwise_Positive;
+    }
 
     // Configs that use the PID values to help with motor speed
-    Slot0Configs Slot0Configs = new Slot0Configs();
+    Slot0Configs Slot0Configs = m_TalonFXConfig.Slot0;
     Slot0Configs.kP = Constants.ShooterConstants.kP;
     Slot0Configs.kI = Constants.ShooterConstants.kI;
     Slot0Configs.kD = Constants.ShooterConstants.kD;
     Slot0Configs.kV = Constants.ShooterConstants.kV;
     Slot0Configs.kS = Constants.ShooterConstants.kS;
-    m_TalonFXConfig.withSlot0(Slot0Configs);
 
     // Applying the configs to the motors, PID
     // Applying the configs to the motors, Voltage Limits
     m_ShooterMotor.getConfigurator().apply(m_TalonFXConfig);
-
-    m_ShooterMotor.getConfigurator().apply(shooterConfig);
 
     velocitySignal = m_ShooterMotor.getVelocity();
   }
@@ -81,6 +83,20 @@ public class Shooter extends SubsystemBase {
     m_EnabledString = getName() + " Enabled";
     m_RevolutionsErrorString = getName() + "Revolutions Error";
     m_SpeedString = getName() + " Speed";
+  }
+
+  public double VoltageCheck() {
+    return m_ShooterMotor.getVelocity().getValueAsDouble();
+  }
+
+  // returns true if no balls in shooter
+  public boolean CurrentCHeck() {
+    return m_ShooterMotor.getStatorCurrent().getValueAsDouble() <= 30; // placeholder
+  }
+
+  public boolean UpToSpeed() {
+    return (VoltageCheck() <= Constants.ShooterConstants.shootRev + 3
+        && VoltageCheck() >= Constants.ShooterConstants.shootRev - 3);
   }
 
   public enum ShooterEnumState {
@@ -118,10 +134,6 @@ public class Shooter extends SubsystemBase {
     m_ShooterMotor.setControl(voltSpeed.withVelocity(0));
   }
 
-  public double VoltageCheck() {
-    return m_ShooterMotor.getVelocity().getValueAsDouble();
-  }
-
   private boolean setEnabledStatus(boolean shooterStatus) {
     m_ShooterEnabled = shooterStatus;
     return m_ShooterEnabled;
@@ -134,8 +146,12 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putString(m_StateString, m_ShooterEnumState.toString());
     SmartDashboard.putBoolean(m_EnabledString, m_ShooterEnabled);
     SmartDashboard.putNumber(
-        m_RevolutionsErrorString, m_ShooterMotor.getClosedLoopError().refresh().getValueAsDouble());
-    SmartDashboard.putNumber(m_SpeedString, velocitySignal.getValueAsDouble());
+        "RevolutionsError", m_ShooterMotor.getClosedLoopError().refresh().getValueAsDouble());
+    SmartDashboard.putNumber("ShooterSpeed", velocitySignal.getValueAsDouble());
+    SmartDashboard.putNumber(
+        "ShooterCurrent", m_ShooterMotor.getStatorCurrent().getValueAsDouble());
+    SmartDashboard.putBoolean("NoBallsInShooter", CurrentCHeck());
+    SmartDashboard.putBoolean("ShooterUpToSpeed", UpToSpeed());
     velocitySignal.refresh();
 
     setEnabledStatus(SmartDashboard.getBoolean(m_EnabledString, m_ShooterEnabled));
