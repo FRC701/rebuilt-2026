@@ -19,78 +19,207 @@ import org.photonvision.targeting.PhotonPipelineResult;
 public class VisionSubsystem extends SubsystemBase {
   private final PhotonCamera m_ForwardCamera;
   private final PhotonPoseEstimator m_ForwardPoseEstimator;
+  private final PhotonCamera m_ReverseCamera;
+  private final PhotonPoseEstimator m_ReversePoseEstimator;
   private final AprilTagFieldLayout m_FieldLayout;
 
   private Optional<VisionMeasurement> m_LatestForwardVisionMeasurement = Optional.empty();
+  private Optional<VisionMeasurement> m_LatestReverseVisionMeasurement = Optional.empty();
+
+  private int m_ForwardRejectionCount = 0;
+  private int m_ReverseRejectionCount = 0;
 
   public VisionSubsystem() {
-    m_ForwardCamera = new PhotonCamera(Constants.Vision.kForwardCameraName);
     m_FieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+    m_ForwardCamera = new PhotonCamera(Constants.Vision.kForwardCameraName);
     m_ForwardPoseEstimator =
         new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kForwardRobotToCam3d);
+    m_ReverseCamera = new PhotonCamera(Constants.Vision.kReverseCameraName);
+    m_ReversePoseEstimator =
+        new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kReverseRobotToCam3d);
   }
 
   public Optional<VisionMeasurement> getLatestForwardVisionMeasurement() {
     return m_LatestForwardVisionMeasurement;
   }
 
+  public Optional<VisionMeasurement> getLatestReverseVisionMeasurement() {
+    return m_LatestReverseVisionMeasurement;
+  }
+
   @Override
   public void periodic() {
-    m_LatestForwardVisionMeasurement = processCamera(m_ForwardCamera, m_ForwardPoseEstimator);
+    boolean forwardConnected = m_ForwardCamera.isConnected();
+    boolean reverseConnected = m_ReverseCamera.isConnected();
 
-    SmartDashboard.putBoolean("Vision/Accepted", m_LatestForwardVisionMeasurement.isPresent());
-    m_LatestForwardVisionMeasurement.ifPresent(
-        m -> {
-          SmartDashboard.putNumber("Vision/PoseX_m", m.pose().getX());
-          SmartDashboard.putNumber("Vision/PoseY_m", m.pose().getY());
-          SmartDashboard.putNumber("Vision/PoseHeading_deg", m.pose().getRotation().getDegrees());
-          SmartDashboard.putNumber("Vision/StdDevXY", m.stdDevs().get(0, 0));
-          SmartDashboard.putNumber(
-              "Vision/StdDevHeading_deg", Math.toDegrees(m.stdDevs().get(2, 0)));
-        });
+    SmartDashboard.putBoolean("Vision/Forward/Connected", forwardConnected);
+    SmartDashboard.putBoolean("Vision/Reverse/Connected", reverseConnected);
+
+    m_LatestForwardVisionMeasurement =
+        forwardConnected
+            ? processCamera(m_ForwardCamera, m_ForwardPoseEstimator, "Forward")
+            : Optional.empty();
+    m_LatestReverseVisionMeasurement =
+        reverseConnected
+            ? processCamera(m_ReverseCamera, m_ReversePoseEstimator, "Reverse")
+            : Optional.empty();
+
+    publishMeasurementTelemetry("Forward", m_LatestForwardVisionMeasurement);
+    publishMeasurementTelemetry("Reverse", m_LatestReverseVisionMeasurement);
+  }
+
+  private void publishMeasurementTelemetry(
+      String cameraName, Optional<VisionMeasurement> measurement) {
+    String prefix = "Vision/" + cameraName + "/";
+    SmartDashboard.putBoolean(prefix + "Accepted", measurement.isPresent());
+
+    if (measurement.isPresent()) {
+      // Clear rejection reason when a measurement is accepted
+      SmartDashboard.putString(prefix + "RejectionReason", "");
+      VisionMeasurement m = measurement.get();
+      SmartDashboard.putNumber(prefix + "PoseX_m", m.pose().getX());
+      SmartDashboard.putNumber(prefix + "PoseY_m", m.pose().getY());
+      SmartDashboard.putNumber(prefix + "PoseHeading_deg", m.pose().getRotation().getDegrees());
+      SmartDashboard.putNumber(prefix + "StdDevXY", m.stdDevs().get(0, 0));
+      SmartDashboard.putNumber(prefix + "StdDevHeading_deg", Math.toDegrees(m.stdDevs().get(2, 0)));
+    }
+  }
+
+  private void publishRejection(String cameraName, String reason) {
+    String prefix = "Vision/" + cameraName + "/";
+    SmartDashboard.putString(prefix + "RejectionReason", reason);
+    if (cameraName.equals("Forward")) {
+      SmartDashboard.putNumber(prefix + "RejectionCount", ++m_ForwardRejectionCount);
+    } else {
+      SmartDashboard.putNumber(prefix + "RejectionCount", ++m_ReverseRejectionCount);
+    }
   }
 
   private Optional<VisionMeasurement> processCamera(
-      PhotonCamera camera, PhotonPoseEstimator poseEstimator) {
+      PhotonCamera camera, PhotonPoseEstimator poseEstimator, String cameraName) {
     Optional<VisionMeasurement> measurement = Optional.empty();
+    String prefix = "Vision/" + cameraName + "/";
+    boolean tagDetected = false;
 
     for (PhotonPipelineResult result : camera.getAllUnreadResults()) {
-      if (!result.hasTargets()) continue;
-      if (result.targets.size() < Constants.Vision.kMinAprilTagsForPose) continue;
-      if (result.targets.size() == 1
-          && result.getBestTarget().getPoseAmbiguity()
-              > Constants.Vision.kMaxAcceptableSingleTagAmbiguity) continue;
-
-      // Single-tag distance limit: PnP becomes unreliable at range
-      if (result.targets.size() == 1) {
-        double dist = result.getBestTarget().getBestCameraToTarget().getTranslation().getNorm();
-        if (dist > Constants.Vision.kMaxSingleTagDistanceMeters) continue;
+      if (!result.hasTargets()) {
+        publishRejection(cameraName, "no_targets");
+        continue;
       }
 
+      tagDetected = true;
+
+      // Publish all tag IDs visible in this frame
+      double[] visibleIds = result.targets.stream().mapToDouble(t -> t.getFiducialId()).toArray();
+      SmartDashboard.putNumberArray(prefix + "VisibleTagIDs", visibleIds);
+
+      int targetCount = result.targets.size();
+
+      if (targetCount < Constants.Vision.kMinAprilTagsForPose) {
+        publishRejection(cameraName, "too_few_targets:" + targetCount);
+        continue;
+      }
+
+      if (targetCount == 1
+          && result.getBestTarget().getPoseAmbiguity()
+              > Constants.Vision.kMaxAcceptableSingleTagAmbiguity) {
+        publishRejection(
+            cameraName,
+            "ambiguity_too_high:"
+                + String.format("%.2f", result.getBestTarget().getPoseAmbiguity()));
+        continue;
+      }
+
+      if (targetCount == 1) {
+        double distanceToTag =
+            result.getBestTarget().getBestCameraToTarget().getTranslation().getNorm();
+        if (distanceToTag > Constants.Vision.kMaxSingleTagDistanceMeters) {
+          publishRejection(
+              cameraName, "single_tag_too_far:" + String.format("%.2f", distanceToTag));
+          continue;
+        }
+      }
+
+      // Attempt coprocessor multi-tag first, fall back to lowest ambiguity
       Optional<EstimatedRobotPose> estimatedPose = poseEstimator.estimateCoprocMultiTagPose(result);
-      if (estimatedPose.isEmpty())
+      String multiTagFailReason = "";
+
+      if (estimatedPose.isEmpty()) {
+        // Diagnose why coprocessor multi-tag failed.
+        // PnpResult is always a plain object (not Optional) -- validity is indicated by
+        // bestReprojErr being non-zero. A value of 0 means the default/invalid state.
+        var multiTagResult = result.getMultiTagResult();
+        if (multiTagResult.isEmpty()) {
+          multiTagFailReason = "no_multitag_result";
+        } else if (multiTagResult.get().estimatedPose.bestReprojErr == 0) {
+          multiTagFailReason = "multitag_transform_invalid(reproj=0)";
+        } else {
+          multiTagFailReason =
+              "multitag_estimator_rejected(reproj:"
+                  + String.format("%.2f", multiTagResult.get().estimatedPose.bestReprojErr)
+                  + "px)";
+        }
+
         estimatedPose = poseEstimator.estimateLowestAmbiguityPose(result);
-      if (estimatedPose.isEmpty()) continue;
+      }
 
-      // Z-height sanity: robot must be near the floor
-      if (Math.abs(estimatedPose.get().estimatedPose.getZ())
-          > Constants.Vision.kMaxPoseHeightMeters) continue;
+      if (estimatedPose.isEmpty()) {
+        // Diagnose why lowest-ambiguity fallback also failed
+        var bestTarget = result.getBestTarget();
+        int tagId = bestTarget.getFiducialId();
+        boolean tagInLayout = m_FieldLayout.getTagPose(tagId).isPresent();
+        double ambiguity = bestTarget.getPoseAmbiguity();
 
-      // Field boundary: reject poses outside the field (plus a small margin)
+        String fallbackReason;
+        if (!tagInLayout) {
+          fallbackReason = "tag_" + tagId + "_not_in_layout";
+        } else if (ambiguity < 0) {
+          fallbackReason = "ambiguity_unavailable(tag_" + tagId + ")";
+        } else {
+          fallbackReason = "lowest_ambiguity_rejected:" + String.format("%.2f", ambiguity);
+        }
+
+        publishRejection(
+            cameraName,
+            "pose_estimation_failed|multitag:"
+                + multiTagFailReason
+                + "|fallback:"
+                + fallbackReason);
+        continue;
+      }
+
+      double poseZ = estimatedPose.get().estimatedPose.getZ();
+      if (Math.abs(poseZ) > Constants.Vision.kMaxPoseHeightMeters) {
+        publishRejection(cameraName, "z_out_of_range:" + String.format("%.2f", poseZ));
+        continue;
+      }
+
       Pose2d robotPose = estimatedPose.get().estimatedPose.toPose2d();
       double fieldMargin = Constants.Vision.kFieldBoundaryMarginMeters;
       if (robotPose.getX() < -fieldMargin
           || robotPose.getX() > m_FieldLayout.getFieldLength() + fieldMargin
           || robotPose.getY() < -fieldMargin
-          || robotPose.getY() > m_FieldLayout.getFieldWidth() + fieldMargin) continue;
+          || robotPose.getY() > m_FieldLayout.getFieldWidth() + fieldMargin) {
+        publishRejection(
+            cameraName,
+            "outside_field:" + String.format("(%.2f, %.2f)", robotPose.getX(), robotPose.getY()));
+        continue;
+      }
+
+      Matrix<N3, N1> stdDevs = computeDynamicStdDevs(estimatedPose.get());
+
+      // Publish the tag IDs that actually contributed to this accepted pose estimate
+      double[] usedIds =
+          estimatedPose.get().targetsUsed.stream().mapToDouble(t -> t.getFiducialId()).toArray();
+      SmartDashboard.putNumberArray(prefix + "UsedTagIDs", usedIds);
 
       measurement =
           Optional.of(
-              new VisionMeasurement(
-                  robotPose,
-                  estimatedPose.get().timestampSeconds,
-                  computeDynamicStdDevs(estimatedPose.get())));
+              new VisionMeasurement(robotPose, estimatedPose.get().timestampSeconds, stdDevs));
     }
+
+    // Published once per periodic cycle, reflects whether any queued frame had visible tags
+    SmartDashboard.putBoolean(prefix + "TagDetected", tagDetected);
 
     return measurement;
   }

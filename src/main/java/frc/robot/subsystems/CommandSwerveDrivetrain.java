@@ -168,6 +168,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
               m -> {
                 addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
               });
+      m_visionSubsystem
+          .getLatestReverseVisionMeasurement()
+          .ifPresent(
+              m -> {
+                addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
+              });
     }
   }
 
