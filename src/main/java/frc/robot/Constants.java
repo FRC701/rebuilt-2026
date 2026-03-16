@@ -210,4 +210,15 @@ public final class Constants {
     public static final double kMaxVisionRotationSpeed =
         Math.toRadians(720); // rad/s (2 full rotations)
   }
+
+  public static class AimBotConstants {
+    // Red alliance hub field coordinates (inches, converted to meters)
+    public static final double kRedHubXMeters = Units.inchesToMeters(158.61);
+    public static final double kRedHubYMeters = Units.inchesToMeters(158.845);
+
+    // Heading PID constants for aiming at the hub
+    public static final double kP = 7.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+  }
 }
