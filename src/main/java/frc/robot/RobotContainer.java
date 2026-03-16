@@ -165,7 +165,7 @@ public class RobotContainer {
     m_DriveTrain.registerTelemetry(logger::telemeterize);
 
     // binds the a-button to toggle the agitator
-    m_coDriverController.a().toggleOnTrue(m_AgitatorToggle);
+    m_driverController.a().toggleOnTrue(m_AgitatorToggle);
     // Binds the x-button to shooting the shooters
    // m_driverController.x().onTrue(new ShootingCommand(m_LeftShooter, m_RightShooter));
     // m_driverController.x().onTrue(new ShootingCommand(m_RightShooter));
