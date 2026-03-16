@@ -5,6 +5,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.subsystems.Feeder;
+import frc.robot.subsystems.Feeder.FeederState;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShooterEnumState;
 
@@ -12,17 +14,23 @@ import frc.robot.subsystems.Shooter.ShooterEnumState;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class NotShootingCommand extends InstantCommand {
-  Shooter m_ShooterSubsystem;
+  Shooter m_LeftShooterSubsystem;
+  Shooter m_RightShooterSubsystem;
+  Feeder m_Feeder;
 
-  public NotShootingCommand(Shooter tempShooter) {
+  public NotShootingCommand(Shooter leftShooter, Shooter rightShooter, Feeder feeder) {
     // Use addRequirements() here to declare subsystem dependencies.
-    m_ShooterSubsystem = tempShooter;
-    addRequirements(m_ShooterSubsystem);
+    m_LeftShooterSubsystem = leftShooter;
+    m_RightShooterSubsystem = rightShooter;
+    m_Feeder = feeder;
+    addRequirements(m_LeftShooterSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_ShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
+    m_LeftShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
+    m_RightShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
+    m_Feeder.m_FeederState = FeederState.S_Off;
   }
 }

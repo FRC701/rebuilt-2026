@@ -60,7 +60,7 @@ public class RobotContainer {
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
-  // private final CommandXboxController joystick = new CommandXboxController(0);
+  // Instantiating the subsystems
 
   public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
 
@@ -138,42 +138,14 @@ public class RobotContainer {
     // m_driverController.start().and(m_driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     // m_driverController.start().and(m_driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
+    // Driver Bindings
     // Reset the field-centric heading on left bumper press for Xbox
     m_driverController
         .leftBumper()
         .onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
-    m_DriveTrain.registerTelemetry(logger::telemeterize);
-
     // Playstation variant of ^^^
     m_ps4Controller.L1().onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
-
-    // binds the dpad down to toggle the agitator for Xbox
-    m_driverController.povDown().toggleOnTrue(m_AgitatorToggle);
-
-    // Playstation variant of ^^^
-    m_ps4Controller.povDown().toggleOnTrue(m_AgitatorToggle);
-
-    // Binds the y-button to passing the left shooter and b-button to not for Xbox
-    m_driverController.rightBumper().onTrue(new PassingCommand(m_LeftShooter));
-    m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter));
-
-    // Playstation variant of ^^^
-    m_ps4Controller.R1().onTrue(new PassingCommand(m_LeftShooter));
-    m_ps4Controller.circle().onTrue(new NotShootingCommand(m_LeftShooter));
-
-    // Binds the x-button to shooting the right shooter, y-button to passing, and b-button to not
-    // for Xbox
-    m_driverController.rightBumper().onTrue(new PassingCommand(m_RightShooter));
-    m_driverController.b().onTrue(new NotShootingCommand(m_RightShooter));
-
-    // Playstation variant of ^^^
-    m_ps4Controller.R1().onTrue(new PassingCommand(m_RightShooter));
-    m_ps4Controller.circle().onTrue(new NotShootingCommand(m_RightShooter));
-
-    m_driverController.leftTrigger().onTrue(new ExtendIntake(m_intake));
-    m_driverController.rightTrigger().onTrue(new RetractIntake(m_intake));
-
-    m_driverController.b().onTrue(new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder));
+    m_DriveTrain.registerTelemetry(logger::telemeterize);
 
     // Climber Bindings
     m_driverController
@@ -182,7 +154,30 @@ public class RobotContainer {
             new ClimberUpDownToggle(
                 m_Climber, m_Agitator, m_Feeder, m_LeftShooter, m_RightShooter));
     m_driverController.b().onTrue(new ClimberLock(m_Climber));
-    m_driverController.a().onTrue(new NotShootingCommand(m_LeftShooter));
-    m_driverController.a().onTrue(new NotShootingCommand(m_RightShooter));
+
+    // Intake Bindings
+    m_driverController.leftTrigger().onTrue(new ExtendIntake(m_intake));
+    m_driverController.rightTrigger().onTrue(new RetractIntake(m_intake));
+
+    // Shooter Binding XBox
+    // Binds the y-button to passing the left shooter and b-button to not for Xbox
+    m_driverController.rightBumper().onTrue(new PassingCommand(m_LeftShooter));
+    m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter, m_RightShooter, m_Feeder));
+    m_driverController.rightBumper().onTrue(new PassingCommand(m_RightShooter));
+    m_driverController.b().onTrue(new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder));
+
+    // Shooter Binding Playstation
+    // Binds the y-button to passing the left shooter and b-button to not for Xbox
+    m_ps4Controller.R1().onTrue(new PassingCommand(m_LeftShooter));
+    m_ps4Controller
+        .circle()
+        .onTrue(new NotShootingCommand(m_LeftShooter, m_RightShooter, m_Feeder));
+    m_ps4Controller.R1().onTrue(new PassingCommand(m_RightShooter));
+
+    // Agitator Bindings
+    // binds the dpad down to toggle the agitator for Xbox
+    m_driverController.povDown().toggleOnTrue(m_AgitatorToggle);
+    // Playstation variant of ^^^
+    m_ps4Controller.povDown().toggleOnTrue(m_AgitatorToggle);
   }
 }
