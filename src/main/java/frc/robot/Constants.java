@@ -117,7 +117,7 @@ public final class Constants {
     // three options- single camera in between shooters (3.8,11,17.5,0,0,0), single camera on mast
     // forward
     //  two on mast forwards (12,11,27.9,0,0,0) backwards
-    // (8.14,11,27.9,0,0,-180) - confirm  on robot AS BUILT  
+    // (8.14,11,27.9,0,0,-180) - confirm  on robot AS BUILT
 
     public static final double kForwardCameraMountPitchAngleRad = Units.degreesToRadians(0);
     public static final double kForwardCameraMountRollAngleRad = Units.degreesToRadians(0);
