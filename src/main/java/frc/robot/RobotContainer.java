@@ -60,25 +60,33 @@ public class RobotContainer {
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
-  // Instantiating the subsystems
+  // Instantiating the Subsystems
 
   public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
-
+  private Intake m_intake = new Intake();
   private final Agitator m_Agitator = new Agitator();
-  private Climber m_Climber = new Climber();
   private Feeder m_Feeder = new Feeder(FeederConstants.kFeederMotor);
   private Shooter m_LeftShooter =
       new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter");
   private Shooter m_RightShooter =
       new Shooter(Constants.ShooterConstants.kRightShooterId, "Right Shooter");
+  private Climber m_Climber = new Climber();
+
+  // Instantiating the Toggles
+
   // Created StartEnd Command for AggitatorToggle
   private Command m_AgitatorToggle =
       Commands.startEnd(
           () -> m_Agitator.m_AgitatorState = AgitatorState.S_On,
           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Off,
           m_Agitator);
-
-  private Intake m_intake = new Intake();
+  private Command m_ShooterToggle =
+      Commands.startEnd(
+          () -> new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder),
+          () -> new NotShootingCommand(m_LeftShooter, m_RightShooter, m_Feeder),
+          m_LeftShooter,
+          m_RightShooter,
+          m_Feeder);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
@@ -160,19 +168,9 @@ public class RobotContainer {
     m_driverController.rightTrigger().onTrue(new RetractIntake(m_intake));
 
     // Shooter Binding XBox
-    // Binds the y-button to passing the left shooter and b-button to not for Xbox
-    m_driverController.rightBumper().onTrue(new PassingCommand(m_LeftShooter));
-    m_driverController.b().onTrue(new NotShootingCommand(m_LeftShooter, m_RightShooter, m_Feeder));
-    m_driverController.rightBumper().onTrue(new PassingCommand(m_RightShooter));
-    m_driverController.b().onTrue(new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder));
-
+    m_driverController.rightTrigger().toggleOnTrue(m_ShooterToggle);
     // Shooter Binding Playstation
-    // Binds the y-button to passing the left shooter and b-button to not for Xbox
-    m_ps4Controller.R1().onTrue(new PassingCommand(m_LeftShooter));
-    m_ps4Controller
-        .circle()
-        .onTrue(new NotShootingCommand(m_LeftShooter, m_RightShooter, m_Feeder));
-    m_ps4Controller.R1().onTrue(new PassingCommand(m_RightShooter));
+    m_ps4Controller.R2().toggleOnTrue(m_ShooterToggle);
 
     // Agitator Bindings
     // binds the dpad down to toggle the agitator for Xbox
