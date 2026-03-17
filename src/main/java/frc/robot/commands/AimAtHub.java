@@ -4,9 +4,13 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
@@ -17,9 +21,17 @@ import java.util.function.DoubleSupplier;
 public class AimAtHub extends Command {
   private static final double kMaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
 
+  private static final AprilTagFieldLayout kFieldLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+
   private static final Translation2d kRedHubPosition =
       new Translation2d(
           Constants.AimBotConstants.kRedHubXMeters, Constants.AimBotConstants.kRedHubYMeters);
+
+  private static final Translation2d kBlueHubPosition =
+      new Translation2d(
+          kFieldLayout.getFieldLength() - Constants.AimBotConstants.kRedHubXMeters,
+          kFieldLayout.getFieldWidth() - Constants.AimBotConstants.kRedHubYMeters);
 
   private final CommandSwerveDrivetrain m_drivetrain;
   private final DoubleSupplier m_velocityXSupplier;
@@ -55,7 +67,9 @@ public class AimAtHub extends Command {
   @Override
   public void execute() {
     Pose2d currentPose = m_drivetrain.getState().Pose;
-    Translation2d robotToHub = kRedHubPosition.minus(currentPose.getTranslation());
+    boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
+    Translation2d hubPosition = isRed ? kRedHubPosition : kBlueHubPosition;
+    Translation2d robotToHub = hubPosition.minus(currentPose.getTranslation());
     Rotation2d targetAngle = robotToHub.getAngle();
 
     SmartDashboard.putNumber("AimBot/TargetAngle_deg", targetAngle.getDegrees());
