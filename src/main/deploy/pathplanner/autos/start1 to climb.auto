@@ -5,9 +5,15 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "align start1 top"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "start1Todepot"
+            "pathName": "start1 to depot1"
           }
         },
         {
@@ -25,6 +31,12 @@
                 "data": {
                   "name": "ExtendIntake"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "climber height to climb"
+                }
               }
             ]
           }
@@ -32,13 +44,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "New Path"
+            "pathName": "depot1 to depotCollected1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "New New Path"
+            "pathName": "depotCollected1 to bump1 shooting"
           }
         },
         {
@@ -58,6 +70,30 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "bump1 to neutral1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "neutral1 to neutralFueled1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "fueled1 to climb2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "climb"
           }
         }
       ]

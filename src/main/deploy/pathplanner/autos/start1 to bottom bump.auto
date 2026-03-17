@@ -1,0 +1,93 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "align start1 top"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "start1 to depot1"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.3
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ExtendIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "depot1 to depotCollected1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "depotCollected1 to bump1 shooting"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.2
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "RetractIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "bump1 to neutral1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "neutral1 to neutralFueled1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "neutralFueled1 to bump2 shooting"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

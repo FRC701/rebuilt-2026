@@ -48,16 +48,16 @@
     },
     {
       "anchor": {
-        "x": 3.362406103283407,
+        "x": 3.362,
         "y": 5.5786032863909485
       },
       "prevControl": {
-        "x": 3.34097121517602,
-        "y": 4.871055254146118
+        "x": 3.3405612552961315,
+        "y": 4.870927951067241
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "bumpA1 3.362x 5.579y 45deg"
     }
   ],
   "rotationTargets": [],
@@ -99,13 +99,13 @@
   },
   "goalEndState": {
     "velocity": 2.5,
-    "rotation": -47.67542665602928
+    "rotation": -45.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.38394009160078
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
