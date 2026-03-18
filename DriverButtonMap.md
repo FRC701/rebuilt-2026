@@ -2,9 +2,8 @@ Driver
 
 | Button        | Action                |
 | ------------- | --------------------- |
-| a             | Extend/Retract Climber|
-| b             | Lock Climber          |
-| b             | Not Shooting          |
+| a/cross       | Extend/Retract Climber|
+| b/circle      | Lock Climber          |
 | Left Bumper   | seedFieldCentric      |
 | Left Trigger  | Intake Toggle         |
 | LeftX         | Velocity Y            |

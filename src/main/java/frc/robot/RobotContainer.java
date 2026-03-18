@@ -164,7 +164,16 @@ public class RobotContainer {
         .onTrue(
             new ClimberUpDownToggle(
                 m_Climber, m_Agitator, m_Feeder, m_LeftShooter, m_RightShooter));
+    // Playstation variant of ^^^
+    m_ps4Controller
+        .cross()
+        .onTrue(
+            new ClimberUpDownToggle(
+                m_Climber, m_Agitator, m_Feeder, m_LeftShooter, m_RightShooter));
+
     m_driverController.b().onTrue(new ClimberLock(m_Climber));
+    // Playstation variant of ^^^
+    m_ps4Controller.circle().onTrue(new ClimberLock(m_Climber));
 
     // Intake Bindings
     m_driverController.leftTrigger().toggleOnTrue(m_IntakeToggle);
