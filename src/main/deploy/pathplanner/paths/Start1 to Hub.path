@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.359619655267574,
-        "y": 3.7859157619727304
+        "x": 4.20240880660257,
+        "y": 4.094647635248885
       },
       "isLocked": false,
-      "linkedName": "start1 top 3.565x 7.636y"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.45617370892018894,
-        "y": 7.04768779342723
+        "x": 3.338,
+        "y": 4.0197134831460675
       },
       "prevControl": {
-        "x": 1.418026944712658,
-        "y": 7.415758844569248
+        "x": 3.005005976717338,
+        "y": 3.9804332128131494
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "depot2 0.456x 7.048y"
+      "linkedName": "hub1 3.338x 4.020y"
     }
   ],
   "rotationTargets": [],
@@ -41,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 5.0,
-    "rotation": -90.0
+    "velocity": 0,
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "start to depot",
+  "folder": "start to hub",
   "idealStartingState": {
-    "velocity": 5.0,
-    "rotation": 180.0
+    "velocity": 0,
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

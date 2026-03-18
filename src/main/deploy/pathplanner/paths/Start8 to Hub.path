@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.565,
-        "y": 4.035
+        "x": 3.5745754653148616,
+        "y": 1.3270350608862953
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.428662709724873,
-        "y": 1.6782234204876536
+        "x": 2.838191011235955,
+        "y": 2.7866011235955055
       },
       "isLocked": false,
-      "linkedName": "start1 top 3.565x 7.636y"
+      "linkedName": "start8 bottom 3.570x 1.320y"
     },
     {
       "anchor": {
-        "x": 1.3929812206572776,
-        "y": 4.929225352112676
+        "x": 2.9350056179775277,
+        "y": 3.036280898876405
       },
       "prevControl": {
-        "x": 1.6579201309720686,
-        "y": 5.021221371928998
+        "x": 2.990686315140702,
+        "y": 2.4028377564992356
       },
       "nextControl": {
-        "x": 1.1568137278926154,
-        "y": 4.847219770831563
+        "x": 2.881612536736757,
+        "y": 3.6436993200796857
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.456,
-        "y": 4.914718882545356
+        "x": 3.338,
+        "y": 4.0197134831460675
       },
       "prevControl": {
-        "x": 2.5453102677069266,
-        "y": 5.273724386886111
+        "x": 3.265072309123638,
+        "y": 3.5118551125947937
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "depot3 0.456x 4.924y"
+      "linkedName": "hub1 3.338x 4.020y"
     }
   ],
   "rotationTargets": [],
@@ -57,14 +57,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 5.0,
-    "rotation": 90.32407831657166
+    "velocity": 0,
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "start to depot",
+  "folder": "start to hub",
   "idealStartingState": {
-    "velocity": 0.0,
-    "rotation": 180.0
+    "velocity": 0,
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

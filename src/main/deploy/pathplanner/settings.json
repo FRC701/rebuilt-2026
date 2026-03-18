@@ -3,7 +3,9 @@
   "robotLength": 0.851,
   "holonomicMode": true,
   "pathFolders": [
-    "start to depot"
+    "New Folder",
+    "start to depot",
+    "start to hub"
   ],
   "autoFolders": [],
   "defaultMaxVel": 5.0,
