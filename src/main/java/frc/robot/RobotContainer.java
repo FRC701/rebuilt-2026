@@ -63,7 +63,7 @@ public class RobotContainer {
   // Instantiating the Subsystems
 
   public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
-  private Intake m_intake = new Intake();
+  private Intake m_Intake = new Intake();
   private final Agitator m_Agitator = new Agitator();
   private Feeder m_Feeder = new Feeder(FeederConstants.kFeederMotor);
   private Shooter m_LeftShooter =
@@ -87,6 +87,9 @@ public class RobotContainer {
           m_LeftShooter,
           m_RightShooter,
           m_Feeder);
+  private Command m_IntakeToggle =
+      Commands.startEnd(
+          () -> new ExtendIntake(m_Intake), () -> new RetractIntake(m_Intake), m_Intake);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
@@ -164,12 +167,13 @@ public class RobotContainer {
     m_driverController.b().onTrue(new ClimberLock(m_Climber));
 
     // Intake Bindings
-    m_driverController.leftTrigger().onTrue(new ExtendIntake(m_intake));
-    m_driverController.rightTrigger().onTrue(new RetractIntake(m_intake));
+    m_driverController.leftTrigger().toggleOnTrue(m_IntakeToggle);
+    // Playstation variant of ^^^
+    m_ps4Controller.L2().toggleOnTrue(m_IntakeToggle);
 
     // Shooter Binding XBox
     m_driverController.rightTrigger().toggleOnTrue(m_ShooterToggle);
-    // Shooter Binding Playstation
+    // Playstation variant of ^^^
     m_ps4Controller.R2().toggleOnTrue(m_ShooterToggle);
 
     // Agitator Bindings
