@@ -163,7 +163,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     if (!tooFast) {
       m_visionSubsystem
-          .getLatestForwardVisionMeasurement()
+          .getLatestRightVisionMeasurement()
           .ifPresent(
               m -> {
                 addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());

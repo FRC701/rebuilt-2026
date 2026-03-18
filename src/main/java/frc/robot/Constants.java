@@ -116,9 +116,9 @@ public final class Constants {
   }
 
   public static final class Vision {
-    // Forward camera name
+    // Right camera name
     // Must match camera set in PhotonVision UI at photonvision.local:5800
-    public static final String kForwardCameraName = "forwardPhotonvisionCamera";
+    public static final String kRightCameraName = "rightPhotonvisionCamera";
     // Robot -> Camera transform (camera pose relative to robot origin).
     // WPILib coordinate convention: +X forward, +Y left, +Z up.
     // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
@@ -127,32 +127,33 @@ public final class Constants {
     // 90° is aligned with the positive Y axis, and -90° is aligned with the
     // negative Y axis.
 
-    //robot coordination system is centered on the floor. So a camer at the center, facing forward on the floor, is 0,0,0,0,0,0
+    // robot coordination system is centered on the floor. So a camer at the center, facing forward
+    // on the floor, is 0,0,0,0,0,0
 
     //  two on mast:
     // one forwards (0,0.78,24.75,0,0,0)
-    // one backwards (0,-2.78,24.75,0,0,0) 
+    // one backwards (0,-2.78,24.75,0,0,0)
     // or
-    // one backwards (0,-2.78,24.75,0,0,0) 
+    // one backwards (0,-2.78,24.75,0,0,0)
     // one facing right rotated  90 CW  (top pointing intake)
 
-    public static final double kForwardCameraMountPitchAngleRad = Units.degreesToRadians(0);
-    public static final double kForwardCameraMountRollAngleRad = Units.degreesToRadians(0);
-    public static final double kForwardCameraMountYawAngleRad = Units.degreesToRadians(0);
+    public static final double kRightCameraMountPitchAngleRad = Units.degreesToRadians(0);
+    public static final double kRightCameraMountRollAngleRad = Units.degreesToRadians(0);
+    public static final double kRightCameraMountYawAngleRad = Units.degreesToRadians(-90);
 
-    public static final double kForwardCameraForwardMeters = Units.inchesToMeters(10.4);
-    public static final double kForwardCameraLeftMeters = Units.inchesToMeters(0);
-    public static final double kForwardCameraUpMeters = Units.inchesToMeters(24.75);
+    public static final double kRightCameraForwardMeters = Units.inchesToMeters(-3.78);
+    public static final double kRightCameraLeftMeters = Units.inchesToMeters(-3);
+    public static final double kRightCameraUpMeters = Units.inchesToMeters(22);
 
-    // Robot to forward camera transform
-    public static final Transform3d kForwardRobotToCam3d =
+    // Robot to right camera transform
+    public static final Transform3d kRightRobotToCam3d =
         new Transform3d(
             new Translation3d(
-                kForwardCameraForwardMeters, kForwardCameraLeftMeters, kForwardCameraUpMeters),
+                kRightCameraForwardMeters, kRightCameraLeftMeters, kRightCameraUpMeters),
             new Rotation3d(
-                kForwardCameraMountRollAngleRad,
-                kForwardCameraMountPitchAngleRad,
-                kForwardCameraMountYawAngleRad));
+                kRightCameraMountRollAngleRad,
+                kRightCameraMountPitchAngleRad,
+                kRightCameraMountYawAngleRad));
 
     // Reverse camera name
     // Must match camera set in PhotonVision UI
