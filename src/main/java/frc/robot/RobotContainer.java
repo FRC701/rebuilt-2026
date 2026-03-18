@@ -90,7 +90,7 @@ public class RobotContainer {
           () -> new ExtendIntake(m_Intake), () -> new RetractIntake(m_Intake), m_Intake);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
+  private final CommandXboxController m_xboxController =
       new CommandXboxController(OperatorConstants.kXboxControllerPort);
   private final CommandPS4Controller m_ps4Controller =
       new CommandPS4Controller(OperatorConstants.kPs4ControllerPort);
@@ -148,7 +148,7 @@ public class RobotContainer {
 
     // Driver Bindings
     // Reset the field-centric heading on left bumper press for Xbox
-    m_driverController
+    m_xboxController
         .leftBumper()
         .onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
     // Playstation variant of ^^^
@@ -173,18 +173,18 @@ public class RobotContainer {
     // m_ps4Controller.circle().onTrue(new ClimberLock(m_Climber));
 
     // Intake Bindings
-    m_driverController.leftTrigger().toggleOnTrue(m_IntakeToggle);
+    m_xboxController.leftTrigger().toggleOnTrue(m_IntakeToggle);
     // Playstation variant of ^^^
     m_ps4Controller.L2().toggleOnTrue(m_IntakeToggle);
 
     // Shooter Binding XBox
-    m_driverController.rightTrigger().toggleOnTrue(m_ShooterToggle);
+    m_xboxController.rightTrigger().toggleOnTrue(m_ShooterToggle);
     // Playstation variant of ^^^
     m_ps4Controller.R2().toggleOnTrue(m_ShooterToggle);
 
     // Agitator Bindings
     // binds the dpad down to toggle the agitator for Xbox
-    m_driverController.povDown().toggleOnTrue(m_AgitatorToggle);
+    m_xboxController.povDown().toggleOnTrue(m_AgitatorToggle);
     // Playstation variant of ^^^
     m_ps4Controller.povDown().toggleOnTrue(m_AgitatorToggle);
   }
