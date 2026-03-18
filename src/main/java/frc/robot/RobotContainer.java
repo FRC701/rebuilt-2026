@@ -8,6 +8,9 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,6 +25,8 @@ import frc.robot.Constants.FeederConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.FeederOn;
 import frc.robot.commands.NotShootingCommand;
+import frc.robot.commands.RetractIntake;
+import frc.robot.commands.SequentialShoot;
 import frc.robot.commands.ShootCommand;
 import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
@@ -48,6 +53,8 @@ public class RobotContainer {
   private double MaxAngularRate =
       RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max
   // angular velocity
+
+  private final SendableChooser<Command> autoChooser;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric m_DriveField =
@@ -113,6 +120,10 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    // builds auto chooser
+    autoChooser = AutoBuilder.buildAutoChooser("Auto Straight Taxi");
+    SmartDashboard.putData("Auto Mode", autoChooser);
     NamedCommands.registerCommand(
         "ShootingCommand", new ShootingCommand(m_LeftShooter, m_RightShooter));
     NamedCommands.registerCommand("ShootCommand", new ShootCommand(m_LeftShooter));
