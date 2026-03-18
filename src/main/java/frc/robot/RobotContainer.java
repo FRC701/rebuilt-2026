@@ -17,8 +17,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FeederConstants;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.ClimberLock;
-import frc.robot.commands.ClimberUpDownToggle;
 import frc.robot.commands.ExtendIntake;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.RetractIntake;
@@ -126,13 +124,12 @@ public class RobotContainer {
             () ->
                 m_DriveField
                     .withVelocityX(
-                        -m_driverController.getLeftY()
+                        -m_ps4Controller.getLeftY()
                             * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(
-                        -m_driverController.getLeftX()
-                            * MaxSpeed) // Drive left with negative X (left)
+                        -m_ps4Controller.getLeftX() * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(
-                        -m_driverController.getRightX()
+                        -m_ps4Controller.getRightX()
                             * MaxAngularRate) // Drive counterclockwise with
             // negative X (left)
             ));
@@ -159,21 +156,21 @@ public class RobotContainer {
     m_DriveTrain.registerTelemetry(logger::telemeterize);
 
     // Climber Bindings
-    m_driverController
-        .a()
-        .onTrue(
-            new ClimberUpDownToggle(
-                m_Climber, m_Agitator, m_Feeder, m_LeftShooter, m_RightShooter));
-    // Playstation variant of ^^^
-    m_ps4Controller
-        .cross()
-        .onTrue(
-            new ClimberUpDownToggle(
-                m_Climber, m_Agitator, m_Feeder, m_LeftShooter, m_RightShooter));
+    // m_driverController
+    //     .a()
+    //     .onTrue(
+    //         new ClimberUpDownToggle(
+    //             m_Climber, m_Agitator, m_Feeder, m_LeftShooter, m_RightShooter));
+    // // Playstation variant of ^^^
+    // m_ps4Controller
+    //     .cross()
+    //     .onTrue(
+    //         new ClimberUpDownToggle(
+    //             m_Climber, m_Agitator, m_Feeder, m_LeftShooter, m_RightShooter));
 
-    m_driverController.b().onTrue(new ClimberLock(m_Climber));
-    // Playstation variant of ^^^
-    m_ps4Controller.circle().onTrue(new ClimberLock(m_Climber));
+    // m_driverController.b().onTrue(new ClimberLock(m_Climber));
+    // // Playstation variant of ^^^
+    // m_ps4Controller.circle().onTrue(new ClimberLock(m_Climber));
 
     // Intake Bindings
     m_driverController.leftTrigger().toggleOnTrue(m_IntakeToggle);
