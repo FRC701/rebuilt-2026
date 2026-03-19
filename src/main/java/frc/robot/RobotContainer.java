@@ -10,6 +10,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -17,8 +18,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FeederConstants;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.FeederOn;
 import frc.robot.commands.NotShootingCommand;
-import frc.robot.commands.SequentialShoot;
+import frc.robot.commands.ShootCommand;
+import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
 import frc.robot.subsystems.Agitator.AgitatorState;
@@ -69,6 +72,18 @@ public class RobotContainer {
       new Shooter(Constants.ShooterConstants.kRightShooterId, "Right Shooter");
   private Climber m_Climber = new Climber();
 
+  // Instantiating Shooter Commands
+
+  private SequentialCommandGroup m_SequentialShoot =
+      new SequentialCommandGroup(
+          new ShootingCommand(m_LeftShooter, m_RightShooter),
+          new ShootCommand(m_LeftShooter),
+          new FeederOn(m_Feeder));
+  // private SequentialShoot m_SequentialShoot = new SequentialShoot(m_LeftShooter, m_RightShooter,
+  // m_Feeder);
+  private NotShootingCommand m_NotShootingCommand =
+      new NotShootingCommand(m_LeftShooter, m_RightShooter, m_Feeder);
+
   // Instantiating the Toggles
 
   // Created StartEnd Command for AggitatorToggle
@@ -77,13 +92,6 @@ public class RobotContainer {
           () -> m_Agitator.m_AgitatorState = AgitatorState.S_On,
           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Off,
           m_Agitator);
-  private Command m_ShooterToggle =
-      Commands.startEnd(
-          () -> new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder),
-          () -> new NotShootingCommand(m_LeftShooter, m_RightShooter, m_Feeder),
-          m_LeftShooter,
-          m_RightShooter,
-          m_Feeder);
   private Command m_IntakeToggle =
       Commands.startEnd(
           () -> m_Intake.m_IntakeState = IntakeState.S_Extend,
@@ -176,9 +184,11 @@ public class RobotContainer {
     m_ps4Controller.L2().toggleOnTrue(m_IntakeToggle);
 
     // Shooter Binding XBox
-    m_xboxController.rightTrigger().toggleOnTrue(m_ShooterToggle);
+    m_xboxController.rightTrigger().onTrue(m_SequentialShoot);
+    m_xboxController.x().onTrue(m_NotShootingCommand);
     // Playstation variant of ^^^
-    m_ps4Controller.R2().toggleOnTrue(m_ShooterToggle);
+    m_ps4Controller.R2().onTrue(m_SequentialShoot);
+    m_ps4Controller.square().onTrue(m_NotShootingCommand);
 
     // Agitator Bindings
     // binds the dpad down to toggle the agitator for Xbox
