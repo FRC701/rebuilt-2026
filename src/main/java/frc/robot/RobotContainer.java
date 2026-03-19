@@ -17,9 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FeederConstants;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.ExtendIntake;
 import frc.robot.commands.NotShootingCommand;
-import frc.robot.commands.RetractIntake;
 import frc.robot.commands.SequentialShoot;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
@@ -28,6 +26,7 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -87,7 +86,9 @@ public class RobotContainer {
           m_Feeder);
   private Command m_IntakeToggle =
       Commands.startEnd(
-          () -> new ExtendIntake(m_Intake), () -> new RetractIntake(m_Intake), m_Intake);
+          () -> m_Intake.m_IntakeState = IntakeState.S_Extend,
+          () -> m_Intake.m_IntakeState = IntakeState.S_Retract,
+          m_Intake);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_xboxController =
@@ -100,9 +101,6 @@ public class RobotContainer {
     // Configure the trigger bindings
     m_Climber = new Climber();
     configureBindings();
-
-    // NamedCommands.registerCommand("ShootLeft", new ShootingCommand(m_LeftShooter));
-    // NamedCommands.registerCommand("ShootRight", new ShootingCommand(m_RightShooter));
   }
 
   /**
