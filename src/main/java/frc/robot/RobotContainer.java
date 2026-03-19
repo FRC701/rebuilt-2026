@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -131,7 +133,11 @@ public class RobotContainer {
 
     // Configure the trigger bindings
     configureBindings();
-  }
+
+     
+     NamedCommands.registerCommand("Shoot", new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder));
+    
+  } 
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
