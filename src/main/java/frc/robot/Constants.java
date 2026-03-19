@@ -138,7 +138,7 @@ public final class Constants {
     // one facing right rotated  90 CW  (top pointing intake)
 
     public static final double kRightCameraMountPitchAngleRad = Units.degreesToRadians(0);
-    public static final double kRightCameraMountRollAngleRad = Units.degreesToRadians(0);
+    public static final double kRightCameraMountRollAngleRad = Units.degreesToRadians(90);
     public static final double kRightCameraMountYawAngleRad = Units.degreesToRadians(-90);
 
     public static final double kRightCameraForwardMeters = Units.inchesToMeters(-3.78);
@@ -161,7 +161,7 @@ public final class Constants {
 
     public static final double kReverseCameraMountPitchAngleRad = Units.degreesToRadians(0);
     public static final double kReverseCameraMountRollAngleRad = Units.degreesToRadians(0);
-    public static final double kReverseCameraMountYawAngleRad = Units.degreesToRadians(-180);
+    public static final double kReverseCameraMountYawAngleRad = Units.degreesToRadians(180);
 
     public static final double kReverseCameraForwardMeters = Units.inchesToMeters(-2.78);
     public static final double kReverseCameraLeftMeters = Units.inchesToMeters(0);
@@ -194,7 +194,7 @@ public final class Constants {
 
     // Acceptance rules
     public static final int kMinAprilTagsForPose = 1;
-    public static final double kMaxAcceptableSingleTagAmbiguity = 0.25;
+    public static final double kMaxAcceptableSingleTagAmbiguity = 0.1;
 
     // Pose sanity / QC filters
     public static final double kMaxPoseHeightMeters =

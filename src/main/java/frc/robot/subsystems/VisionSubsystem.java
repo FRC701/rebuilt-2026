@@ -111,7 +111,10 @@ public class VisionSubsystem extends SubsystemBase {
 
       // Publish all tag IDs visible in this frame
       double[] visibleIds = result.targets.stream().mapToDouble(t -> t.getFiducialId()).toArray();
-      // SmartDashboard.putNumberArray(prefix + "VisibleTagIDs", visibleIds);
+      SmartDashboard.putNumberArray(prefix + "VisibleTagIDs", visibleIds);
+      double[] ambiguities =
+          result.targets.stream().mapToDouble(t -> t.getPoseAmbiguity()).toArray();
+      SmartDashboard.putNumberArray(prefix + "Ambiguities", ambiguities);
 
       int targetCount = result.targets.size();
 
@@ -169,6 +172,7 @@ public class VisionSubsystem extends SubsystemBase {
         int tagId = bestTarget.getFiducialId();
         boolean tagInLayout = m_FieldLayout.getTagPose(tagId).isPresent();
         double ambiguity = bestTarget.getPoseAmbiguity();
+        SmartDashboard.putNumber("Vision/" + cameraName + "/ambiguity", ambiguity);
 
         String fallbackReason;
         if (!tagInLayout) {
