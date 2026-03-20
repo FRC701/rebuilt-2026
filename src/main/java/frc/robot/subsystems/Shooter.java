@@ -16,12 +16,16 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.Agitator.AgitatorState;
 
 public class Shooter extends SubsystemBase {
 
   private TalonFX m_ShooterMotor;
 
   public ShooterEnumState m_ShooterEnumState;
+
+  private Agitator m_Agitator;
+  int aState;
 
   // Boolean to track the enabled status
   private boolean m_ShooterEnabled = true;
@@ -122,16 +126,20 @@ public class Shooter extends SubsystemBase {
   // Uses PID to arrive at our shooting speed
   public void shooting() {
     m_ShooterMotor.setControl(voltSpeed.withVelocity(Constants.ShooterConstants.shootRev));
+    m_Agitator.m_AgitatorState = AgitatorState.S_In;
   }
 
   // Uses PID to arrive at our passing speed
   public void passing() {
     m_ShooterMotor.setControl(voltSpeed.withVelocity(Constants.ShooterConstants.passRev));
+    m_Agitator.m_AgitatorState = AgitatorState.S_In;
   }
 
   // Sets the speed to 0 by using a VelocityVotage object with 0 velocity
   public void stopping() {
     m_ShooterMotor.setControl(voltSpeed.withVelocity(0));
+    if(aState == 0) m_Agitator.m_AgitatorState = AgitatorState.S_Off;
+    else if (aState == 1) m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
   }
 
   private boolean setEnabledStatus(boolean shooterStatus) {
@@ -158,5 +166,11 @@ public class Shooter extends SubsystemBase {
     if (m_ShooterEnabled) {
       runShooterStates();
     }
+
+    if(m_Agitator.m_AgitatorState == AgitatorState.S_Off) 
+      aState = 0;
+    else if(m_Agitator.m_AgitatorState == AgitatorState.S_Idle) 
+      aState = 1;
+    
   }
 }
