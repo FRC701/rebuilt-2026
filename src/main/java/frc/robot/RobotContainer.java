@@ -92,16 +92,6 @@ public class RobotContainer {
 //           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Idle,
 //           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Off,
 //           m_Agitator);
-<<<<<<< HEAD
-=======
-  private Command m_ShooterToggle =
-      Commands.startEnd(
-          () -> new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder),
-          () -> new NotShootingCommand(m_LeftShooter, m_RightShooter, m_Feeder),
-          m_LeftShooter,
-          m_RightShooter,
-          m_Feeder);
->>>>>>> origin/feature/agitatorIntakeCombo
   private Command m_IntakeToggle =
       Commands.startEnd(
           () -> m_Intake.m_IntakeState = IntakeState.S_Extend,
