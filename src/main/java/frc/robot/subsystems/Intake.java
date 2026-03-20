@@ -35,6 +35,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.subsystems.Agitator;
+import frc.robot.subsystems.Agitator.AgitatorState;;
 
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
@@ -43,6 +45,7 @@ public class Intake extends SubsystemBase {
   private TalonFX m_IntakeMotorRoller;
 
   public IntakeState m_IntakeState;
+  private Agitator m_Agitator;
 
   private double FORWARD_LIMIT = 4.7; // Placeholder
   private double REVERSE_LIMIT = 0;
@@ -53,12 +56,14 @@ public class Intake extends SubsystemBase {
           new Config(Units.Volts.per(Units.Second).of(1), Units.Volts.of(7), Units.Seconds.of(10)),
           new Mechanism(this::voltageCallback, this::logCallback, this));
 
-  public Intake() {
+  public Intake(Agitator agitator) {
     // Created Two Motors
     m_IntakeMotorArm = new TalonFX(IntakeConstants.kIntakeMotorArm);
     m_IntakeMotorRoller = new TalonFX(IntakeConstants.kIntakeMotorRoller);
 
-    m_IntakeState = IntakeState.S_Empty;
+    m_Agitator = agitator;
+
+    m_IntakeState = IntakeState.S_Retract;
 
     // Configs that use the PID values to help with motor speed
     var m_talonFXConfigs =
@@ -109,7 +114,6 @@ public class Intake extends SubsystemBase {
     S_Extend,
     S_Retract,
     S_Outtake,
-    S_Empty
   }
 
   public void RunIntakeState() {
@@ -145,6 +149,7 @@ public class Intake extends SubsystemBase {
   // Extends the intake out and starts the rollers
   public void ExtendPosition() {
     // If motor has reached its destination the stop the arm and start the rollers
+    m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeMotorRoller.setVoltage(8);
     }
@@ -156,6 +161,7 @@ public class Intake extends SubsystemBase {
   public void RetractPosition() {
     // When retracting we want to rollers to stay off
     m_IntakeMotorRoller.setVoltage(0);
+    m_Agitator.m_AgitatorState = AgitatorState.S_Off;
     // // If the arm has reached its destination stop the motor
     // if (checkExtended(IntakeConstants.kRetractPosition)) {
     //   //m_IntakeState = IntakeState.S_Retracted;
@@ -168,9 +174,10 @@ public class Intake extends SubsystemBase {
   public void Outtake() {
     // If motor has reached its destination the stop the arm and start the rollers moving backwards
     // (ejecting)
+    m_Agitator.m_AgitatorState = AgitatorState.S_Out;
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeMotorArm.setVoltage(0);
-      m_IntakeMotorRoller.setVoltage(8);
+      m_IntakeMotorRoller.setVoltage(-8);
     } else {
       // Move the arm until it reaches its destination
       setPosition(IntakeConstants.kExtensionPosition, 0);
