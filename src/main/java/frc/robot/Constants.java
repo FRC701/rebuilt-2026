@@ -138,9 +138,9 @@ public final class Constants {
     // one backwards (0,-2.78,24.75)
     // one facing right rotated  90 CW  (top pointing intake) (must match photonvision ui) in )
 
-    public static final double kRightCameraMountPitchAngleRad = Units.degreesToRadians(-90);
+    public static final double kRightCameraMountPitchAngleRad = Units.degreesToRadians(90);
     public static final double kRightCameraMountRollAngleRad = Units.degreesToRadians(0);
-    public static final double kRightCameraMountYawAngleRad = Units.degreesToRadians(90);
+    public static final double kRightCameraMountYawAngleRad = Units.degreesToRadians(0);
 
     public static final double kRightCameraForwardMeters = Units.inchesToMeters(-3.78);
     public static final double kRightCameraLeftMeters = Units.inchesToMeters(-3);
@@ -195,7 +195,7 @@ public final class Constants {
 
     // Acceptance rules
     public static final int kMinAprilTagsForPose = 1;
-    public static final double kMaxAcceptableSingleTagAmbiguity = 0.4;
+    public static final double kMaxAcceptableSingleTagAmbiguity = 0.2;
 
     // Pose sanity / QC filters
     public static final double kMaxPoseHeightMeters =
