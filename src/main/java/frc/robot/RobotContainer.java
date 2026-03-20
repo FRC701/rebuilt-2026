@@ -60,8 +60,8 @@ public class RobotContainer {
   // Instantiating the Subsystems
 
   public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
-  private Intake m_Intake = new Intake();
   private final Agitator m_Agitator = new Agitator();
+  private Intake m_Intake = new Intake(m_Agitator);
   private Feeder m_Feeder = new Feeder(FeederConstants.kFeederMotor);
   private Shooter m_LeftShooter =
       new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter");
@@ -72,11 +72,11 @@ public class RobotContainer {
   // Instantiating the Toggles
 
   // Created StartEnd Command for AggitatorToggle
-  private Command m_AgitatorToggle =
-      Commands.startEnd(
-          () -> m_Agitator.m_AgitatorState = AgitatorState.S_On,
-          () -> m_Agitator.m_AgitatorState = AgitatorState.S_Off,
-          m_Agitator);
+//   private Command m_AgitatorToggle =
+//       Commands.startEnd(
+//           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Idle,
+//           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Off,
+//           m_Agitator);
   private Command m_ShooterToggle =
       Commands.startEnd(
           () -> new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder),
@@ -182,8 +182,8 @@ public class RobotContainer {
 
     // Agitator Bindings
     // binds the dpad down to toggle the agitator for Xbox
-    m_xboxController.povDown().toggleOnTrue(m_AgitatorToggle);
-    // Playstation variant of ^^^
-    m_ps4Controller.povDown().toggleOnTrue(m_AgitatorToggle);
+    // m_xboxController.povDown().toggleOnTrue(m_AgitatorToggle);
+    // // Playstation variant of ^^^
+    // m_ps4Controller.povDown().toggleOnTrue(m_AgitatorToggle);
   }
 }
