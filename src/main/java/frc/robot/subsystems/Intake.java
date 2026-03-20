@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
@@ -46,6 +47,7 @@ public class Intake extends SubsystemBase {
 
   public IntakeState m_IntakeState;
   private Agitator m_Agitator;
+  private final StatusSignal<ReverseLimitValue> m_reverseLimitSignal;
 
   private double FORWARD_LIMIT = 4.7; // Placeholder
   private double REVERSE_LIMIT = 0;
@@ -62,6 +64,7 @@ public class Intake extends SubsystemBase {
     m_IntakeMotorRoller = new TalonFX(IntakeConstants.kIntakeMotorRoller);
 
     m_Agitator = agitator;
+    m_reverseLimitSignal = m_IntakeMotorArm.getReverseLimit();
 
     m_IntakeState = IntakeState.S_Retract;
 
@@ -186,9 +189,11 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (m_IntakeMotorArm.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
+    m_reverseLimitSignal.refresh();
+    if (m_reverseLimitSignal.getValue() == ReverseLimitValue.ClosedToGround) {
       m_IntakeMotorArm.setPosition(0);
     }
+    
     RunIntakeState();
     SmartDashboard.putBoolean("CheckExtended", checkExtended(IntakeConstants.kExtensionPosition));
     SmartDashboard.putBoolean("CheckRetracted", checkExtended(IntakeConstants.kRetractPosition));

@@ -107,7 +107,6 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
-    m_Climber = new Climber();
     configureBindings();
   }
 
