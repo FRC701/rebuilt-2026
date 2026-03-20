@@ -27,7 +27,9 @@ public final class Constants {
   public static class AgitatorConstants {
     public static final int kAgitatorLeftMotor = 21;
     public static final int kAgitatorRightMotor = 22;
-    public static final double kAgitatorVolt = 4;
+    public static final double kAgitatorVoltIn = 4;
+    public static final double kAgitatorVoltOut = -4;
+    public static final double kAgitatorVoltIdle = 1;
   }
 
   // Feeder Motor Ids = 30s

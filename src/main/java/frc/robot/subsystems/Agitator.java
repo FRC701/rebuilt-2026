@@ -21,7 +21,7 @@ public class Agitator extends SubsystemBase {
     m_AgitatorLeftMotor = new TalonFX(Constants.AgitatorConstants.kAgitatorLeftMotor);
     m_AgitatorRightMotor = new TalonFX(Constants.AgitatorConstants.kAgitatorRightMotor);
 
-    m_AgitatorState = AgitatorState.S_On;
+    m_AgitatorState = AgitatorState.S_Off;
 
     m_AgitatorRightMotor.setControl(
         new Follower(m_AgitatorLeftMotor.getDeviceID(), MotorAlignmentValue.Opposed));
@@ -32,33 +32,46 @@ public class Agitator extends SubsystemBase {
    * S_Off = motor is inactive
    */
   public enum AgitatorState {
-    S_On,
-    S_Off
+    S_In,
+    S_Off,
+    S_Out,
+    S_Idle
   }
-
-  public AgitatorState mAgitatorState;
 
   public void runAgitatorState() {
     switch (m_AgitatorState) {
-      case S_On:
-        spinAgitatorMotor();
+      case S_In:
+        AgitatorIntaking();
         break;
       case S_Off:
-        stopAgitatorMotor();
+        AgitatorStop();
+        break;
+      case S_Out:
+        AgitatorOuttaking();
+        break;
+      case S_Idle:
+        AgitatorIdling();
         break;
     }
   }
 
   // method for when motor is in motion
-  public void spinAgitatorMotor() {
-    m_AgitatorLeftMotor.setVoltage(Constants.AgitatorConstants.kAgitatorVolt);
+  public void AgitatorIntaking() {
+    m_AgitatorLeftMotor.setVoltage(Constants.AgitatorConstants.kAgitatorVoltIn);
   }
 
   // method for when motor is not in motion
-  public void stopAgitatorMotor() {
+  public void AgitatorStop() {
     m_AgitatorLeftMotor.setVoltage(0);
   }
 
+  public void AgitatorOuttaking() {
+    m_AgitatorLeftMotor.setVoltage(Constants.AgitatorConstants.kAgitatorVoltIn);
+  }
+
+  public void AgitatorIdling() {
+    m_AgitatorLeftMotor.setVoltage(Constants.AgitatorConstants.kAgitatorVoltIdle);
+  }
   @Override
   public void periodic() {
     runAgitatorState();
