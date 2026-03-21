@@ -24,7 +24,6 @@ import frc.robot.commands.ShootCommand;
 import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
-import frc.robot.subsystems.Agitator.AgitatorState;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
@@ -87,11 +86,11 @@ public class RobotContainer {
   // Instantiating the Toggles
 
   // Created StartEnd Command for AggitatorToggle
-//   private Command m_AgitatorToggle =
-//       Commands.startEnd(
-//           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Idle,
-//           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Off,
-//           m_Agitator);
+  //   private Command m_AgitatorToggle =
+  //       Commands.startEnd(
+  //           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Idle,
+  //           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Off,
+  //           m_Agitator);
   private Command m_IntakeToggle =
       Commands.startEnd(
           () -> m_Intake.m_IntakeState = IntakeState.S_Extend,

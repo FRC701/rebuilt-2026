@@ -36,8 +36,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.subsystems.Agitator;
-import frc.robot.subsystems.Agitator.AgitatorState;;
+import frc.robot.subsystems.Agitator.AgitatorState;
 
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
@@ -193,7 +192,7 @@ public class Intake extends SubsystemBase {
     if (m_reverseLimitSignal.getValue() == ReverseLimitValue.ClosedToGround) {
       m_IntakeMotorArm.setPosition(0);
     }
-    
+
     RunIntakeState();
     SmartDashboard.putBoolean("CheckExtended", checkExtended(IntakeConstants.kExtensionPosition));
     SmartDashboard.putBoolean("CheckRetracted", checkExtended(IntakeConstants.kRetractPosition));

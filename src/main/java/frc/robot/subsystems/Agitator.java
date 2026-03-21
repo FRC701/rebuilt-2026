@@ -72,6 +72,7 @@ public class Agitator extends SubsystemBase {
   public void AgitatorIdling() {
     m_AgitatorLeftMotor.setVoltage(Constants.AgitatorConstants.kAgitatorVoltIdle);
   }
+
   @Override
   public void periodic() {
     runAgitatorState();
