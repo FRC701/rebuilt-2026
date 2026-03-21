@@ -153,7 +153,7 @@ public class Intake extends SubsystemBase {
     // If motor has reached its destination the stop the arm and start the rollers
     m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
     //if (checkExtended(IntakeConstants.kExtensionPosition)) {
-      m_IntakeMotorRoller.setVoltage(10);
+      m_IntakeMotorRoller.setVoltage(6);
     //}
     // Move the arm until it reaches its destination
     setPosition(IntakeConstants.kExtensionPosition, 0);
