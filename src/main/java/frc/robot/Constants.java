@@ -60,18 +60,19 @@ public final class Constants {
 
   public static class IntakeConstants {
     public static final int kIntakeMotorArm = 11;
-    public static final int kIntakeMotorRoller = 12;
+    public static final int kIntakeMotorRoller1 = 12;
+    public static final int kIntakeMotorRoller2 = 13;
     // The number of rotations using the falcon's encoder
     public static final double kExtensionPosition = 4.7; // 4.7
     public static final double kRetractPosition = 0; // Intake is retracted and in the bot
 
     // PID Constants for Intake Extension
-    public static final double ExtendkP = 1.51337;//1.51227
-    public static final double ExtendkI = 0;//0
-    public static final double ExtendkD = 0.3;//0.3
-    public static final double ExtendkS = 2.4686;//2.4686
-    public static final double ExtendkV = 1;//1
-    public static final double ExtendkA = 1.01164;//1.01164
+    public static final double ExtendkP = 1.51337; // 1.51227
+    public static final double ExtendkI = 0; // 0
+    public static final double ExtendkD = 0.3; // 0.3
+    public static final double ExtendkS = 2.4686; // 2.4686
+    public static final double ExtendkV = 1; // 1
+    public static final double ExtendkA = 1.01164; // 1.01164
     public static final double ExtendkG = 1; // 0.46724, 1
 
     public static final double RetractkP = 3.0;
@@ -82,12 +83,12 @@ public final class Constants {
     public static final double RetractkA = 1.01164;
     public static final double RetractkG = 1;
 
-    public static final double DownkP = 1.51337;//1.51227
-    public static final double DownkI = 0;//0
-    public static final double DownkD = 0.3;//0.3
-    public static final double DownkS = 2.4686;//2.4686
-    public static final double DownkV = 1;//1
-    public static final double DownkA = 1.01164;//1.01164
+    public static final double DownkP = 1.51337; // 1.51227
+    public static final double DownkI = 0; // 0
+    public static final double DownkD = 0.3; // 0.3
+    public static final double DownkS = 2.4686; // 2.4686
+    public static final double DownkV = 1; // 1
+    public static final double DownkA = 1.01164; // 1.01164
     public static final double DownkG = 1; // 0.46724, 1
   }
 
