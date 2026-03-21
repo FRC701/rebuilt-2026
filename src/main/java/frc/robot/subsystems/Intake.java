@@ -46,9 +46,9 @@ public class Intake extends SubsystemBase {
 
   public IntakeState m_IntakeState;
   private Agitator m_Agitator;
-  private final StatusSignal<ReverseLimitValue> m_reverseLimitSignal;
+  //private final StatusSignal<ReverseLimitValue> m_reverseLimitSignal;
 
-  private double FORWARD_LIMIT = 4.7; // Placeholder
+  private double FORWARD_LIMIT = 5.3; // Placeholder
   private double REVERSE_LIMIT = 0;
 
   private final SysIdRoutine m_SysID =
@@ -63,7 +63,7 @@ public class Intake extends SubsystemBase {
     m_IntakeMotorRoller = new TalonFX(IntakeConstants.kIntakeMotorRoller);
 
     m_Agitator = agitator;
-    m_reverseLimitSignal = m_IntakeMotorArm.getReverseLimit();
+    //m_reverseLimitSignal = m_IntakeMotorArm.getReverseLimit();
 
     m_IntakeState = IntakeState.S_Retract;
 
@@ -98,6 +98,15 @@ public class Intake extends SubsystemBase {
     Slot1Configs.kA = Constants.IntakeConstants.RetractkA;
     Slot1Configs.kG = Constants.IntakeConstants.RetractkG;
 
+    var Slot2Configs = m_talonFXConfigs.Slot2;
+    Slot2Configs.kP = Constants.IntakeConstants.DownkP;
+    Slot2Configs.kI = Constants.IntakeConstants.DownkI;
+    Slot2Configs.kD = Constants.IntakeConstants.DownkD;
+    Slot2Configs.kS = Constants.IntakeConstants.DownkS;
+    Slot2Configs.kV = Constants.IntakeConstants.DownkV;
+    Slot2Configs.kA = Constants.IntakeConstants.DownkA;
+    Slot2Configs.kG = Constants.IntakeConstants.DownkG;
+
     MotorOutputConfigs IntakeConfig = new MotorOutputConfigs();
     IntakeConfig.Inverted = InvertedValue.Clockwise_Positive;
 
@@ -116,6 +125,7 @@ public class Intake extends SubsystemBase {
     S_Extend,
     S_Retract,
     S_Outtake,
+    S_Down
   }
 
   public void RunIntakeState() {
@@ -129,11 +139,18 @@ public class Intake extends SubsystemBase {
       case S_Outtake:
         Outtake();
         break;
+      case S_Down:
+        Down();
+        break;
     }
   }
 
-  public void empty() {
-    m_IntakeMotorArm.setVoltage(0);
+  public void Down() {
+        // If motor has reached its destination the stop the arm and start the rollers
+    m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
+    m_IntakeMotorRoller.setVoltage(9);
+    // Move the arm until it reaches its destination
+    setPosition(IntakeConstants.kExtensionPosition, 2);
   }
 
   // Gives the motor velocity using arm position
@@ -152,9 +169,10 @@ public class Intake extends SubsystemBase {
   public void ExtendPosition() {
     // If motor has reached its destination the stop the arm and start the rollers
     m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
-    //if (checkExtended(IntakeConstants.kExtensionPosition)) {
-      m_IntakeMotorRoller.setVoltage(6);
-    //}
+    m_IntakeMotorRoller.setVoltage(9);
+    if (checkExtended(IntakeConstants.kExtensionPosition)) {
+      m_IntakeState = IntakeState.S_Down;
+    }
     // Move the arm until it reaches its destination
     setPosition(IntakeConstants.kExtensionPosition, 0);
   }
@@ -188,8 +206,11 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_reverseLimitSignal.refresh();
-    if (m_reverseLimitSignal.getValue() == ReverseLimitValue.ClosedToGround) {
+    //m_reverseLimitSignal.refresh();
+    // if (m_reverseLimitSignal.getValue() == ReverseLimitValue.ClosedToGround) {
+    //   m_IntakeMotorArm.setPosition(0);
+    // }
+    if (m_IntakeMotorArm.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
       m_IntakeMotorArm.setPosition(0);
     }
 
