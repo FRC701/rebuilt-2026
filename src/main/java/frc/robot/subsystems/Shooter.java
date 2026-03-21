@@ -152,15 +152,15 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     // The current State
-    SmartDashboard.putString(m_StateString, m_ShooterEnumState.toString());
-    SmartDashboard.putBoolean(m_EnabledString, m_ShooterEnabled);
-    SmartDashboard.putNumber(
-        "RevolutionsError", m_ShooterMotor.getClosedLoopError().refresh().getValueAsDouble());
-    SmartDashboard.putNumber("ShooterSpeed", velocitySignal.getValueAsDouble());
-    SmartDashboard.putNumber(
-        "ShooterCurrent", m_ShooterMotor.getStatorCurrent().getValueAsDouble());
-    SmartDashboard.putBoolean("NoBallsInShooter", CurrentCHeck());
-    SmartDashboard.putBoolean("ShooterUpToSpeed", UpToSpeed());
+    // SmartDashboard.putString(m_StateString, m_ShooterEnumState.toString());
+    // SmartDashboard.putBoolean(m_EnabledString, m_ShooterEnabled);
+    // SmartDashboard.putNumber(
+    //     "RevolutionsError", m_ShooterMotor.getClosedLoopError().refresh().getValueAsDouble());
+    // SmartDashboard.putNumber("ShooterSpeed", velocitySignal.getValueAsDouble());
+    // SmartDashboard.putNumber(
+    //     "ShooterCurrent", m_ShooterMotor.getStatorCurrent().getValueAsDouble());
+    // SmartDashboard.putBoolean("NoBallsInShooter", CurrentCHeck());
+    // SmartDashboard.putBoolean("ShooterUpToSpeed", UpToSpeed());
     velocitySignal.refresh();
 
     setEnabledStatus(SmartDashboard.getBoolean(m_EnabledString, m_ShooterEnabled));

@@ -28,7 +28,6 @@ import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -221,12 +220,13 @@ public class Intake extends SubsystemBase {
     }
 
     RunIntakeState();
-    SmartDashboard.putBoolean("CheckExtended", checkExtended(IntakeConstants.kExtensionPosition));
-    SmartDashboard.putBoolean("CheckRetracted", checkExtended(IntakeConstants.kRetractPosition));
-    SmartDashboard.putNumber("ForwardSoftLimit", FORWARD_LIMIT);
-    SmartDashboard.putNumber("ReverseSoftLimit", REVERSE_LIMIT);
-    SmartDashboard.putNumber("IntakePose", m_IntakeMotorArm.getPosition().getValueAsDouble());
-    SmartDashboard.putString("IntakeState", m_IntakeState.toString());
+    // SmartDashboard.putBoolean("CheckExtended",
+    // checkExtended(IntakeConstants.kExtensionPosition));
+    // SmartDashboard.putBoolean("CheckRetracted", checkExtended(IntakeConstants.kRetractPosition));
+    // SmartDashboard.putNumber("ForwardSoftLimit", FORWARD_LIMIT);
+    // SmartDashboard.putNumber("ReverseSoftLimit", REVERSE_LIMIT);
+    // SmartDashboard.putNumber("IntakePose", m_IntakeMotorArm.getPosition().getValueAsDouble());
+    // SmartDashboard.putString("IntakeState", m_IntakeState.toString());
     // This method will be called once per scheduler run
 
   }
