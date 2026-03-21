@@ -53,7 +53,7 @@ public class VisionSubsystem extends SubsystemBase {
     boolean reverseConnected = m_ReverseCamera.isConnected();
 
     SmartDashboard.putBoolean("Vision/Forward/Connected", forwardConnected);
-    SmartDashboard.putBoolean("Vision/Reverse/Connected", reverseConnected);
+    // SmartDashboard.putBoolean("Vision/Reverse/Connected", reverseConnected);
 
     m_LatestForwardVisionMeasurement =
         forwardConnected
@@ -65,7 +65,7 @@ public class VisionSubsystem extends SubsystemBase {
             : Optional.empty();
 
     publishMeasurementTelemetry("Forward", m_LatestForwardVisionMeasurement);
-    publishMeasurementTelemetry("Reverse", m_LatestReverseVisionMeasurement);
+    //publishMeasurementTelemetry("Reverse", m_LatestReverseVisionMeasurement);
   }
 
   private void publishMeasurementTelemetry(
@@ -111,7 +111,7 @@ public class VisionSubsystem extends SubsystemBase {
 
       // Publish all tag IDs visible in this frame
       double[] visibleIds = result.targets.stream().mapToDouble(t -> t.getFiducialId()).toArray();
-      SmartDashboard.putNumberArray(prefix + "VisibleTagIDs", visibleIds);
+      // SmartDashboard.putNumberArray(prefix + "VisibleTagIDs", visibleIds);
 
       int targetCount = result.targets.size();
 
