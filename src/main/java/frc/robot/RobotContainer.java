@@ -66,9 +66,9 @@ public class RobotContainer {
   private Intake m_Intake = new Intake(m_Agitator);
   private Feeder m_Feeder = new Feeder(FeederConstants.kFeederMotor);
   private Shooter m_LeftShooter =
-      new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter");
+      new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter", m_Agitator);
   private Shooter m_RightShooter =
-      new Shooter(Constants.ShooterConstants.kRightShooterId, "Right Shooter");
+      new Shooter(Constants.ShooterConstants.kRightShooterId, "Right Shooter", m_Agitator);
   private Climber m_Climber = new Climber();
 
   // Instantiating Shooter Commands

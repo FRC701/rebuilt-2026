@@ -16,6 +16,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+
 import frc.robot.subsystems.Agitator.AgitatorState;
 
 public class Shooter extends SubsystemBase {
@@ -41,7 +42,7 @@ public class Shooter extends SubsystemBase {
   private String m_SpeedString;
 
   /** Creates a new Shooter. */
-  public Shooter(int motorId, String subsystemName) {
+  public Shooter(int motorId, String subsystemName, Agitator agitator) {
     super(subsystemName);
 
     // gives values to the Strings that are used for Shuffleboard
