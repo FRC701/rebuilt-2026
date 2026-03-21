@@ -3,7 +3,7 @@
   "robotLength": 0.851,
   "holonomicMode": true,
   "pathFolders": [
-    "New Folder",
+    "depot to hub",
     "start to depot",
     "start to hub"
   ],

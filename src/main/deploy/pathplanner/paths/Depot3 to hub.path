@@ -3,51 +3,58 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.565,
-        "y": 4.035
+        "x": 0.36036384976525904,
+        "y": 4.8653521126760575
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.428662709724873,
-        "y": 1.6782234204876536
+        "x": 1.5227997050136448,
+        "y": 4.653256985502085
       },
       "isLocked": false,
-      "linkedName": "start1 top 3.565x 7.636y"
+      "linkedName": "depot3 0.456x 4.924y"
     },
     {
       "anchor": {
-        "x": 1.3929812206572776,
-        "y": 4.929225352112676
+        "x": 1.8294483568075126,
+        "y": 4.4608215962441315
       },
       "prevControl": {
-        "x": 1.6579201309720686,
-        "y": 5.021221371928998
+        "x": 1.4355633802816905,
+        "y": 4.609859154929579
       },
       "nextControl": {
-        "x": 1.1568137278926154,
-        "y": 4.847219770831563
+        "x": 2.0632699211715835,
+        "y": 4.372348571890158
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.36036384976525904,
-        "y": 4.8653521126760575
+        "x": 3.338,
+        "y": 4.0197134831460675
       },
       "prevControl": {
-        "x": 2.4496741174721857,
-        "y": 5.224357617016813
+        "x": 2.4840594750936877,
+        "y": 4.281025896797452
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "depot3 0.456x 4.924y"
+      "linkedName": "hub1 3.338x 4.020y"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 5.0,
     "maxAcceleration": 7.5,
@@ -57,14 +64,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 5.0,
-    "rotation": 90.32407831657166
+    "velocity": 0,
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "start to depot",
+  "folder": "depot to hub",
   "idealStartingState": {
-    "velocity": 0.0,
-    "rotation": 180.0
+    "velocity": 0,
+    "rotation": 90.32407831657166
   },
   "useDefaultConstraints": true
 }
