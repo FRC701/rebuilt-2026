@@ -95,7 +95,8 @@ public class RobotContainer {
       Commands.startEnd(
           () -> m_Intake.m_IntakeState = IntakeState.S_Extend,
           () -> m_Intake.m_IntakeState = IntakeState.S_Retract,
-          m_Intake);
+          m_Intake,
+          m_Agitator);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_xboxController =

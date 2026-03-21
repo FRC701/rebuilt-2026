@@ -29,7 +29,7 @@ public final class Constants {
     public static final int kAgitatorRightMotor = 22;
     public static final double kAgitatorVoltIn = 4;
     public static final double kAgitatorVoltOut = -4;
-    public static final double kAgitatorVoltIdle = 1;
+    public static final double kAgitatorVoltIdle = 3;
   }
 
   // Feeder Motor Ids = 30s
@@ -66,13 +66,13 @@ public final class Constants {
     public static final double kRetractPosition = 0; // Intake is retracted and in the bot
 
     // PID Constants for Intake Extension
-    public static final double ExtendkP = 1.51337;
-    public static final double ExtendkI = 0;
-    public static final double ExtendkD = 0.3;
-    public static final double ExtendkS = 2.4686;
-    public static final double ExtendkV = 1;
-    public static final double ExtendkA = 1.01164;
-    public static final double ExtendkG = 1; // 0.46724;
+    public static final double ExtendkP = 1.51337;//1.51227
+    public static final double ExtendkI = 0;//0
+    public static final double ExtendkD = 0.3;//0.3
+    public static final double ExtendkS = 2.4686;//2.4686
+    public static final double ExtendkV = 1;//1
+    public static final double ExtendkA = 1.01164;//1.01164
+    public static final double ExtendkG = 1; // 0.46724, 1
 
     public static final double RetractkP = 3.0;
     public static final double RetractkI = 0;
