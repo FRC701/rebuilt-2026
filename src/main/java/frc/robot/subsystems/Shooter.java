@@ -47,6 +47,7 @@ public class Shooter extends SubsystemBase {
 
     // gives values to the Strings that are used for Shuffleboard
     nameStrings();
+    m_Agitator = agitator;
 
     // Selects the intial state
     m_ShooterEnumState = ShooterEnumState.S_NotShooting;
