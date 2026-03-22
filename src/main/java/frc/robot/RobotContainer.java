@@ -98,8 +98,8 @@ public class RobotContainer {
           m_Intake,
           m_Agitator);
 
-  private Command m_IntakeRollerToggle =
-      Commands.startEnd(() -> m_Intake.holdBool = true, () -> m_Intake.holdBool = false, m_Intake);
+//   private Command m_IntakeRollerToggle =
+//       Commands.startEnd(() -> m_Intake.holdBool = true, () -> m_Intake.holdBool = false, m_Intake);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_xboxController =
@@ -184,7 +184,7 @@ public class RobotContainer {
     m_xboxController.leftTrigger().toggleOnTrue(m_IntakeToggle);
     // Playstation variant of ^^^
     m_ps4Controller.L2().toggleOnTrue(m_IntakeToggle);
-    m_ps4Controller.povRight().onTrue(m_IntakeRollerToggle);
+    // m_ps4Controller.povRight().onTrue(m_IntakeRollerToggle);
 
     // Shooter Binding XBox
     m_xboxController.rightTrigger().onTrue(m_SequentialShoot);

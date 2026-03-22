@@ -64,9 +64,9 @@ public class Shooter extends SubsystemBase {
                 new VoltageConfigs().withPeakForwardVoltage(10).withPeakReverseVoltage(-10))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(40))
+                    .withStatorCurrentLimit(Amps.of(60))
                     .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(40));
+                    .withSupplyCurrentLimit(60));
     ;
 
     MotorOutputConfigs shooterConfig = m_TalonFXConfig.MotorOutput;
