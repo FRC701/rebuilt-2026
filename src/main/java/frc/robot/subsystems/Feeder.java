@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Amps;
+
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -17,6 +21,15 @@ public class Feeder extends SubsystemBase {
   public Feeder(int motorID) {
     m_FeederMotor = new TalonFX(motorID);
     m_FeederState = FeederState.S_Off;
+
+    var m_talonFXConfigs =
+        new TalonFXConfiguration()
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(Amps.of(40))
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(40));
+    m_FeederMotor.getConfigurator().apply(m_talonFXConfigs);
   }
 
   public void runFeederState() {

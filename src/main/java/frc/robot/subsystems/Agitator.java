@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Amps;
+
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -25,6 +29,16 @@ public class Agitator extends SubsystemBase {
 
     m_AgitatorRightMotor.setControl(
         new Follower(m_AgitatorLeftMotor.getDeviceID(), MotorAlignmentValue.Opposed));
+
+    var m_TalonFXConfig =
+        new TalonFXConfiguration()
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(Amps.of(40))
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(40));
+
+    m_AgitatorLeftMotor.getConfigurator().apply(m_TalonFXConfig);
   }
 
   /*

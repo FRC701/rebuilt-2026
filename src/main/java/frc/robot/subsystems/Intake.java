@@ -4,12 +4,14 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
@@ -83,9 +85,23 @@ public class Intake extends SubsystemBase {
                     .withReverseSoftLimitEnable(true))
             .withHardwareLimitSwitch(
                 new HardwareLimitSwitchConfigs()
-                    .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin));
+                    .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(Amps.of(40))
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(40));
+    ;
 
-    var Slot0Configs = m_talonFXConfigs.Slot0;
+    var m_rollerConfigs =
+        new TalonFXConfiguration()
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(Amps.of(60))
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(60));
+
+    var Slot0Configs = m_talonFXConfigs.Slot0; // pid for moving down
     Slot0Configs.kP = Constants.IntakeConstants.ExtendkP;
     Slot0Configs.kI = Constants.IntakeConstants.ExtendkI;
     Slot0Configs.kD = Constants.IntakeConstants.ExtendkD;
@@ -94,7 +110,7 @@ public class Intake extends SubsystemBase {
     Slot0Configs.kA = Constants.IntakeConstants.ExtendkA;
     Slot0Configs.kG = Constants.IntakeConstants.ExtendkG;
 
-    var Slot1Configs = m_talonFXConfigs.Slot1;
+    var Slot1Configs = m_talonFXConfigs.Slot1; // pid for moving up
     Slot1Configs.kP = Constants.IntakeConstants.RetractkP;
     Slot1Configs.kI = Constants.IntakeConstants.RetractkI;
     Slot1Configs.kD = Constants.IntakeConstants.RetractkD;
@@ -103,7 +119,7 @@ public class Intake extends SubsystemBase {
     Slot1Configs.kA = Constants.IntakeConstants.RetractkA;
     Slot1Configs.kG = Constants.IntakeConstants.RetractkG;
 
-    var Slot2Configs = m_talonFXConfigs.Slot2;
+    var Slot2Configs = m_talonFXConfigs.Slot2; // pid for holding intake position once it is down
     Slot2Configs.kP = Constants.IntakeConstants.DownkP;
     Slot2Configs.kI = Constants.IntakeConstants.DownkI;
     Slot2Configs.kD = Constants.IntakeConstants.DownkD;
@@ -120,6 +136,7 @@ public class Intake extends SubsystemBase {
 
     // Apply the Configs to the Motor Objects
     m_IntakeMotorArm.getConfigurator().apply(m_talonFXConfigs);
+    m_IntakeMotorRoller1.getConfigurator().apply(m_rollerConfigs);
     m_IntakeMotorArm.getConfigurator().apply(IntakeConfig);
     m_IntakeMotorRoller1.getConfigurator().apply(RollerIntakeConfig);
 
