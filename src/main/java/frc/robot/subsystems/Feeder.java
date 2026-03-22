@@ -21,15 +21,6 @@ public class Feeder extends SubsystemBase {
   public Feeder(int motorID) {
     m_FeederMotor = new TalonFX(motorID);
     m_FeederState = FeederState.S_Off;
-
-    var m_talonFXConfigs =
-        new TalonFXConfiguration()
-            .withCurrentLimits(
-                new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(60))
-                    .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(60));
-    m_FeederMotor.getConfigurator().apply(m_talonFXConfigs);
   }
 
   public void runFeederState() {
