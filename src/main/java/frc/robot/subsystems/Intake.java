@@ -30,6 +30,7 @@ import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -49,6 +50,8 @@ public class Intake extends SubsystemBase {
 
   public IntakeState m_IntakeState;
   private Agitator m_Agitator;
+
+  Timer m_Timer = new Timer();
   // private final StatusSignal<ReverseLimitValue> m_reverseLimitSignal;
 
   private double FORWARD_LIMIT = 5.3; // Placeholder
@@ -147,7 +150,8 @@ public class Intake extends SubsystemBase {
     S_Extend,
     S_Retract,
     S_Outtake,
-    S_Down
+    S_Down,
+    S_ExtendCycleUp
   }
 
   public void RunIntakeState() {
@@ -164,13 +168,34 @@ public class Intake extends SubsystemBase {
       case S_Down:
         Down();
         break;
+      case S_ExtendCycleUp:
+        CycleUp();
+        break;
     }
   }
+
+  public void CycleUp() {
+    m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
+    m_Timer.start();
+      m_IntakeMotorRoller1.setVoltage(6.5);
+      if (m_Timer.hasElapsed(0.3)) {
+        m_IntakeState = IntakeState.S_Down;
+        m_Timer.reset();
+        m_Timer.stop();
+      }
+    setPosition(IntakeConstants.kExtentionCycleUpPos, 1);
+      }
 
   public void Down() {
     // If motor has reached its destination the stop the arm and start the rollers
     m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
-    m_IntakeMotorRoller1.setVoltage(9);
+    m_Timer.start();
+      m_IntakeMotorRoller1.setVoltage(6.5);
+      if (m_Timer.hasElapsed(0.7)) {
+        m_IntakeState = IntakeState.S_ExtendCycleUp;
+        m_Timer.reset();
+        m_Timer.stop();
+      }
     // Move the arm until it reaches its destination
     setPosition(IntakeConstants.kExtensionPosition, 2);
   }
