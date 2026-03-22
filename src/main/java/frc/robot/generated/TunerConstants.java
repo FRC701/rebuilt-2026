@@ -61,11 +61,12 @@ public class TunerConstants {
 
   // The stator current at which the wheels start to slip;
   // This needs to be tuned to your individual robot
-  private static final Current kSlipCurrent = Amps.of(70);
+  private static final Current kSlipCurrent = Amps.of(120);
 
   // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
   // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
-  private static final TalonFXConfiguration driveInitialConfigs =
+  private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration();
+  private static final TalonFXConfiguration steerInitialConfigs =
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
@@ -170,7 +171,7 @@ public class TunerConstants {
   private static final int kFrontRightSteerMotorId = 1;
   private static final int kFrontRightEncoderId = 1;
   private static final Angle kFrontRightEncoderOffset =
-      Rotations.of(-0.13671875 + SmartDashboard.getNumber("frontRightCoderOffset", 0));
+      Rotations.of(-0.21671875 + SmartDashboard.getNumber("frontRightCoderOffset", 0));
   private static final boolean kFrontRightSteerMotorInverted = true;
   private static final boolean kFrontRightEncoderInverted = false;
 
@@ -182,7 +183,7 @@ public class TunerConstants {
   private static final int kBackLeftSteerMotorId = 4;
   private static final int kBackLeftEncoderId = 0;
   private static final Angle kBackLeftEncoderOffset =
-      Rotations.of(-0.171630859375 + SmartDashboard.getNumber("backLeftCoderOffset", 0));
+      Rotations.of(-0.528630859375 + SmartDashboard.getNumber("backLeftCoderOffset", 0)); //-0.021630859375 
   private static final boolean kBackLeftSteerMotorInverted = true;
   private static final boolean kBackLeftEncoderInverted = false;
 
@@ -194,7 +195,7 @@ public class TunerConstants {
   private static final int kBackRightSteerMotorId = 8;
   private static final int kBackRightEncoderId = 3;
   private static final Angle kBackRightEncoderOffset =
-      Rotations.of(-0.469970703125 + SmartDashboard.getNumber("backRightCoderOffset", 0));
+      Rotations.of(-0.529970703125 + SmartDashboard.getNumber("backRightCoderOffset", 0));
   private static final boolean kBackRightSteerMotorInverted = true;
   private static final boolean kBackRightEncoderInverted = false;
 

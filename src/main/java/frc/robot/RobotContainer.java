@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -192,6 +194,9 @@ public class RobotContainer {
     // Playstation variant of ^^^
     m_ps4Controller.R2().onTrue(m_SequentialShoot);
     m_ps4Controller.square().onTrue(m_NotShootingCommand);
+
+    m_ps4Controller.povUp().whileTrue(m_DriveTrain.applyRequest(()->
+        point.withModuleDirection (new Rotation2d(1,0))));
 
     // Agitator Bindings
     // binds the dpad down to toggle the agitator for Xbox
