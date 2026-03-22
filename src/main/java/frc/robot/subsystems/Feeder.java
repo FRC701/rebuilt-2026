@@ -26,9 +26,9 @@ public class Feeder extends SubsystemBase {
         new TalonFXConfiguration()
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(40))
+                    .withStatorCurrentLimit(Amps.of(60))
                     .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(40));
+                    .withSupplyCurrentLimit(60));
     m_FeederMotor.getConfigurator().apply(m_talonFXConfigs);
   }
 
