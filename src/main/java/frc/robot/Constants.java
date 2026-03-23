@@ -138,9 +138,9 @@ public final class Constants {
     // one backwards (0,-2.78,24.75)
     // one facing right rotated  90 CW  (top pointing intake) (must match photonvision ui) in )
 
-    public static final double kRightCameraMountPitchAngleRad = Units.degreesToRadians(90);
+    public static final double kRightCameraMountPitchAngleRad = Units.degreesToRadians(-90);
     public static final double kRightCameraMountRollAngleRad = Units.degreesToRadians(0);
-    public static final double kRightCameraMountYawAngleRad = Units.degreesToRadians(0);
+    public static final double kRightCameraMountYawAngleRad = Units.degreesToRadians(-90);
 
     public static final double kRightCameraForwardMeters = Units.inchesToMeters(-3.78);
     public static final double kRightCameraLeftMeters = Units.inchesToMeters(-3);
@@ -166,7 +166,7 @@ public final class Constants {
 
     public static final double kReverseCameraForwardMeters = Units.inchesToMeters(-2.78);
     public static final double kReverseCameraLeftMeters = Units.inchesToMeters(0);
-    public static final double kReverseCameraUpMeters = Units.inchesToMeters(24.75);
+    public static final double kReverseCameraUpMeters = Units.inchesToMeters(22);
 
     // Robot to reverse camera transform
     public static final Transform3d kReverseRobotToCam3d =
