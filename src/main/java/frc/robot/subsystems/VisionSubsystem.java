@@ -19,53 +19,53 @@ import org.photonvision.targeting.PhotonPipelineResult;
 public class VisionSubsystem extends SubsystemBase {
   private final PhotonCamera m_RightCamera;
   private final PhotonPoseEstimator m_RightPoseEstimator;
-  private final PhotonCamera m_ReverseCamera;
-  private final PhotonPoseEstimator m_ReversePoseEstimator;
+  private final PhotonCamera m_ForwardCamera;
+  private final PhotonPoseEstimator m_ForwardPoseEstimator;
   private final AprilTagFieldLayout m_FieldLayout;
 
   private Optional<VisionMeasurement> m_LatestRightVisionMeasurement = Optional.empty();
-  private Optional<VisionMeasurement> m_LatestReverseVisionMeasurement = Optional.empty();
+  private Optional<VisionMeasurement> m_LatestForwardVisionMeasurement = Optional.empty();
 
   private int m_RightRejectionCount = 0;
-  private int m_ReverseRejectionCount = 0;
+  private int m_ForwardRejectionCount = 0;
 
   public VisionSubsystem() {
     m_FieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
     m_RightCamera = new PhotonCamera(Constants.Vision.kRightCameraName);
     m_RightPoseEstimator =
         new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kRightRobotToCam3d);
-    m_ReverseCamera = new PhotonCamera(Constants.Vision.kReverseCameraName);
-    m_ReversePoseEstimator =
-        new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kReverseRobotToCam3d);
+    m_ForwardCamera = new PhotonCamera(Constants.Vision.kForwardCameraName);
+    m_ForwardPoseEstimator =
+        new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kForwardRobotToCam3d);
   }
 
   public Optional<VisionMeasurement> getLatestRightVisionMeasurement() {
     return m_LatestRightVisionMeasurement;
   }
 
-  public Optional<VisionMeasurement> getLatestReverseVisionMeasurement() {
-    return m_LatestReverseVisionMeasurement;
+  public Optional<VisionMeasurement> getLatestForwardVisionMeasurement() {
+    return m_LatestForwardVisionMeasurement;
   }
 
   @Override
   public void periodic() {
     boolean rightConnected = m_RightCamera.isConnected();
-    boolean reverseConnected = m_ReverseCamera.isConnected();
+    boolean forwardConnected = m_ForwardCamera.isConnected();
 
     SmartDashboard.putBoolean("Vision/Right/Connected", rightConnected);
-    SmartDashboard.putBoolean("Vision/Reverse/Connected", reverseConnected);
+    SmartDashboard.putBoolean("Vision/Forward/Connected", forwardConnected);
 
     m_LatestRightVisionMeasurement =
         rightConnected
             ? processCamera(m_RightCamera, m_RightPoseEstimator, "Right")
             : Optional.empty();
-    m_LatestReverseVisionMeasurement =
-        reverseConnected
-            ? processCamera(m_ReverseCamera, m_ReversePoseEstimator, "Reverse")
+    m_LatestForwardVisionMeasurement =
+        forwardConnected
+            ? processCamera(m_ForwardCamera, m_ForwardPoseEstimator, "Forward")
             : Optional.empty();
 
     publishMeasurementTelemetry("Right", m_LatestRightVisionMeasurement);
-    publishMeasurementTelemetry("Reverse", m_LatestReverseVisionMeasurement);
+    publishMeasurementTelemetry("Forward", m_LatestForwardVisionMeasurement);
   }
 
   private void publishMeasurementTelemetry(
@@ -91,7 +91,7 @@ public class VisionSubsystem extends SubsystemBase {
     if (cameraName.equals("Right")) {
       SmartDashboard.putNumber(prefix + "RejectionCount", ++m_RightRejectionCount);
     } else {
-      SmartDashboard.putNumber(prefix + "RejectionCount", ++m_ReverseRejectionCount);
+      SmartDashboard.putNumber(prefix + "RejectionCount", ++m_ForwardRejectionCount);
     }
   }
 
