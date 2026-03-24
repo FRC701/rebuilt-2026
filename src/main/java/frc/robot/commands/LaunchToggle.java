@@ -13,24 +13,30 @@ import frc.robot.subsystems.Shooter.ShooterEnumState;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class NotShootingCommand extends InstantCommand {
-  Shooter m_LeftShooterSubsystem;
-  Shooter m_RightShooterSubsystem;
-  Feeder m_Feeder;
+public class LaunchToggle extends InstantCommand {
 
-  public NotShootingCommand(Shooter leftShooter, Shooter rightShooter, Feeder feeder) {
+  Feeder m_Feeder;
+  Shooter m_LeftShooter;
+  Shooter m_RightShooter;
+
+  public LaunchToggle(Feeder tempfeeder, Shooter tempLeftShooter, Shooter tempRightShooter) {
     // Use addRequirements() here to declare subsystem dependencies.
-    m_LeftShooterSubsystem = leftShooter;
-    m_RightShooterSubsystem = rightShooter;
-    m_Feeder = feeder;
-    addRequirements(m_LeftShooterSubsystem);
+    m_LeftShooter = tempLeftShooter;
+    m_RightShooter = tempRightShooter;
+    m_Feeder = tempfeeder;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_LeftShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
-    m_RightShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
-    m_Feeder.m_FeederState = FeederState.S_Off;
+    if (m_LeftShooter.m_ShooterEnumState == ShooterEnumState.S_Shooting) {
+      m_LeftShooter.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
+      m_RightShooter.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
+      m_Feeder.m_FeederState = FeederState.S_Off;
+    } else {
+      m_LeftShooter.m_ShooterEnumState = ShooterEnumState.S_Shooting;
+      m_RightShooter.m_ShooterEnumState = ShooterEnumState.S_Shooting;
+      m_Feeder.m_FeederState = FeederState.S_On;
+    }
   }
 }

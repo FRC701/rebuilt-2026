@@ -19,15 +19,17 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
   public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
-    public static final int kCoDriverControllerPort = 1;
+    public static final int kXboxControllerPort = 1;
+    public static final int kPs4ControllerPort = 0;
   }
 
   // Agitator IDs : 20s
   public static class AgitatorConstants {
     public static final int kAgitatorLeftMotor = 21;
     public static final int kAgitatorRightMotor = 22;
-    public static final double kAgitatorVolt = 4;
+    public static final double kAgitatorVoltIn = 4;
+    public static final double kAgitatorVoltOut = -4;
+    public static final double kAgitatorVoltIdle = 3;
   }
 
   // Feeder Motor Ids = 30s
@@ -58,19 +60,21 @@ public final class Constants {
 
   public static class IntakeConstants {
     public static final int kIntakeMotorArm = 11;
-    public static final int kIntakeMotorRoller = 12;
+    public static final int kIntakeMotorRoller1 = 12;
+    public static final int kIntakeMotorRoller2 = 13;
     // The number of rotations using the falcon's encoder
-    public static final double kExtensionPosition = 4.8; // 4.7
-    public static final double kRetractPosition = 0; // Intake is retracted and in the bot
+    public static final double kExtensionPosition = 4.9; // 4.7
+    public static final double kExtentionCycleUpPos = kExtensionPosition - 1.5;
+    public static final double kRetractPosition = 0; // Intake is retract ed and in the bot
 
     // PID Constants for Intake Extension
-    public static final double ExtendkP = 1.51337;
-    public static final double ExtendkI = 0;
-    public static final double ExtendkD = 0.3;
-    public static final double ExtendkS = 2.4686;
-    public static final double ExtendkV = 1;
-    public static final double ExtendkA = 1.01164;
-    public static final double ExtendkG = 1; // 0.46724;
+    public static final double ExtendkP = 1.51337; // 1.51227
+    public static final double ExtendkI = 0; // 0
+    public static final double ExtendkD = 0.3; // 0.3
+    public static final double ExtendkS = 2.4686; // 2.4686
+    public static final double ExtendkV = 1; // 1
+    public static final double ExtendkA = 1.01164; // 1.01164
+    public static final double ExtendkG = 1; // 0.46724, 1
 
     public static final double RetractkP = 3.0;
     public static final double RetractkI = 0;
@@ -79,6 +83,14 @@ public final class Constants {
     public static final double RetractkV = 1;
     public static final double RetractkA = 1.01164;
     public static final double RetractkG = 1;
+
+    public static final double DownkP = 1.51337; // 1.51227
+    public static final double DownkI = 0; // 0
+    public static final double DownkD = 0.3; // 0.3
+    public static final double DownkS = 2.4686; // 2.4686
+    public static final double DownkV = 1; // 1
+    public static final double DownkA = 1.01164; // 1.01164
+    public static final double DownkG = 1; // 0.46724, 1
   }
 
   // Shooter Motor Ids = 40s
@@ -123,8 +135,8 @@ public final class Constants {
     public static final double kForwardCameraMountRollAngleRad = Units.degreesToRadians(0);
     public static final double kForwardCameraMountYawAngleRad = Units.degreesToRadians(0);
 
-    public static final double kForwardCameraForwardMeters = Units.inchesToMeters(12);
-    public static final double kForwardCameraLeftMeters = Units.inchesToMeters(11);
+    public static final double kForwardCameraForwardMeters = Units.inchesToMeters(0);
+    public static final double kForwardCameraLeftMeters = Units.inchesToMeters(0);
     public static final double kForwardCameraUpMeters = Units.inchesToMeters(27.9);
 
     // Robot to forward camera transform
