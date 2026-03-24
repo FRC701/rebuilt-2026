@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -30,7 +29,6 @@ import frc.robot.commands.ShootCommand;
 import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
-import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
@@ -76,7 +74,6 @@ public class RobotContainer {
       new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter", m_Agitator);
   private Shooter m_RightShooter =
       new Shooter(Constants.ShooterConstants.kRightShooterId, "Right Shooter", m_Agitator);
-  private Climber m_Climber = new Climber();
 
   // Instantiating Shooter Commands
 
@@ -95,11 +92,14 @@ public class RobotContainer {
           m_Intake,
           m_Agitator);
 
-  private Command m_ShooterToggle = Commands.startEnd(() -> m_ShootingCommand.andThen(m_ShootCommand.andThen(m_FeederOn)), () -> m_NotShootingCommand.initialize(), m_LeftShooter, m_RightShooter, m_LeftFeeder, m_RightFeeder);
-
-  //   private Command m_IntakeRollerToggle =
-  //       Commands.startEnd(() -> m_Intake.holdBool = true, () -> m_Intake.holdBool = false,
-  //    m_Intake);
+  private Command m_ShooterToggle =
+      Commands.startEnd(
+          () -> m_ShootingCommand.andThen(m_ShootCommand.andThen(m_FeederOn)),
+          () -> m_NotShootingCommand.initialize(),
+          m_LeftShooter,
+          m_RightShooter,
+          m_LeftFeeder,
+          m_RightFeeder);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_xboxController =
@@ -172,23 +172,6 @@ public class RobotContainer {
     m_ps4Controller.L1().onTrue(m_DriveTrain.runOnce(() -> m_DriveTrain.seedFieldCentric()));
     m_DriveTrain.registerTelemetry(logger::telemeterize);
 
-    // Climber Bindings
-    // m_driverController
-    //     .a()
-    //     .onTrue(
-    //         new ClimberUpDownToggle(
-    //             m_Climber, m_Agitator, m_Feeder, m_LeftShooter, m_RightShooter));
-    // // Playstation variant of ^^^
-    // m_ps4Controller
-    //     .cross()
-    //     .onTrue(
-    //         new ClimberUpDownToggle(
-    //             m_Climber, m_Agitator, m_Feeder, m_LeftShooter, m_RightShooter));
-
-    // m_driverController.b().onTrue(new ClimberLock(m_Climber));
-    // // Playstation variant of ^^^
-    // m_ps4Controller.circle().onTrue(new ClimberLock(m_Climber));
-
     // Intake Bindings
     m_xboxController.leftTrigger().toggleOnTrue(m_IntakeToggle);
     // Playstation variant of ^^^
@@ -204,12 +187,6 @@ public class RobotContainer {
         .povUp()
         .whileTrue(
             m_DriveTrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(1, 0))));
-
-    // Agitator Bindings
-    // binds the dpad down to toggle the agitator for Xbox
-    // m_xboxController.povDown().toggleOnTrue(m_AgitatorToggle);
-    // // Playstation variant of ^^^
-    // m_ps4Controller.povDown().toggleOnTrue(m_AgitatorToggle);
   }
 
   public Command getAutonomusCommand() {
