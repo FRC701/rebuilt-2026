@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -100,8 +99,9 @@ public class RobotContainer {
           m_Intake,
           m_Agitator);
 
-//   private Command m_IntakeRollerToggle =
-//       Commands.startEnd(() -> m_Intake.holdBool = true, () -> m_Intake.holdBool = false, m_Intake);
+  //   private Command m_IntakeRollerToggle =
+  //       Commands.startEnd(() -> m_Intake.holdBool = true, () -> m_Intake.holdBool = false,
+  // m_Intake);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_xboxController =
@@ -195,8 +195,10 @@ public class RobotContainer {
     m_ps4Controller.R2().onTrue(m_SequentialShoot);
     m_ps4Controller.square().onTrue(m_NotShootingCommand);
 
-    m_ps4Controller.povUp().whileTrue(m_DriveTrain.applyRequest(()->
-        point.withModuleDirection (new Rotation2d(1,0))));
+    m_ps4Controller
+        .povUp()
+        .whileTrue(
+            m_DriveTrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(1, 0))));
 
     // Agitator Bindings
     // binds the dpad down to toggle the agitator for Xbox
