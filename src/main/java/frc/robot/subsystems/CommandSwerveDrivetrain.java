@@ -204,12 +204,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             || Math.abs(speeds.omegaRadiansPerSecond) > Constants.Vision.kMaxVisionRotationSpeed;
 
     if (!tooFast) {
-      // m_visionSubsystem
-      //     .getLatestRightVisionMeasurement()
-      //     .ifPresent(
-      //         m -> {
-      //           addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
-      //         });
+      m_visionSubsystem
+          .getLatestRightVisionMeasurement()
+          .ifPresent(
+              m -> {
+                addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
+              });
       m_visionSubsystem
           .getLatestForwardVisionMeasurement()
           .ifPresent(
