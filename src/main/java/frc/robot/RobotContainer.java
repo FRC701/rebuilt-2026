@@ -74,24 +74,14 @@ public class RobotContainer {
 
   // Instantiating Shooter Commands
 
-  private SequentialCommandGroup m_SequentialShoot =
-      new SequentialCommandGroup(
-          new ShootingCommand(m_LeftShooter, m_RightShooter),
-          new ShootCommand(m_LeftShooter),
-          new FeederOn(m_Feeder));
-  // private SequentialShoot m_SequentialShoot = new SequentialShoot(m_LeftShooter, m_RightShooter,
-  // m_Feeder);
+    private ShootingCommand m_ShootingCommand = new ShootingCommand(m_LeftShooter, m_RightShooter);
+    private ShootCommand m_ShootCommand = new ShootCommand(m_LeftShooter);
+    private FeederOn m_FeederOn = new FeederOn(m_Feeder);
   private NotShootingCommand m_NotShootingCommand =
       new NotShootingCommand(m_LeftShooter, m_RightShooter, m_Feeder);
 
   // Instantiating the Toggles
 
-  // Created StartEnd Command for AggitatorToggle
-  //   private Command m_AgitatorToggle =
-  //       Commands.startEnd(
-  //           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Idle,
-  //           () -> m_Agitator.m_AgitatorState = AgitatorState.S_Off,
-  //           m_Agitator);
   private Command m_IntakeToggle =
       Commands.startEnd(
           () -> m_Intake.m_IntakeState = IntakeState.S_Extend,
@@ -99,9 +89,11 @@ public class RobotContainer {
           m_Intake,
           m_Agitator);
 
+    private Command m_ShooterToggle = Commands.startEnd(() -> m_ShootingCommand.andThen(m_ShootCommand.andThen(m_FeederOn)), () -> m_NotShootingCommand.initialize(), m_LeftShooter, m_RightShooter, m_Feeder);
+
   //   private Command m_IntakeRollerToggle =
   //       Commands.startEnd(() -> m_Intake.holdBool = true, () -> m_Intake.holdBool = false,
-  // m_Intake);
+  //    m_Intake);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_xboxController =
@@ -189,11 +181,9 @@ public class RobotContainer {
     // m_ps4Controller.povRight().onTrue(m_IntakeRollerToggle);
 
     // Shooter Binding XBox
-    m_xboxController.rightTrigger().onTrue(m_SequentialShoot);
-    m_xboxController.x().onTrue(m_NotShootingCommand);
+    m_xboxController.rightTrigger().onTrue(m_ShooterToggle);
     // Playstation variant of ^^^
-    m_ps4Controller.R2().onTrue(m_SequentialShoot);
-    m_ps4Controller.square().onTrue(m_NotShootingCommand);
+    m_ps4Controller.R2().onTrue(m_ShooterToggle);
 
     m_ps4Controller
         .povUp()
