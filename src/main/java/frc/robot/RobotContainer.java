@@ -163,9 +163,9 @@ public class RobotContainer {
     // m_ps4Controller.povRight().onTrue(m_IntakeRollerToggle);
 
     // Shooter Binding XBox
-    m_xboxController.rightTrigger().onTrue(m_ShooterToggle);
+    m_xboxController.rightTrigger().toggleOnTrue(m_ShooterToggle);
     // Playstation variant of ^^^
-    m_ps4Controller.R2().onTrue(m_ShooterToggle);
+    m_ps4Controller.R2().toggleOnTrue(m_ShooterToggle);
 
     m_ps4Controller
         .povUp()
