@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -65,7 +66,8 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
   private final Agitator m_Agitator = new Agitator();
   private Intake m_Intake = new Intake(m_Agitator);
-  private Feeder m_Feeder = new Feeder(FeederConstants.kFeederMotor);
+  private Feeder m_LeftFeeder = new Feeder(FeederConstants.kFeederLeftMotor, "Left Feeder");
+  private Feeder m_RightFeeder = new Feeder(FeederConstants.kFeederRightMotor, "Right Feeder");
   private Shooter m_LeftShooter =
       new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter", m_Agitator);
   private Shooter m_RightShooter =
@@ -78,11 +80,11 @@ public class RobotContainer {
       new SequentialCommandGroup(
           new ShootingCommand(m_LeftShooter, m_RightShooter),
           new ShootCommand(m_LeftShooter),
-          new FeederOn(m_Feeder));
+          new FeederOn(m_LeftFeeder, m_RightFeeder));
   // private SequentialShoot m_SequentialShoot = new SequentialShoot(m_LeftShooter, m_RightShooter,
   // m_Feeder);
   private NotShootingCommand m_NotShootingCommand =
-      new NotShootingCommand(m_LeftShooter, m_RightShooter, m_Feeder);
+      new NotShootingCommand(m_LeftShooter, m_RightShooter, m_LeftFeeder, m_RightFeeder);
 
   // Instantiating the Toggles
 
@@ -111,6 +113,11 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    NamedCommands.registerCommand(
+        "ShootingCommand", new ShootingCommand(m_LeftShooter, m_RightShooter));
+    NamedCommands.registerCommand("ShootCommand", new ShootCommand(m_LeftShooter));
+    NamedCommands.registerCommand("FeederOn", new FeederOn(m_LeftFeeder, m_RightFeeder));
+
     // Configure the trigger bindings
     configureBindings();
   }
