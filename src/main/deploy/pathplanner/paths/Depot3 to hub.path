@@ -8,7 +8,7 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5227997050136448,
+        "x": 1.522799705013645,
         "y": 4.653256985502085
       },
       "isLocked": false,
@@ -56,11 +56,11 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 5.0,
-    "maxAcceleration": 7.5,
-    "maxAngularVelocity": 600.0,
-    "maxAngularAcceleration": 1800.0,
-    "nominalVoltage": 12.2,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
@@ -68,7 +68,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "depot to hub",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 90.32407831657166

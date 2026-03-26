@@ -10,7 +10,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -48,15 +48,13 @@ import frc.robot.subsystems.Shooter;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-
+  private final SendableChooser<Command> autoChooser;
   private double MaxSpeed =
       1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
   // speed
   private double MaxAngularRate =
       RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max
   // angular velocity
-
-  private final SendableChooser<Command> autoChooser;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric m_DriveField =
@@ -87,8 +85,8 @@ public class RobotContainer {
 
   private SequentialCommandGroup m_SequentialShoot =
       new SequentialCommandGroup(
-          new ShootingCommand(m_LeftShooter, m_RightShooter),
-          new ShootCommand(m_LeftShooter),
+          //new ShootingCommand(m_LeftShooter, m_RightShooter),
+          new ShootCommand(m_LeftShooter, m_RightShooter),
           new FeederOn(m_LeftFeeder, m_RightFeeder));
   // private SequentialShoot m_SequentialShoot = new SequentialShoot(m_LeftShooter, m_RightShooter,
   // m_Feeder);
@@ -122,22 +120,18 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
     // builds auto chooser
     autoChooser = AutoBuilder.buildAutoChooser("Auto Straight Taxi");
     SmartDashboard.putData("Auto Mode", autoChooser);
+
     NamedCommands.registerCommand(
         "ShootingCommand", new ShootingCommand(m_LeftShooter, m_RightShooter));
-    NamedCommands.registerCommand("ShootCommand", new ShootCommand(m_LeftShooter));
+    NamedCommands.registerCommand("ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter));
     NamedCommands.registerCommand("FeederOn", new FeederOn(m_LeftFeeder, m_RightFeeder));
 
     // Configure the trigger bindings
     configureBindings();
-
-     
-     NamedCommands.registerCommand("Shoot", new SequentialShoot(m_LeftShooter, m_RightShooter, m_Feeder));
-    
-  } 
+  }
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -229,5 +223,11 @@ public class RobotContainer {
     // m_xboxController.povDown().toggleOnTrue(m_AgitatorToggle);
     // // Playstation variant of ^^^
     // m_ps4Controller.povDown().toggleOnTrue(m_AgitatorToggle);
+  }
+
+  public Command getAutonomusCommand() {
+    // An exmaple command will run in automonous
+    // Run the path selected form the auto chooser
+    return autoChooser.getSelected();
   }
 }

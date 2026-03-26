@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5785100266590923,
-        "y": 0.451847709493544
+        "x": 3.594630952380953,
+        "y": 4.056595238095238
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8076179775280896,
-        "y": 1.4311966292134832
-      },
-      "isLocked": false,
-      "linkedName": "start9 bottom 3.564x 0.444y"
-    },
-    {
-      "anchor": {
-        "x": 2.7311853932584262,
-        "y": 1.8490280898876406
-      },
-      "prevControl": {
-        "x": 2.7719494382022463,
-        "y": 1.4413876404494386
-      },
-      "nextControl": {
-        "x": 2.6839815719237317,
-        "y": 2.3210663032345877
+        "x": 4.050930040784912,
+        "y": 4.055461895056469
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.338,
-        "y": 4.0197134831460675
+        "x": 1.9479940476190487,
+        "y": 4.056595238095238
       },
       "prevControl": {
-        "x": 2.578320224719101,
-        "y": 1.8184550561797757
+        "x": 1.5913352996413666,
+        "y": 4.061334221049
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "hub1 3.338x 4.020y"
+      "linkedName": "FieldCenter"
     }
   ],
   "rotationTargets": [],
@@ -64,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }
