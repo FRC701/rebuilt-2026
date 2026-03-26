@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FeederConstants;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.AimAtHub;
 import frc.robot.commands.ExtendIntake;
 import frc.robot.commands.FeederOn;
 import frc.robot.commands.NotShootingCommand;
@@ -183,6 +184,23 @@ public class RobotContainer {
     m_xboxController.rightTrigger().toggleOnTrue(m_ShooterToggle);
     // Playstation variant of ^^^
     m_ps4Controller.R2().toggleOnTrue(m_ShooterToggle);
+
+    // AimBot Binding - aims at hub while held
+    m_xboxController
+        .y()
+        .whileTrue(
+            new AimAtHub(
+                m_DriveTrain,
+                () -> -m_xboxController.getLeftY() * MaxSpeed,
+                () -> -m_xboxController.getLeftX() * MaxSpeed));
+    // Playstation variant of ^^^
+    m_ps4Controller
+        .triangle()
+        .whileTrue(
+            new AimAtHub(
+                m_DriveTrain,
+                () -> -m_ps4Controller.getLeftY() * MaxSpeed,
+                () -> -m_ps4Controller.getLeftX() * MaxSpeed));
 
     m_ps4Controller
         .povUp()

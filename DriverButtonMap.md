@@ -8,3 +8,4 @@ Driver
 | LeftY         | Velocity X            |
 | RightX        | Rotate                |
 | Right Trigger | Shooting Toggle       |
+| Triangle/Y    | Aim at Hub            |
