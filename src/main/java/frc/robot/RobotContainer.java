@@ -120,15 +120,15 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // builds auto chooser
-    autoChooser = AutoBuilder.buildAutoChooser("Auto Straight Taxi");
-    SmartDashboard.putData("Auto Mode", autoChooser);
 
     NamedCommands.registerCommand(
         "ShootingCommand", new ShootingCommand(m_LeftShooter, m_RightShooter));
     NamedCommands.registerCommand("ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter));
     NamedCommands.registerCommand("FeederOn", new FeederOn(m_LeftFeeder, m_RightFeeder));
 
+    // builds auto chooser
+    autoChooser = AutoBuilder.buildAutoChooser("Auto Straight Taxi");
+    SmartDashboard.putData("Auto Mode", autoChooser);
     // Configure the trigger bindings
     configureBindings();
   }
