@@ -1,10 +1,12 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.Utils;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -14,6 +16,9 @@ import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 public class VisionSubsystem extends SubsystemBase {
@@ -29,6 +34,10 @@ public class VisionSubsystem extends SubsystemBase {
   private int m_RightRejectionCount = 0;
   private int m_ForwardRejectionCount = 0;
 
+  // Simulation support
+  private VisionSystemSim m_visionSim;
+  private Pose2d m_simRobotPose = new Pose2d();
+
   public VisionSubsystem() {
     m_FieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
     m_RightCamera = new PhotonCamera(Constants.Vision.kRightCameraName);
@@ -37,6 +46,29 @@ public class VisionSubsystem extends SubsystemBase {
     m_ForwardCamera = new PhotonCamera(Constants.Vision.kForwardCameraName);
     m_ForwardPoseEstimator =
         new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kForwardRobotToCam3d);
+
+    if (Utils.isSimulation()) {
+      m_visionSim = new VisionSystemSim("main");
+      m_visionSim.addAprilTags(m_FieldLayout);
+
+      var cameraProp = new SimCameraProperties();
+      cameraProp.setCalibration(
+          Constants.Vision.kSimCameraResWidth,
+          Constants.Vision.kSimCameraResHeight,
+          Rotation2d.fromDegrees(Constants.Vision.kSimCameraFOVDeg));
+      cameraProp.setCalibError(0.25, 0.08);
+      cameraProp.setFPS(Constants.Vision.kSimCameraFPS);
+      cameraProp.setAvgLatencyMs(Constants.Vision.kSimAvgLatencyMs);
+      cameraProp.setLatencyStdDevMs(Constants.Vision.kSimLatencyStdDevMs);
+
+      var rightCameraSim = new PhotonCameraSim(m_RightCamera, cameraProp);
+      var forwardCameraSim = new PhotonCameraSim(m_ForwardCamera, cameraProp);
+      rightCameraSim.enableDrawWireframe(true);
+      forwardCameraSim.enableDrawWireframe(true);
+
+      m_visionSim.addCamera(rightCameraSim, Constants.Vision.kRightRobotToCam3d);
+      m_visionSim.addCamera(forwardCameraSim, Constants.Vision.kForwardRobotToCam3d);
+    }
   }
 
   public Optional<VisionMeasurement> getLatestRightVisionMeasurement() {
@@ -255,6 +287,17 @@ public class VisionSubsystem extends SubsystemBase {
     double headingStdDev = baseHeading * distanceFactor;
 
     return VecBuilder.fill(xyStdDev, xyStdDev, headingStdDev);
+  }
+
+  public void setSimRobotPose(Pose2d pose) {
+    m_simRobotPose = pose;
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    if (m_visionSim != null) {
+      m_visionSim.update(m_simRobotPose);
+    }
   }
 
   public static record VisionMeasurement(

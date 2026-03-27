@@ -209,6 +209,15 @@ public final class Constants {
     public static final double kMaxVisionTranslationSpeed = 4.0; // m/s
     public static final double kMaxVisionRotationSpeed =
         Math.toRadians(720); // rad/s (2 full rotations)
+
+    // Simulation camera properties (Limelight 4 — OV9782, HFOV 82°, VFOV ~56°)
+    // Two resolutions are available (640x400 and 1280x800)
+    public static final int kSimCameraResWidth = 1280;
+    public static final int kSimCameraResHeight = 800;
+    public static final double kSimCameraFOVDeg = 91.4; // diagonal FOV derived from 82° HFOV
+    public static final double kSimAvgLatencyMs = 35.0;
+    public static final double kSimLatencyStdDevMs = 5.0;
+    public static final int kSimCameraFPS = 20;
   }
 
   public static class AimBotConstants {
