@@ -92,6 +92,12 @@ public final class Constants {
     public static final double DownkV = 1; // 1
     public static final double DownkA = 1.01164; // 1.01164
     public static final double DownkG = 1; // 0.46724, 1
+
+    // Simulation
+    public static final double kSimArmGearRatio = 15.0;
+    public static final double kSimArmMOI = 0.1; // kg*m^2 (mechanism side)
+    public static final double kSimRollerGearRatio = 1.0;
+    public static final double kSimRollerMOI = 0.001; // kg*m^2
   }
 
   // Shooter Motor Ids = 40s
@@ -114,6 +120,13 @@ public final class Constants {
      */
     public static final double shootRev = 75;
     public static final double passRev = 1;
+
+    // Simulation (4:1 gearing, each motor drives 2 shafts)
+    // Shaft A: 2x stealth(0.000141) + 1x SS flywheel(0.000790) = 0.00107
+    // Shaft B: 2x stealth(0.000141) = 0.00028
+    // Total mechanism-side MOI per motor = 0.00135 kg*m^2
+    public static final double kSimGearRatio = 4.0;
+    public static final double kSimMOI = 0.00135; // kg*m^2
   }
 
   public static final class Vision {
