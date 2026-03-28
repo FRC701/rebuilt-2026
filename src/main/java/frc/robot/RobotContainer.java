@@ -94,13 +94,11 @@ public class RobotContainer {
           m_Agitator);
 
   private Command m_ShooterToggle =
-      Commands.startEnd(
-          () -> m_ShootingCommand.andThen(m_ShootCommand.andThen(m_FeederOn)),
-          () -> m_NotShootingCommand.initialize(),
-          m_LeftShooter,
-          m_RightShooter,
-          m_LeftFeeder,
-          m_RightFeeder);
+      m_ShootingCommand
+          .andThen(m_ShootCommand)
+          .andThen(m_FeederOn)
+          .andThen(Commands.idle(m_LeftShooter, m_RightShooter, m_LeftFeeder, m_RightFeeder))
+          .finallyDo(() -> m_NotShootingCommand.schedule());
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_xboxController =
@@ -181,9 +179,9 @@ public class RobotContainer {
     // m_ps4Controller.povRight().onTrue(m_IntakeRollerToggle);
 
     // Shooter Binding XBox
-    m_xboxController.rightTrigger().toggleOnTrue(m_ShooterToggle);
+    m_xboxController.rightTrigger().whileTrue(m_ShooterToggle);
     // Playstation variant of ^^^
-    m_ps4Controller.R2().toggleOnTrue(m_ShooterToggle);
+    m_ps4Controller.R2().whileTrue(m_ShooterToggle);
 
     // AimBot Binding - aims at hub while held
     m_xboxController
