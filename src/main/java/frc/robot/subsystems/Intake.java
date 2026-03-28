@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -22,6 +23,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
+import com.ctre.phoenix6.sim.TalonFXSimState;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
@@ -29,6 +33,8 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -55,6 +61,12 @@ public class Intake extends SubsystemBase {
 
   private double FORWARD_LIMIT = 5.3; // Placeholder
   private double REVERSE_LIMIT = 0;
+
+  // Simulation
+  private SingleJointedArmSim m_armSim;
+  private FlywheelSim m_rollerSim;
+  private TalonFXSimState m_armSimState;
+  private TalonFXSimState m_rollerSimState;
 
   private final SysIdRoutine m_SysID =
       new SysIdRoutine(
@@ -143,6 +155,30 @@ public class Intake extends SubsystemBase {
     m_IntakeMotorRoller1.getConfigurator().apply(RollerIntakeConfig);
 
     m_IntakeMotorArm.setPosition(0);
+
+    if (Utils.isSimulation()) {
+      m_armSimState = m_IntakeMotorArm.getSimState();
+      m_rollerSimState = m_IntakeMotorRoller1.getSimState();
+
+      m_armSim =
+          new SingleJointedArmSim(
+              DCMotor.getKrakenX60Foc(1),
+              IntakeConstants.kSimArmGearRatio,
+              IntakeConstants.kSimArmMOI,
+              0.3, // arm length meters
+              0.0, // min angle rad (retracted)
+              FORWARD_LIMIT * 2.0 * Math.PI / IntakeConstants.kSimArmGearRatio, // max angle rad
+              true, // simulate gravity
+              0.0); // starting angle rad
+
+      m_rollerSim =
+          new FlywheelSim(
+              LinearSystemId.createFlywheelSystem(
+                  DCMotor.getKrakenX60Foc(1),
+                  IntakeConstants.kSimRollerMOI,
+                  IntakeConstants.kSimRollerGearRatio),
+              DCMotor.getKrakenX60Foc(1));
+    }
   }
 
   public enum IntakeState {
@@ -270,6 +306,37 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putString("IntakeState", m_IntakeState.toString());
     // This method will be called once per scheduler run
 
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    if (m_armSimState == null) return;
+
+    m_armSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+    m_rollerSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+
+    // Arm simulation
+    m_armSim.setInputVoltage(m_armSimState.getMotorVoltage());
+    m_armSim.update(0.02);
+
+    double armRadians = m_armSim.getAngleRads();
+    double armRadPerSec = m_armSim.getVelocityRadPerSec();
+    double armRotorRotations = armRadians / (2.0 * Math.PI) * IntakeConstants.kSimArmGearRatio;
+    double armRotorRPS = armRadPerSec / (2.0 * Math.PI) * IntakeConstants.kSimArmGearRatio;
+
+    m_armSimState.setRawRotorPosition(armRotorRotations);
+    m_armSimState.setRotorVelocity(armRotorRPS);
+
+    // Roller simulation
+    m_rollerSim.setInputVoltage(m_rollerSimState.getMotorVoltage());
+    m_rollerSim.update(0.02);
+
+    double rollerRadPerSec = m_rollerSim.getAngularVelocityRadPerSec();
+    double rollerRotorRPS =
+        rollerRadPerSec / (2.0 * Math.PI) * IntakeConstants.kSimRollerGearRatio;
+
+    m_rollerSimState.addRotorPosition(rollerRotorRPS * 0.02);
+    m_rollerSimState.setRotorVelocity(rollerRotorRPS);
   }
 
   // A (resusable) voltage out for driving the motor during sysId
