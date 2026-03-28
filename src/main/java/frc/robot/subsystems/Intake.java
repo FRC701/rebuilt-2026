@@ -183,10 +183,10 @@ public class Intake extends SubsystemBase {
       m_rollerSim =
           new FlywheelSim(
               LinearSystemId.createFlywheelSystem(
-                  DCMotor.getKrakenX44Foc(2),
+                  DCMotor.getKrakenX44Foc(1),
                   IntakeConstants.kSimRollerMOI,
                   IntakeConstants.kSimRollerGearRatio),
-              DCMotor.getKrakenX44Foc(2));
+              DCMotor.getKrakenX44Foc(1));
     }
   }
 
