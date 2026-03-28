@@ -191,6 +191,28 @@ public final class Constants {
                 kForwardCameraMountPitchAngleRad,
                 kForwardCameraMountYawAngleRad));
 
+    // Reverse camera name (same position as forward, facing backward)
+    // Must match camera set in PhotonVision UI
+    public static final String kReverseCameraName = "reversePhotonvisionCamera";
+
+    public static final double kReverseCameraMountPitchAngleRad = Units.degreesToRadians(0);
+    public static final double kReverseCameraMountRollAngleRad = Units.degreesToRadians(0);
+    public static final double kReverseCameraMountYawAngleRad = Units.degreesToRadians(180);
+
+    public static final double kReverseCameraForwardMeters = Units.inchesToMeters(0);
+    public static final double kReverseCameraLeftMeters = Units.inchesToMeters(0);
+    public static final double kReverseCameraUpMeters = Units.inchesToMeters(22);
+
+    // Robot to reverse camera transform
+    public static final Transform3d kReverseRobotToCam3d =
+        new Transform3d(
+            new Translation3d(
+                kReverseCameraForwardMeters, kReverseCameraLeftMeters, kReverseCameraUpMeters),
+            new Rotation3d(
+                kReverseCameraMountRollAngleRad,
+                kReverseCameraMountPitchAngleRad,
+                kReverseCameraMountYawAngleRad));
+
     // Dynamic std-dev scaling constants
     // Formula: stdDev = base * (avgDistance ^ exponent)
     // If the robot snaps/jumps to vision poses too aggressively → increase the base
