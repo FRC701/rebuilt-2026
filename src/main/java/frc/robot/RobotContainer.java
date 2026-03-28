@@ -25,6 +25,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AimAtHub;
 import frc.robot.commands.ExtendIntake;
 import frc.robot.commands.FeederOn;
+import frc.robot.commands.LaunchToggle;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.ShootCommand;
 import frc.robot.commands.ShootingCommand;
@@ -78,9 +79,12 @@ public class RobotContainer {
 
   // Instantiating Shooter Commands
 
-  private ShootingCommand m_ShootingCommand = new ShootingCommand(m_LeftShooter, m_RightShooter);
-  private ShootCommand m_ShootCommand = new ShootCommand(m_LeftShooter, m_RightShooter);
-  private FeederOn m_FeederOn = new FeederOn(m_LeftFeeder, m_RightFeeder);
+  private SequentialCommandGroup m_SequentialShoot =
+      new SequentialCommandGroup(
+          new ShootCommand(m_LeftShooter, m_RightShooter),
+          new FeederOn(m_LeftFeeder, m_RightFeeder));
+  // private SequentialShoot m_SequentialShoot = new SequentialShoot(m_LeftShooter, m_RightShooter,
+  // m_Feeder);
   private NotShootingCommand m_NotShootingCommand =
       new NotShootingCommand(m_LeftShooter, m_RightShooter, m_LeftFeeder, m_RightFeeder);
 
@@ -110,7 +114,6 @@ public class RobotContainer {
   public RobotContainer() {
 
     // NamedCommands.registerCommand(
-    //    "ShootingCommand", new ShootingCommand(m_LeftShooter, m_RightShooter));
     NamedCommands.registerCommand("ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter));
     NamedCommands.registerCommand("FeederOn", new FeederOn(m_LeftFeeder, m_RightFeeder));
     NamedCommands.registerCommand("ExtendIntake", new ExtendIntake(m_Intake));
@@ -178,9 +181,16 @@ public class RobotContainer {
     // m_ps4Controller.povRight().onTrue(m_IntakeRollerToggle);
 
     // Shooter Binding XBox
-    m_xboxController.rightTrigger().whileTrue(m_ShooterToggle);
+    m_xboxController
+        .rightTrigger()
+        .onTrue(new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter));
+    m_xboxController.x().onTrue(m_NotShootingCommand);
     // Playstation variant of ^^^
-    m_ps4Controller.R2().whileTrue(m_ShooterToggle);
+    // m_ps4Controller.R2().onTrue(m_SequentialShoot);
+    m_ps4Controller
+        .R2()
+        .onTrue(new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter));
+    m_ps4Controller.square().onTrue(m_NotShootingCommand);
 
     // AimBot Binding - aims at hub while held
     m_xboxController
