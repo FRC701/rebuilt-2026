@@ -342,8 +342,7 @@ public class Intake extends SubsystemBase {
     m_rollerSim.update(0.02);
 
     double rollerRadPerSec = m_rollerSim.getAngularVelocityRadPerSec();
-    double rollerRotorRPS =
-        rollerRadPerSec / (2.0 * Math.PI) * IntakeConstants.kSimRollerGearRatio;
+    double rollerRotorRPS = rollerRadPerSec / (2.0 * Math.PI) * IntakeConstants.kSimRollerGearRatio;
 
     m_rollerSimState.addRotorPosition(rollerRotorRPS * 0.02);
     m_rollerSimState.setRotorVelocity(rollerRotorRPS);
