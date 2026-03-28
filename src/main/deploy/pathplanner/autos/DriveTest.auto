@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Start1 to Hub"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
+            "pathName": "depot1 to depotCollected1"
           }
         }
       ]

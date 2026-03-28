@@ -5,21 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "ExtendIntake"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 4.0
+            "pathName": "depot1 to depotCollected1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "RetractIntake"
+            "name": "ShootCommand"
           }
         }
       ]

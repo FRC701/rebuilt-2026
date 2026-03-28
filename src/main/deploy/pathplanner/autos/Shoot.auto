@@ -5,15 +5,15 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "No Move"
+          }
+        },
+        {
           "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "ShootingCommand"
-                }
-              },
               {
                 "type": "named",
                 "data": {
