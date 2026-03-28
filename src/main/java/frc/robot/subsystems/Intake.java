@@ -147,19 +147,19 @@ public class Intake extends SubsystemBase {
 
     // Apply the Configs to the Motor Objects
     m_IntakeMotorArm.getConfigurator().apply(m_armConfigs);
-    m_IntakeMotorRoller1.getConfigurator().apply(m_rollerConfigs);
+    m_IntakeMotorRoller.getConfigurator().apply(m_rollerConfigs);
 
     m_IntakeMotorArm.setPosition(0);
 
     if (Utils.isSimulation()) {
       // Zero out friction/gravity feedforward — not applicable in sim
-      m_talonFXConfigs.Slot0.kS = 0;
-      m_talonFXConfigs.Slot0.kG = 0;
-      m_talonFXConfigs.Slot1.kS = 0;
-      m_talonFXConfigs.Slot1.kG = 0;
-      m_talonFXConfigs.Slot2.kS = 0;
-      m_talonFXConfigs.Slot2.kG = 0;
-      m_IntakeMotorArm.getConfigurator().apply(m_talonFXConfigs);
+      m_armConfigs.Slot0.kS = 0;
+      m_armConfigs.Slot0.kG = 0;
+      m_armConfigs.Slot1.kS = 0;
+      m_armConfigs.Slot1.kG = 0;
+      m_armConfigs.Slot2.kS = 0;
+      m_armConfigs.Slot2.kG = 0;
+      m_IntakeMotorArm.getConfigurator().apply(m_armConfigs);
 
       m_armSimState = m_IntakeMotorArm.getSimState();
       m_rollerSimState = m_IntakeMotorRoller.getSimState();
@@ -279,7 +279,7 @@ public class Intake extends SubsystemBase {
     m_Agitator.m_AgitatorState = AgitatorState.S_Out;
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeMotorArm.setVoltage(0);
-      m_IntakeMotorRoller1.setVoltage(-8);
+      m_IntakeMotorRoller.setVoltage(-8);
     } else {
       // Move the arm until it reaches its destination
       setPosition(IntakeConstants.kExtensionPosition, 0);

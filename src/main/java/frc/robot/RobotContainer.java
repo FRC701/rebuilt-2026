@@ -28,7 +28,6 @@ import frc.robot.commands.FeederOn;
 import frc.robot.commands.LaunchToggle;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.ShootCommand;
-import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
