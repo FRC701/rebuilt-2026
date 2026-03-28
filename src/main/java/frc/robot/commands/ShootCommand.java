@@ -35,7 +35,7 @@ public class ShootCommand extends Command {
     //  else {
     //   m_Feeder.m_FeederState = FeederState.S_Off;
     // }
-  }
+  
 
   // Called once the command ends or is interrupted.
   @Override

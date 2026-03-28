@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FeederConstants;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.ExtendIntake;
 import frc.robot.commands.FeederOn;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.RetractIntake;
@@ -125,7 +126,7 @@ public class RobotContainer {
     //    "ShootingCommand", new ShootingCommand(m_LeftShooter, m_RightShooter));
     NamedCommands.registerCommand("ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter));
     NamedCommands.registerCommand("FeederOn", new FeederOn(m_LeftFeeder, m_RightFeeder));
-
+    NamedCommands.registerCommand("ExtendIntake", new ExtendIntake(m_Intake));
     // builds auto chooser
     autoChooser = AutoBuilder.buildAutoChooser("Shoot");
     SmartDashboard.putData("Auto Mode", autoChooser);
@@ -212,6 +213,7 @@ public class RobotContainer {
     // Playstation variant of ^^^
     m_ps4Controller.R2().onTrue(m_SequentialShoot);
     m_ps4Controller.square().onTrue(m_NotShootingCommand);
+
 
     m_ps4Controller
         .povUp()

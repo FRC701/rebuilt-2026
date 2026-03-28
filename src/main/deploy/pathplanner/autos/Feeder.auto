@@ -5,9 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "start3 to depot1"
+            "name": "FeederOn"
           }
         }
       ]
