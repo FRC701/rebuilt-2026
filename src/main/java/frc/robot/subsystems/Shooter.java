@@ -50,6 +50,10 @@ public class Shooter extends SubsystemBase {
   private FlywheelSim m_flywheelSim;
   private TalonFXSimState m_motorSimState;
 
+  private final double[] distance = {36, 61, 72};
+  private final double[] speed = {50, 75, 100};
+  private double a, b, c;
+
   /** Creates a new Shooter. */
   public Shooter(int motorId, String subsystemName, Agitator agitator) {
     super(subsystemName);
@@ -91,6 +95,8 @@ public class Shooter extends SubsystemBase {
     m_ShooterMotor.getConfigurator().apply(m_TalonFXConfig);
 
     velocitySignal = m_ShooterMotor.getVelocity();
+
+    BallShooterInterpolation(distance[0], speed[0], distance[1], speed[1], distance[2], speed[2]);
 
     if (Utils.isSimulation()) {
       m_motorSimState = m_ShooterMotor.getSimState();
@@ -191,6 +197,23 @@ public class Shooter extends SubsystemBase {
 
     if (m_Agitator.m_AgitatorState == AgitatorState.S_Off) aState = 0;
     else if (m_Agitator.m_AgitatorState == AgitatorState.S_Idle) aState = 1;
+  }
+
+  // Call once at startup — pre-computes the quadratic coefficients
+  void BallShooterInterpolation(double x0, double y0, double x1, double y1, double x2, double y2) {
+    // Lagrange basis pre-expanded into ax^2 + bx + c
+    double d0 = (x0 - x1) * (x0 - x2);
+    double d1 = (x1 - x0) * (x1 - x2);
+    double d2 = (x2 - x0) * (x2 - x1);
+
+    a = y0 / d0 + y1 / d1 + y2 / d2;
+    b = y0 * (-x1 - x2) / d0 + y1 * (-x0 - x2) / d1 + y2 * (-x0 - x1) / d2;
+    c = y0 * (x1 * x2) / d0 + y1 * (x0 * x2) / d1 + y2 * (x0 * x1) / d2;
+  }
+
+  // Call in the robot loop — just 2 multiplies + 2 adds (Horner's method)
+  double speed(double distance) {
+    return (a * distance + b) * distance + c;
   }
 
   @Override
