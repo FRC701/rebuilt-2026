@@ -70,8 +70,8 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
   private final Agitator m_Agitator = new Agitator();
   private Intake m_Intake = new Intake(m_Agitator);
-  private Feeder m_LeftFeeder = new Feeder(FeederConstants.kFeederLeftMotor, "Left Feeder");
-  private Feeder m_RightFeeder = new Feeder(FeederConstants.kFeederRightMotor, "Right Feeder");
+  private Feeder m_LeftFeeder = new Feeder(FeederConstants.kFeederLeftMotor);
+  private Feeder m_RightFeeder = new Feeder(FeederConstants.kFeederRightMotor);
   private Shooter m_LeftShooter =
       new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter", m_Agitator);
   private Shooter m_RightShooter =
@@ -79,12 +79,6 @@ public class RobotContainer {
 
   // Instantiating Shooter Commands
 
-  private SequentialCommandGroup m_SequentialShoot =
-      new SequentialCommandGroup(
-          new ShootCommand(m_LeftShooter, m_RightShooter),
-          new FeederOn(m_LeftFeeder, m_RightFeeder));
-  // private SequentialShoot m_SequentialShoot = new SequentialShoot(m_LeftShooter, m_RightShooter,
-  // m_Feeder);
   private NotShootingCommand m_NotShootingCommand =
       new NotShootingCommand(m_LeftShooter, m_RightShooter, m_LeftFeeder, m_RightFeeder);
 
@@ -96,13 +90,6 @@ public class RobotContainer {
           () -> m_Intake.m_IntakeState = IntakeState.S_Retract,
           m_Intake,
           m_Agitator);
-
-  private Command m_ShooterToggle =
-      m_ShootingCommand
-          .andThen(m_ShootCommand)
-          .andThen(m_FeederOn)
-          .andThen(Commands.idle(m_LeftShooter, m_RightShooter, m_LeftFeeder, m_RightFeeder))
-          .finallyDo(() -> m_NotShootingCommand.schedule());
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_xboxController =
@@ -186,7 +173,6 @@ public class RobotContainer {
         .onTrue(new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter));
     m_xboxController.x().onTrue(m_NotShootingCommand);
     // Playstation variant of ^^^
-    // m_ps4Controller.R2().onTrue(m_SequentialShoot);
     m_ps4Controller
         .R2()
         .onTrue(new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter));

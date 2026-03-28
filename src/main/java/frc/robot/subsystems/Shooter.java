@@ -86,8 +86,7 @@ public class Shooter extends SubsystemBase {
     Slot0Configs.kV = Constants.ShooterConstants.kV;
     Slot0Configs.kS = Constants.ShooterConstants.kS;
 
-    // Applying the configs to the motors, PID
-    // Applying the configs to the motors, Voltage Limits
+    // Applying the configs to the motors
     m_ShooterMotor.getConfigurator().apply(m_TalonFXConfig);
 
     velocitySignal = m_ShooterMotor.getVelocity();

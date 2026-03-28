@@ -27,21 +27,23 @@ public class Feeder extends SubsystemBase {
   private FlywheelSim m_flywheelSim;
   private TalonFXSimState m_simState;
 
-  public Feeder(int motorID, String feederName) {
+  public Feeder(int motorID) {
     m_FeederMotor = new TalonFX(motorID);
-
-    var m_TalonFXConfig = new TalonFXConfiguration();
 
     m_FeederState = FeederState.S_Off;
 
-    MotorOutputConfigs feederConfig = m_TalonFXConfig.MotorOutput;
+    // Creates the Configs objects
+    var m_TalonFXConfig = new TalonFXConfiguration();
 
+    // Applies the MotorOutput configs
+    MotorOutputConfigs feederConfig = m_TalonFXConfig.MotorOutput;
     if (motorID == Constants.FeederConstants.kFeederLeftMotor) {
       feederConfig.Inverted = InvertedValue.CounterClockwise_Positive;
     } else {
       feederConfig.Inverted = InvertedValue.Clockwise_Positive;
     }
 
+    // Applies the configs for the motor
     m_FeederMotor.getConfigurator().apply(m_TalonFXConfig);
 
     if (Utils.isSimulation()) {
