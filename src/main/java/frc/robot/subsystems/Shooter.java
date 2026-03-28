@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -12,7 +13,12 @@ import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.sim.TalonFXSimState;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -39,6 +45,10 @@ public class Shooter extends SubsystemBase {
   private String m_EnabledString;
   private String m_RevolutionsErrorString;
   private String m_SpeedString;
+
+  // Simulation
+  private FlywheelSim m_flywheelSim;
+  private TalonFXSimState m_motorSimState;
 
   /** Creates a new Shooter. */
   public Shooter(int motorId, String subsystemName, Agitator agitator) {
@@ -81,6 +91,17 @@ public class Shooter extends SubsystemBase {
     m_ShooterMotor.getConfigurator().apply(m_TalonFXConfig);
 
     velocitySignal = m_ShooterMotor.getVelocity();
+
+    if (Utils.isSimulation()) {
+      m_motorSimState = m_ShooterMotor.getSimState();
+      m_flywheelSim =
+          new FlywheelSim(
+              LinearSystemId.createFlywheelSystem(
+                  DCMotor.getKrakenX60Foc(1),
+                  Constants.ShooterConstants.kSimMOI,
+                  Constants.ShooterConstants.kSimGearRatio),
+              DCMotor.getKrakenX60Foc(1));
+    }
   }
 
   private void nameStrings() {
@@ -170,5 +191,21 @@ public class Shooter extends SubsystemBase {
 
     if (m_Agitator.m_AgitatorState == AgitatorState.S_Off) aState = 0;
     else if (m_Agitator.m_AgitatorState == AgitatorState.S_Idle) aState = 1;
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    if (m_motorSimState == null) return;
+
+    m_motorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+    m_flywheelSim.setInputVoltage(m_motorSimState.getMotorVoltage());
+    m_flywheelSim.update(0.02);
+
+    double mechanismRadPerSec = m_flywheelSim.getAngularVelocityRadPerSec();
+    double rotorRPS =
+        mechanismRadPerSec / (2.0 * Math.PI) * Constants.ShooterConstants.kSimGearRatio;
+
+    m_motorSimState.addRotorPosition(rotorRPS * 0.02);
+    m_motorSimState.setRotorVelocity(rotorRPS);
   }
 }

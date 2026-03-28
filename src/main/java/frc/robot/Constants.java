@@ -92,6 +92,12 @@ public final class Constants {
     public static final double DownkV = 1; // 1
     public static final double DownkA = 1.01164; // 1.01164
     public static final double DownkG = 1; // 0.46724, 1
+
+    // Simulation
+    public static final double kSimArmGearRatio = 15.0;
+    public static final double kSimArmMOI = 0.1; // kg*m^2 (mechanism side)
+    public static final double kSimRollerGearRatio = 1.0;
+    public static final double kSimRollerMOI = 0.001; // kg*m^2
   }
 
   // Shooter Motor Ids = 40s
@@ -114,12 +120,19 @@ public final class Constants {
      */
     public static final double shootRev = 75;
     public static final double passRev = 1;
+
+    // Simulation (4:1 gearing, each motor drives 2 shafts)
+    // Shaft A: 2x stealth(0.000141) + 1x SS flywheel(0.000790) = 0.00107
+    // Shaft B: 2x stealth(0.000141) = 0.00028
+    // Total mechanism-side MOI per motor = 0.00135 kg*m^2
+    public static final double kSimGearRatio = 4.0;
+    public static final double kSimMOI = 0.00135; // kg*m^2
   }
 
   public static final class Vision {
-    // Forward camera name
+    // Right camera name
     // Must match camera set in PhotonVision UI at photonvision.local:5800
-    public static final String kForwardCameraName = "forwardPhotonvisionCamera";
+    public static final String kRightCameraName = "rightPhotonvisionCamera";
     // Robot -> Camera transform (camera pose relative to robot origin).
     // WPILib coordinate convention: +X forward, +Y left, +Z up.
     // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
@@ -127,10 +140,38 @@ public final class Constants {
     // and 180° is aligned with the negative X axis. CCW rotation is positive, so
     // 90° is aligned with the positive Y axis, and -90° is aligned with the
     // negative Y axis.
-    // three options- single camera in between shooters (3.8,11,17.5,0,0,0), single camera on mast
-    // forward
-    //  two on mast forwards (12,11,27.9,0,0,0) backwards
-    // (8.14,11,27.9,0,0,-180) - confirm  on robot AS BUILT
+
+    // robot coordination system is centered on the floor. So a camer at the center, facing forward
+    // on the floor, is 0,0,0,0,0,0
+
+    //  two on mast:
+
+    // one backwards (0,-2.78,24.75,0,0,0)
+    // or
+    // one backwards (0,-2.78,24.75)
+    // one facing right rotated  90 CW  (top pointing intake) (must match photonvision ui) in )
+
+    public static final double kRightCameraMountPitchAngleRad = Units.degreesToRadians(0);
+    public static final double kRightCameraMountRollAngleRad = Units.degreesToRadians(-90);
+    public static final double kRightCameraMountYawAngleRad = Units.degreesToRadians(-90);
+
+    public static final double kRightCameraForwardMeters = Units.inchesToMeters(-3.78);
+    public static final double kRightCameraLeftMeters = Units.inchesToMeters(-3);
+    public static final double kRightCameraUpMeters = Units.inchesToMeters(22);
+
+    // Robot to right camera transform
+    public static final Transform3d kRightRobotToCam3d =
+        new Transform3d(
+            new Translation3d(
+                kRightCameraForwardMeters, kRightCameraLeftMeters, kRightCameraUpMeters),
+            new Rotation3d(
+                kRightCameraMountRollAngleRad,
+                kRightCameraMountPitchAngleRad,
+                kRightCameraMountYawAngleRad));
+
+    // Forward camera name
+    // Must match camera set in PhotonVision UI
+    public static final String kForwardCameraName = "forwardPhotonvisionCamera";
 
     public static final double kForwardCameraMountPitchAngleRad = Units.degreesToRadians(0);
     public static final double kForwardCameraMountRollAngleRad = Units.degreesToRadians(0);
@@ -138,7 +179,7 @@ public final class Constants {
 
     public static final double kForwardCameraForwardMeters = Units.inchesToMeters(0);
     public static final double kForwardCameraLeftMeters = Units.inchesToMeters(0);
-    public static final double kForwardCameraUpMeters = Units.inchesToMeters(27.9);
+    public static final double kForwardCameraUpMeters = Units.inchesToMeters(22);
 
     // Robot to forward camera transform
     public static final Transform3d kForwardRobotToCam3d =
@@ -150,17 +191,17 @@ public final class Constants {
                 kForwardCameraMountPitchAngleRad,
                 kForwardCameraMountYawAngleRad));
 
-    // Reverse camera name
+    // Reverse camera name (same position as forward, facing backward)
     // Must match camera set in PhotonVision UI
     public static final String kReverseCameraName = "reversePhotonvisionCamera";
 
     public static final double kReverseCameraMountPitchAngleRad = Units.degreesToRadians(0);
     public static final double kReverseCameraMountRollAngleRad = Units.degreesToRadians(0);
-    public static final double kReverseCameraMountYawAngleRad = Units.degreesToRadians(-180);
+    public static final double kReverseCameraMountYawAngleRad = Units.degreesToRadians(180);
 
-    public static final double kReverseCameraForwardMeters = Units.inchesToMeters(8.14);
-    public static final double kReverseCameraLeftMeters = Units.inchesToMeters(11);
-    public static final double kReverseCameraUpMeters = Units.inchesToMeters(27.9);
+    public static final double kReverseCameraForwardMeters = Units.inchesToMeters(0);
+    public static final double kReverseCameraLeftMeters = Units.inchesToMeters(0);
+    public static final double kReverseCameraUpMeters = Units.inchesToMeters(22);
 
     // Robot to reverse camera transform
     public static final Transform3d kReverseRobotToCam3d =
@@ -189,7 +230,7 @@ public final class Constants {
 
     // Acceptance rules
     public static final int kMinAprilTagsForPose = 1;
-    public static final double kMaxAcceptableSingleTagAmbiguity = 0.25;
+    public static final double kMaxAcceptableSingleTagAmbiguity = 0.2;
 
     // Pose sanity / QC filters
     public static final double kMaxPoseHeightMeters =
@@ -203,5 +244,26 @@ public final class Constants {
     public static final double kMaxVisionTranslationSpeed = 4.0; // m/s
     public static final double kMaxVisionRotationSpeed =
         Math.toRadians(720); // rad/s (2 full rotations)
+
+    // Simulation camera properties (Limelight 4 — OV9782, HFOV 82°, VFOV ~56°)
+    // Two resolutions are available (640x400 and 1280x800)
+    public static final int kSimCameraResWidth = 1280;
+    public static final int kSimCameraResHeight = 800;
+    public static final double kSimCameraFOVDeg = 91.4; // diagonal FOV derived from 82° HFOV
+    public static final double kSimAvgLatencyMs = 35.0;
+    public static final double kSimLatencyStdDevMs = 5.0;
+    public static final int kSimCameraFPS = 20;
+    public static final double kSimMaxSightRangeMeters = 5.0; // max range for tag detection in sim
+  }
+
+  public static class AimBotConstants {
+    // Red alliance hub field coordinates (inches, converted to meters)
+    public static final double kRedHubXMeters = Units.inchesToMeters(158.61);
+    public static final double kRedHubYMeters = Units.inchesToMeters(158.845);
+
+    // Heading PID constants for aiming at the hub
+    public static final double kP = 7.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
   }
 }

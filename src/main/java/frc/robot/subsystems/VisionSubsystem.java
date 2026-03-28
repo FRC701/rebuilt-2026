@@ -1,10 +1,12 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.Utils;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -14,29 +16,76 @@ import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 public class VisionSubsystem extends SubsystemBase {
+  private final PhotonCamera m_RightCamera;
+  private final PhotonPoseEstimator m_RightPoseEstimator;
   private final PhotonCamera m_ForwardCamera;
   private final PhotonPoseEstimator m_ForwardPoseEstimator;
   private final PhotonCamera m_ReverseCamera;
   private final PhotonPoseEstimator m_ReversePoseEstimator;
   private final AprilTagFieldLayout m_FieldLayout;
 
+  private Optional<VisionMeasurement> m_LatestRightVisionMeasurement = Optional.empty();
   private Optional<VisionMeasurement> m_LatestForwardVisionMeasurement = Optional.empty();
   private Optional<VisionMeasurement> m_LatestReverseVisionMeasurement = Optional.empty();
 
+  private int m_RightRejectionCount = 0;
   private int m_ForwardRejectionCount = 0;
   private int m_ReverseRejectionCount = 0;
 
+  // Simulation support
+  private VisionSystemSim m_visionSim;
+  private Pose2d m_simRobotPose = new Pose2d();
+
   public VisionSubsystem() {
     m_FieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+    m_RightCamera = new PhotonCamera(Constants.Vision.kRightCameraName);
+    m_RightPoseEstimator =
+        new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kRightRobotToCam3d);
     m_ForwardCamera = new PhotonCamera(Constants.Vision.kForwardCameraName);
     m_ForwardPoseEstimator =
         new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kForwardRobotToCam3d);
     m_ReverseCamera = new PhotonCamera(Constants.Vision.kReverseCameraName);
     m_ReversePoseEstimator =
         new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kReverseRobotToCam3d);
+
+    if (Utils.isSimulation()) {
+      m_visionSim = new VisionSystemSim("main");
+      m_visionSim.addAprilTags(m_FieldLayout);
+
+      var cameraProp = new SimCameraProperties();
+      cameraProp.setCalibration(
+          Constants.Vision.kSimCameraResWidth,
+          Constants.Vision.kSimCameraResHeight,
+          Rotation2d.fromDegrees(Constants.Vision.kSimCameraFOVDeg));
+      cameraProp.setCalibError(0.25, 0.08);
+      cameraProp.setFPS(Constants.Vision.kSimCameraFPS);
+      cameraProp.setAvgLatencyMs(Constants.Vision.kSimAvgLatencyMs);
+      cameraProp.setLatencyStdDevMs(Constants.Vision.kSimLatencyStdDevMs);
+
+      var rightCameraSim = new PhotonCameraSim(m_RightCamera, cameraProp);
+      var forwardCameraSim = new PhotonCameraSim(m_ForwardCamera, cameraProp);
+      var reverseCameraSim = new PhotonCameraSim(m_ReverseCamera, cameraProp);
+      rightCameraSim.enableDrawWireframe(true);
+      forwardCameraSim.enableDrawWireframe(true);
+      reverseCameraSim.enableDrawWireframe(true);
+      rightCameraSim.setMaxSightRange(Constants.Vision.kSimMaxSightRangeMeters);
+      forwardCameraSim.setMaxSightRange(Constants.Vision.kSimMaxSightRangeMeters);
+      reverseCameraSim.setMaxSightRange(Constants.Vision.kSimMaxSightRangeMeters);
+
+      m_visionSim.addCamera(rightCameraSim, Constants.Vision.kRightRobotToCam3d);
+      m_visionSim.addCamera(forwardCameraSim, Constants.Vision.kForwardRobotToCam3d);
+      m_visionSim.addCamera(reverseCameraSim, Constants.Vision.kReverseRobotToCam3d);
+    }
+  }
+
+  public Optional<VisionMeasurement> getLatestRightVisionMeasurement() {
+    return m_LatestRightVisionMeasurement;
   }
 
   public Optional<VisionMeasurement> getLatestForwardVisionMeasurement() {
@@ -49,12 +98,18 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    boolean rightConnected = m_RightCamera.isConnected();
     boolean forwardConnected = m_ForwardCamera.isConnected();
     boolean reverseConnected = m_ReverseCamera.isConnected();
 
+    SmartDashboard.putBoolean("Vision/Right/Connected", rightConnected);
     SmartDashboard.putBoolean("Vision/Forward/Connected", forwardConnected);
-    // SmartDashboard.putBoolean("Vision/Reverse/Connected", reverseConnected);
+    SmartDashboard.putBoolean("Vision/Reverse/Connected", reverseConnected);
 
+    m_LatestRightVisionMeasurement =
+        rightConnected
+            ? processCamera(m_RightCamera, m_RightPoseEstimator, "Right")
+            : Optional.empty();
     m_LatestForwardVisionMeasurement =
         forwardConnected
             ? processCamera(m_ForwardCamera, m_ForwardPoseEstimator, "Forward")
@@ -64,8 +119,9 @@ public class VisionSubsystem extends SubsystemBase {
             ? processCamera(m_ReverseCamera, m_ReversePoseEstimator, "Reverse")
             : Optional.empty();
 
+    publishMeasurementTelemetry("Right", m_LatestRightVisionMeasurement);
     publishMeasurementTelemetry("Forward", m_LatestForwardVisionMeasurement);
-    // publishMeasurementTelemetry("Reverse", m_LatestReverseVisionMeasurement);
+    publishMeasurementTelemetry("Reverse", m_LatestReverseVisionMeasurement);
   }
 
   private void publishMeasurementTelemetry(
@@ -88,7 +144,9 @@ public class VisionSubsystem extends SubsystemBase {
   private void publishRejection(String cameraName, String reason) {
     String prefix = "Vision/" + cameraName + "/";
     SmartDashboard.putString(prefix + "RejectionReason", reason);
-    if (cameraName.equals("Forward")) {
+    if (cameraName.equals("Right")) {
+      SmartDashboard.putNumber(prefix + "RejectionCount", ++m_RightRejectionCount);
+    } else if (cameraName.equals("Forward")) {
       SmartDashboard.putNumber(prefix + "RejectionCount", ++m_ForwardRejectionCount);
     } else {
       SmartDashboard.putNumber(prefix + "RejectionCount", ++m_ReverseRejectionCount);
@@ -111,7 +169,10 @@ public class VisionSubsystem extends SubsystemBase {
 
       // Publish all tag IDs visible in this frame
       double[] visibleIds = result.targets.stream().mapToDouble(t -> t.getFiducialId()).toArray();
-      // SmartDashboard.putNumberArray(prefix + "VisibleTagIDs", visibleIds);
+      SmartDashboard.putNumberArray(prefix + "VisibleTagIDs", visibleIds);
+      double[] ambiguities =
+          result.targets.stream().mapToDouble(t -> t.getPoseAmbiguity()).toArray();
+      SmartDashboard.putNumberArray(prefix + "Ambiguities", ambiguities);
 
       int targetCount = result.targets.size();
 
@@ -169,6 +230,7 @@ public class VisionSubsystem extends SubsystemBase {
         int tagId = bestTarget.getFiducialId();
         boolean tagInLayout = m_FieldLayout.getTagPose(tagId).isPresent();
         double ambiguity = bestTarget.getPoseAmbiguity();
+        SmartDashboard.putNumber("Vision/" + cameraName + "/ambiguity", ambiguity);
 
         String fallbackReason;
         if (!tagInLayout) {
@@ -251,6 +313,17 @@ public class VisionSubsystem extends SubsystemBase {
     double headingStdDev = baseHeading * distanceFactor;
 
     return VecBuilder.fill(xyStdDev, xyStdDev, headingStdDev);
+  }
+
+  public void setSimRobotPose(Pose2d pose) {
+    m_simRobotPose = pose;
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    if (m_visionSim != null) {
+      m_visionSim.update(m_simRobotPose);
+    }
   }
 
   public static record VisionMeasurement(

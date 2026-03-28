@@ -197,6 +197,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     Pose2d currentPose = getState().Pose;
     m_field.setRobotPose(currentPose);
 
+    if (Utils.isSimulation()) {
+      m_visionSubsystem.setSimRobotPose(currentPose);
+    }
+
     var speeds = getState().Speeds;
     double translationSpeed = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
     boolean tooFast =
@@ -204,6 +208,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             || Math.abs(speeds.omegaRadiansPerSecond) > Constants.Vision.kMaxVisionRotationSpeed;
 
     if (!tooFast) {
+      m_visionSubsystem
+          .getLatestRightVisionMeasurement()
+          .ifPresent(
+              m -> {
+                addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
+              });
       m_visionSubsystem
           .getLatestForwardVisionMeasurement()
           .ifPresent(
