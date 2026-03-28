@@ -65,6 +65,8 @@ public class VisionSubsystem extends SubsystemBase {
       var forwardCameraSim = new PhotonCameraSim(m_ForwardCamera, cameraProp);
       rightCameraSim.enableDrawWireframe(true);
       forwardCameraSim.enableDrawWireframe(true);
+      rightCameraSim.setMaxSightRange(Constants.Vision.kSimMaxSightRangeMeters);
+      forwardCameraSim.setMaxSightRange(Constants.Vision.kSimMaxSightRangeMeters);
 
       m_visionSim.addCamera(rightCameraSim, Constants.Vision.kRightRobotToCam3d);
       m_visionSim.addCamera(forwardCameraSim, Constants.Vision.kForwardRobotToCam3d);

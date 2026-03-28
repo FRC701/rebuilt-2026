@@ -231,6 +231,7 @@ public final class Constants {
     public static final double kSimAvgLatencyMs = 35.0;
     public static final double kSimLatencyStdDevMs = 5.0;
     public static final int kSimCameraFPS = 20;
+    public static final double kSimMaxSightRangeMeters = 5.0; // max range for tag detection in sim
   }
 
   public static class AimBotConstants {
