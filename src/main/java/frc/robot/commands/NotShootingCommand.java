@@ -16,13 +16,16 @@ import frc.robot.subsystems.Shooter.ShooterEnumState;
 public class NotShootingCommand extends InstantCommand {
   Shooter m_LeftShooterSubsystem;
   Shooter m_RightShooterSubsystem;
-  Feeder m_Feeder;
+  Feeder m_LeftFeeder;
+  Feeder m_RightFeeder;
 
-  public NotShootingCommand(Shooter leftShooter, Shooter rightShooter, Feeder feeder) {
+  public NotShootingCommand(
+      Shooter leftShooter, Shooter rightShooter, Feeder leftFeeder, Feeder rightFeeder) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_LeftShooterSubsystem = leftShooter;
     m_RightShooterSubsystem = rightShooter;
-    m_Feeder = feeder;
+    m_LeftFeeder = leftFeeder;
+    m_RightFeeder = rightFeeder;
     addRequirements(m_LeftShooterSubsystem);
   }
 
@@ -31,6 +34,7 @@ public class NotShootingCommand extends InstantCommand {
   public void initialize() {
     m_LeftShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
     m_RightShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
-    m_Feeder.m_FeederState = FeederState.S_Off;
+    m_LeftFeeder.m_FeederState = FeederState.S_Off;
+    m_RightFeeder.m_FeederState = FeederState.S_Off;
   }
 }

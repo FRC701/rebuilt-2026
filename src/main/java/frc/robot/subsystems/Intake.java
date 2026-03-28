@@ -31,6 +31,7 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -209,14 +210,14 @@ public class Intake extends SubsystemBase {
   // A method that returns true if the arm is at its destination
   public boolean checkExtended(double Setpoint) {
     double position = m_IntakeMotorArm.getPosition().getValueAsDouble();
-    return (position - 0.05 <= Setpoint) && (position + 0.05 >= Setpoint); // subject to change
+    return (position - 0.1 <= Setpoint) && (position + 0.1 >= Setpoint); // subject to change
   }
 
   // Extends the intake out and starts the rollers
   public void ExtendPosition() {
     // If motor has reached its destination the stop the arm and start the rollers
     m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
-    m_IntakeMotorRoller1.setVoltage(9);
+    m_IntakeMotorRoller1.setVoltage(6.5);
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeState = IntakeState.S_Down;
     }
@@ -267,8 +268,8 @@ public class Intake extends SubsystemBase {
     // SmartDashboard.putBoolean("CheckRetracted", checkExtended(IntakeConstants.kRetractPosition));
     // SmartDashboard.putNumber("ForwardSoftLimit", FORWARD_LIMIT);
     // SmartDashboard.putNumber("ReverseSoftLimit", REVERSE_LIMIT);
-    // SmartDashboard.putNumber("IntakePose", m_IntakeMotorArm.getPosition().getValueAsDouble());
-    // SmartDashboard.putString("IntakeState", m_IntakeState.toString());
+    SmartDashboard.putNumber("IntakePose", m_IntakeMotorArm.getPosition().getValueAsDouble());
+    SmartDashboard.putString("IntakeState", m_IntakeState.toString());
     // This method will be called once per scheduler run
 
   }

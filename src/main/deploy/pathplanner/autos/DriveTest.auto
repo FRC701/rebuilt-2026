@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "start3 to depot1"
+            "pathName": "depot1 to depotCollected1"
           }
         }
       ]

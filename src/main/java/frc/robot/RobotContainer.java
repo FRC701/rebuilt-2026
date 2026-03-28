@@ -8,7 +8,11 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -19,10 +23,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FeederConstants;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.ExtendIntake;
 import frc.robot.commands.FeederOn;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.ShootCommand;
-import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
 import frc.robot.subsystems.Climber;
@@ -40,7 +44,7 @@ import frc.robot.subsystems.Shooter;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-
+  private final SendableChooser<Command> autoChooser;
   private double MaxSpeed =
       1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
   // speed
@@ -65,7 +69,8 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
   private final Agitator m_Agitator = new Agitator();
   private Intake m_Intake = new Intake(m_Agitator);
-  private Feeder m_Feeder = new Feeder(FeederConstants.kFeederMotor);
+  private Feeder m_LeftFeeder = new Feeder(FeederConstants.kFeederLeftMotor, "Left Feeder");
+  private Feeder m_RightFeeder = new Feeder(FeederConstants.kFeederRightMotor, "Right Feeder");
   private Shooter m_LeftShooter =
       new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter", m_Agitator);
   private Shooter m_RightShooter =
@@ -76,13 +81,13 @@ public class RobotContainer {
 
   private SequentialCommandGroup m_SequentialShoot =
       new SequentialCommandGroup(
-          new ShootingCommand(m_LeftShooter, m_RightShooter),
-          new ShootCommand(m_LeftShooter),
-          new FeederOn(m_Feeder));
+          // new ShootingCommand(m_LeftShooter, m_RightShooter),
+          new ShootCommand(m_LeftShooter, m_RightShooter),
+          new FeederOn(m_LeftFeeder, m_RightFeeder));
   // private SequentialShoot m_SequentialShoot = new SequentialShoot(m_LeftShooter, m_RightShooter,
   // m_Feeder);
   private NotShootingCommand m_NotShootingCommand =
-      new NotShootingCommand(m_LeftShooter, m_RightShooter, m_Feeder);
+      new NotShootingCommand(m_LeftShooter, m_RightShooter, m_LeftFeeder, m_RightFeeder);
 
   // Instantiating the Toggles
 
@@ -111,6 +116,15 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    // NamedCommands.registerCommand(
+    //    "ShootingCommand", new ShootingCommand(m_LeftShooter, m_RightShooter));
+    NamedCommands.registerCommand("ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter));
+    NamedCommands.registerCommand("FeederOn", new FeederOn(m_LeftFeeder, m_RightFeeder));
+    NamedCommands.registerCommand("ExtendIntake", new ExtendIntake(m_Intake));
+    // builds auto chooser
+    autoChooser = AutoBuilder.buildAutoChooser("Shoot");
+    SmartDashboard.putData("Auto Mode", autoChooser);
     // Configure the trigger bindings
     configureBindings();
   }
@@ -205,5 +219,11 @@ public class RobotContainer {
     // m_xboxController.povDown().toggleOnTrue(m_AgitatorToggle);
     // // Playstation variant of ^^^
     // m_ps4Controller.povDown().toggleOnTrue(m_AgitatorToggle);
+  }
+
+  public Command getAutonomusCommand() {
+    // An exmaple command will run in automonous
+    // Run the path selected form the auto chooser
+    return autoChooser.getSelected();
   }
 }

@@ -12,16 +12,25 @@ import frc.robot.subsystems.Feeder.FeederState;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class FeederOn extends InstantCommand {
-  Feeder m_Feeder;
+  Feeder m_LeftFeeder;
+  Feeder m_RightFeeder;
 
-  public FeederOn(Feeder feeder) {
-    m_Feeder = feeder;
+  public FeederOn(Feeder leftFeeder, Feeder rightFeeder) {
+    m_LeftFeeder = leftFeeder;
+    m_RightFeeder = rightFeeder;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_Feeder.m_FeederState = FeederState.S_On;
+    m_LeftFeeder.m_FeederState = FeederState.S_On;
+    m_RightFeeder.m_FeederState = FeederState.S_On;
   }
 }
+
+/* public ShootingCommand(Shooter leftShooter, Shooter rightShooter) {
+  // Use addRequirements() here to declare subsystem dependencies.
+  m_LeftShooterSubsystem = leftShooter;
+  m_RightShooterSubsystem = rightShooter;
+} */

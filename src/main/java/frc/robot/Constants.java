@@ -34,7 +34,8 @@ public final class Constants {
 
   // Feeder Motor Ids = 30s
   public static class FeederConstants {
-    public static final int kFeederMotor = 31;
+    public static final int kFeederLeftMotor = 31;
+    public static final int kFeederRightMotor = 32;
     // 3 is a placeholder for motor voltage
     public static final double kFeederVolt = 3;
   }

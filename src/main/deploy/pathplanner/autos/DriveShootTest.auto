@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "MoveBackFromCenter"
+            "pathName": "depot1 to depotCollected1"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "DepotFromCenter"
+            "name": "ShootCommand"
           }
         }
       ]
