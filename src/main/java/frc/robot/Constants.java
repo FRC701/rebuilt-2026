@@ -258,7 +258,7 @@ public final class Constants {
 
   public static class AimBotConstants {
     // Red alliance hub field coordinates (inches, converted to meters)
-    public static final double kRedHubXMeters = Units.inchesToMeters(158.61);
+    public static final double kRedHubXMeters = Units.inchesToMeters(469.11);
     public static final double kRedHubYMeters = Units.inchesToMeters(158.845);
 
     // Heading PID constants for aiming at the hub
