@@ -17,12 +17,10 @@ import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -52,8 +50,7 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   private TalonFX m_IntakeMotorArm;
 
-  private TalonFX m_IntakeMotorRoller1;
-  private TalonFX m_IntakeMotorRoller2;
+  private TalonFX m_IntakeMotorRoller;
 
   public IntakeState m_IntakeState;
   private Agitator m_Agitator;
@@ -79,16 +76,12 @@ public class Intake extends SubsystemBase {
   public Intake(Agitator agitator) {
     // Created Two Motors
     m_IntakeMotorArm = new TalonFX(IntakeConstants.kIntakeMotorArm);
-    m_IntakeMotorRoller1 = new TalonFX(IntakeConstants.kIntakeMotorRoller1);
-    m_IntakeMotorRoller2 = new TalonFX(IntakeConstants.kIntakeMotorRoller2);
+    m_IntakeMotorRoller = new TalonFX(IntakeConstants.kIntakeMotorRoller);
 
     m_Agitator = agitator;
     // m_reverseLimitSignal = m_IntakeMotorArm.getReverseLimit();
 
     m_IntakeState = IntakeState.S_Retract;
-
-    m_IntakeMotorRoller2.setControl(
-        new Follower(m_IntakeMotorRoller1.getDeviceID(), MotorAlignmentValue.Opposed));
 
     // Configs that use the PID values to help with motor speed
     var m_talonFXConfigs =
@@ -152,9 +145,9 @@ public class Intake extends SubsystemBase {
 
     // Apply the Configs to the Motor Objects
     m_IntakeMotorArm.getConfigurator().apply(m_talonFXConfigs);
-    m_IntakeMotorRoller1.getConfigurator().apply(m_rollerConfigs);
+    m_IntakeMotorRoller.getConfigurator().apply(m_rollerConfigs);
     m_IntakeMotorArm.getConfigurator().apply(IntakeConfig);
-    m_IntakeMotorRoller1.getConfigurator().apply(RollerIntakeConfig);
+    m_IntakeMotorRoller.getConfigurator().apply(RollerIntakeConfig);
 
     m_IntakeMotorArm.setPosition(0);
 
@@ -169,7 +162,7 @@ public class Intake extends SubsystemBase {
       m_IntakeMotorArm.getConfigurator().apply(m_talonFXConfigs);
 
       m_armSimState = m_IntakeMotorArm.getSimState();
-      m_rollerSimState = m_IntakeMotorRoller1.getSimState();
+      m_rollerSimState = m_IntakeMotorRoller.getSimState();
 
       m_armSim =
           new SingleJointedArmSim(
@@ -223,7 +216,7 @@ public class Intake extends SubsystemBase {
   public void CycleUp() {
     m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
     m_Timer.start();
-    m_IntakeMotorRoller1.setVoltage(7);
+    m_IntakeMotorRoller.setVoltage(7);
     if (m_Timer.hasElapsed(0.15)) {
       m_IntakeState = IntakeState.S_Down;
       m_Timer.reset();
@@ -236,7 +229,7 @@ public class Intake extends SubsystemBase {
     // If motor has reached its destination the stop the arm and start the rollers
     m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
     m_Timer.start();
-    m_IntakeMotorRoller1.setVoltage(7);
+    m_IntakeMotorRoller.setVoltage(7);
     if (m_Timer.hasElapsed(0.35)) {
       m_IntakeState = IntakeState.S_ExtendCycleUp;
       m_Timer.reset();
@@ -262,7 +255,7 @@ public class Intake extends SubsystemBase {
   public void ExtendPosition() {
     // If motor has reached its destination the stop the arm and start the rollers
     m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
-    m_IntakeMotorRoller1.setVoltage(6.5);
+    m_IntakeMotorRoller.setVoltage(6.5);
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeState = IntakeState.S_Down;
     }
@@ -273,7 +266,7 @@ public class Intake extends SubsystemBase {
   // Pulls the intake back in and stops the rollers
   public void RetractPosition() {
     // When retracting we want to rollers to stay off
-    m_IntakeMotorRoller1.setVoltage(0);
+    m_IntakeMotorRoller.setVoltage(0);
     m_Agitator.m_AgitatorState = AgitatorState.S_Off;
     // // If the arm has reached its destination stop the motor
     // if (checkExtended(IntakeConstants.kRetractPosition)) {
@@ -290,7 +283,7 @@ public class Intake extends SubsystemBase {
     m_Agitator.m_AgitatorState = AgitatorState.S_Out;
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeMotorArm.setVoltage(0);
-      m_IntakeMotorRoller1.setVoltage(-8);
+      m_IntakeMotorRoller.setVoltage(-8);
     } else {
       // Move the arm until it reaches its destination
       setPosition(IntakeConstants.kExtensionPosition, 0);
