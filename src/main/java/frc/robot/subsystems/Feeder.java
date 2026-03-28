@@ -6,10 +6,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -22,14 +20,13 @@ public class Feeder extends SubsystemBase {
   public Feeder(int motorID, String feederName) {
     m_FeederMotor = new TalonFX(motorID);
 
-        var m_TalonFXConfig =
-        new TalonFXConfiguration();
+    var m_TalonFXConfig = new TalonFXConfiguration();
 
-        m_FeederState = FeederState.S_Off;
+    m_FeederState = FeederState.S_Off;
 
-     MotorOutputConfigs feederConfig = m_TalonFXConfig.MotorOutput;
+    MotorOutputConfigs feederConfig = m_TalonFXConfig.MotorOutput;
 
-if (motorID == Constants.FeederConstants.kFeederLeftMotor) {
+    if (motorID == Constants.FeederConstants.kFeederLeftMotor) {
       feederConfig.Inverted = InvertedValue.CounterClockwise_Positive;
     } else {
       feederConfig.Inverted = InvertedValue.Clockwise_Positive;

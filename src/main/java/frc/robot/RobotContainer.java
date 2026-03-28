@@ -13,8 +13,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -28,10 +26,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.ExtendIntake;
 import frc.robot.commands.FeederOn;
 import frc.robot.commands.NotShootingCommand;
-import frc.robot.commands.RetractIntake;
-import frc.robot.commands.SequentialShoot;
 import frc.robot.commands.ShootCommand;
-import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
 import frc.robot.subsystems.Climber;
@@ -86,7 +81,7 @@ public class RobotContainer {
 
   private SequentialCommandGroup m_SequentialShoot =
       new SequentialCommandGroup(
-          //new ShootingCommand(m_LeftShooter, m_RightShooter),
+          // new ShootingCommand(m_LeftShooter, m_RightShooter),
           new ShootCommand(m_LeftShooter, m_RightShooter),
           new FeederOn(m_LeftFeeder, m_RightFeeder));
   // private SequentialShoot m_SequentialShoot = new SequentialShoot(m_LeftShooter, m_RightShooter,
@@ -122,7 +117,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-   // NamedCommands.registerCommand(
+    // NamedCommands.registerCommand(
     //    "ShootingCommand", new ShootingCommand(m_LeftShooter, m_RightShooter));
     NamedCommands.registerCommand("ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter));
     NamedCommands.registerCommand("FeederOn", new FeederOn(m_LeftFeeder, m_RightFeeder));
@@ -213,7 +208,6 @@ public class RobotContainer {
     // Playstation variant of ^^^
     m_ps4Controller.R2().onTrue(m_SequentialShoot);
     m_ps4Controller.square().onTrue(m_NotShootingCommand);
-
 
     m_ps4Controller
         .povUp()
