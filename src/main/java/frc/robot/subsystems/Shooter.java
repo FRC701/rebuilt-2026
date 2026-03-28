@@ -14,9 +14,16 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,6 +38,7 @@ public class Shooter extends SubsystemBase {
   public ShooterEnumState m_ShooterEnumState;
 
   private Agitator m_Agitator;
+  private CommandSwerveDrivetrain m_drivetrain;
   int aState;
 
   // Boolean to track the enabled status
@@ -50,17 +58,21 @@ public class Shooter extends SubsystemBase {
   private FlywheelSim m_flywheelSim;
   private TalonFXSimState m_motorSimState;
 
-  private final double[] distance = {36, 61, 72};
+  private final double[] distance = {
+    Units.inchesToMeters(36), Units.inchesToMeters(61), Units.inchesToMeters(72)
+  };
   private final double[] speed = {50, 75, 100};
   private double a, b, c;
 
   /** Creates a new Shooter. */
-  public Shooter(int motorId, String subsystemName, Agitator agitator) {
+  public Shooter(
+      int motorId, String subsystemName, CommandSwerveDrivetrain drivetrain, Agitator agitator) {
     super(subsystemName);
 
     // gives values to the Strings that are used for Shuffleboard
     nameStrings();
     m_Agitator = agitator;
+    m_drivetrain = drivetrain;
 
     // Selects the intial state
     m_ShooterEnumState = ShooterEnumState.S_NotShooting;
@@ -197,6 +209,28 @@ public class Shooter extends SubsystemBase {
 
     if (m_Agitator.m_AgitatorState == AgitatorState.S_Off) aState = 0;
     else if (m_Agitator.m_AgitatorState == AgitatorState.S_Idle) aState = 1;
+  }
+
+  private static final AprilTagFieldLayout kFieldLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+
+  private static final Translation2d kRedHubPosition =
+      new Translation2d(
+          Constants.AimBotConstants.kRedHubXMeters, Constants.AimBotConstants.kRedHubYMeters);
+
+  private static final Translation2d kBlueHubPosition =
+      new Translation2d(
+          kFieldLayout.getFieldLength() - Constants.AimBotConstants.kRedHubXMeters,
+          kFieldLayout.getFieldWidth() - Constants.AimBotConstants.kRedHubYMeters);
+
+  double DistanceToHub() {
+    Pose2d currentPose = m_drivetrain.getState().Pose;
+    // TODO: Can isRed and hubPosition be calculated once at startup?
+    boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
+    Translation2d hubPosition = isRed ? kRedHubPosition : kBlueHubPosition;
+    Translation2d robotToHub = hubPosition.minus(currentPose.getTranslation());
+    double DistanceToHub_m = robotToHub.getNorm();
+    return DistanceToHub_m;
   }
 
   // Call once at startup — pre-computes the quadratic coefficients
