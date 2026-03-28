@@ -159,27 +159,36 @@ public class Intake extends SubsystemBase {
     m_IntakeMotorArm.setPosition(0);
 
     if (Utils.isSimulation()) {
+      // Zero out friction/gravity feedforward — not applicable in sim
+      m_talonFXConfigs.Slot0.kS = 0;
+      m_talonFXConfigs.Slot0.kG = 0;
+      m_talonFXConfigs.Slot1.kS = 0;
+      m_talonFXConfigs.Slot1.kG = 0;
+      m_talonFXConfigs.Slot2.kS = 0;
+      m_talonFXConfigs.Slot2.kG = 0;
+      m_IntakeMotorArm.getConfigurator().apply(m_talonFXConfigs);
+
       m_armSimState = m_IntakeMotorArm.getSimState();
       m_rollerSimState = m_IntakeMotorRoller1.getSimState();
 
       m_armSim =
           new SingleJointedArmSim(
-              DCMotor.getKrakenX60Foc(1),
+              DCMotor.getFalcon500(1),
               IntakeConstants.kSimArmGearRatio,
               IntakeConstants.kSimArmMOI,
               0.3, // arm length meters
               0.0, // min angle rad (retracted)
               FORWARD_LIMIT * 2.0 * Math.PI / IntakeConstants.kSimArmGearRatio, // max angle rad
-              true, // simulate gravity
+              false, // gravity disabled — real PID gains don't match sim gravity model
               0.0); // starting angle rad
 
       m_rollerSim =
           new FlywheelSim(
               LinearSystemId.createFlywheelSystem(
-                  DCMotor.getKrakenX60Foc(1),
+                  DCMotor.getKrakenX44Foc(2),
                   IntakeConstants.kSimRollerMOI,
                   IntakeConstants.kSimRollerGearRatio),
-              DCMotor.getKrakenX60Foc(1));
+              DCMotor.getKrakenX44Foc(2));
     }
   }
 
@@ -294,7 +303,8 @@ public class Intake extends SubsystemBase {
     // if (m_reverseLimitSignal.getValue() == ReverseLimitValue.ClosedToGround) {
     //   m_IntakeMotorArm.setPosition(0);
     // }
-    if (m_IntakeMotorArm.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
+    if (!Utils.isSimulation()
+        && m_IntakeMotorArm.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
       m_IntakeMotorArm.setPosition(0);
     }
 
