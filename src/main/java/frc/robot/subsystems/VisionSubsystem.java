@@ -26,13 +26,17 @@ public class VisionSubsystem extends SubsystemBase {
   private final PhotonPoseEstimator m_RightPoseEstimator;
   private final PhotonCamera m_ForwardCamera;
   private final PhotonPoseEstimator m_ForwardPoseEstimator;
+  private final PhotonCamera m_ReverseCamera;
+  private final PhotonPoseEstimator m_ReversePoseEstimator;
   private final AprilTagFieldLayout m_FieldLayout;
 
   private Optional<VisionMeasurement> m_LatestRightVisionMeasurement = Optional.empty();
   private Optional<VisionMeasurement> m_LatestForwardVisionMeasurement = Optional.empty();
+  private Optional<VisionMeasurement> m_LatestReverseVisionMeasurement = Optional.empty();
 
   private int m_RightRejectionCount = 0;
   private int m_ForwardRejectionCount = 0;
+  private int m_ReverseRejectionCount = 0;
 
   // Simulation support
   private VisionSystemSim m_visionSim;
@@ -46,6 +50,9 @@ public class VisionSubsystem extends SubsystemBase {
     m_ForwardCamera = new PhotonCamera(Constants.Vision.kForwardCameraName);
     m_ForwardPoseEstimator =
         new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kForwardRobotToCam3d);
+    m_ReverseCamera = new PhotonCamera(Constants.Vision.kReverseCameraName);
+    m_ReversePoseEstimator =
+        new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kReverseRobotToCam3d);
 
     if (Utils.isSimulation()) {
       m_visionSim = new VisionSystemSim("main");
@@ -63,13 +70,17 @@ public class VisionSubsystem extends SubsystemBase {
 
       var rightCameraSim = new PhotonCameraSim(m_RightCamera, cameraProp);
       var forwardCameraSim = new PhotonCameraSim(m_ForwardCamera, cameraProp);
+      var reverseCameraSim = new PhotonCameraSim(m_ReverseCamera, cameraProp);
       rightCameraSim.enableDrawWireframe(true);
       forwardCameraSim.enableDrawWireframe(true);
+      reverseCameraSim.enableDrawWireframe(true);
       rightCameraSim.setMaxSightRange(Constants.Vision.kSimMaxSightRangeMeters);
       forwardCameraSim.setMaxSightRange(Constants.Vision.kSimMaxSightRangeMeters);
+      reverseCameraSim.setMaxSightRange(Constants.Vision.kSimMaxSightRangeMeters);
 
       m_visionSim.addCamera(rightCameraSim, Constants.Vision.kRightRobotToCam3d);
       m_visionSim.addCamera(forwardCameraSim, Constants.Vision.kForwardRobotToCam3d);
+      m_visionSim.addCamera(reverseCameraSim, Constants.Vision.kReverseRobotToCam3d);
     }
   }
 
@@ -81,13 +92,19 @@ public class VisionSubsystem extends SubsystemBase {
     return m_LatestForwardVisionMeasurement;
   }
 
+  public Optional<VisionMeasurement> getLatestReverseVisionMeasurement() {
+    return m_LatestReverseVisionMeasurement;
+  }
+
   @Override
   public void periodic() {
     boolean rightConnected = m_RightCamera.isConnected();
     boolean forwardConnected = m_ForwardCamera.isConnected();
+    boolean reverseConnected = m_ReverseCamera.isConnected();
 
     SmartDashboard.putBoolean("Vision/Right/Connected", rightConnected);
     SmartDashboard.putBoolean("Vision/Forward/Connected", forwardConnected);
+    SmartDashboard.putBoolean("Vision/Reverse/Connected", reverseConnected);
 
     m_LatestRightVisionMeasurement =
         rightConnected
@@ -97,9 +114,14 @@ public class VisionSubsystem extends SubsystemBase {
         forwardConnected
             ? processCamera(m_ForwardCamera, m_ForwardPoseEstimator, "Forward")
             : Optional.empty();
+    m_LatestReverseVisionMeasurement =
+        reverseConnected
+            ? processCamera(m_ReverseCamera, m_ReversePoseEstimator, "Reverse")
+            : Optional.empty();
 
     publishMeasurementTelemetry("Right", m_LatestRightVisionMeasurement);
     publishMeasurementTelemetry("Forward", m_LatestForwardVisionMeasurement);
+    publishMeasurementTelemetry("Reverse", m_LatestReverseVisionMeasurement);
   }
 
   private void publishMeasurementTelemetry(
@@ -124,8 +146,10 @@ public class VisionSubsystem extends SubsystemBase {
     SmartDashboard.putString(prefix + "RejectionReason", reason);
     if (cameraName.equals("Right")) {
       SmartDashboard.putNumber(prefix + "RejectionCount", ++m_RightRejectionCount);
-    } else {
+    } else if (cameraName.equals("Forward")) {
       SmartDashboard.putNumber(prefix + "RejectionCount", ++m_ForwardRejectionCount);
+    } else {
+      SmartDashboard.putNumber(prefix + "RejectionCount", ++m_ReverseRejectionCount);
     }
   }
 
