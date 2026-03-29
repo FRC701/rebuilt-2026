@@ -70,10 +70,12 @@ public class AimAtHub extends Command {
     boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
     Translation2d hubPosition = isRed ? kRedHubPosition : kBlueHubPosition;
     Translation2d robotToHub = hubPosition.minus(currentPose.getTranslation());
-    Rotation2d targetAngle = robotToHub.getAngle();
+    // Rotate 180° so the shooter faces the hub
+    Rotation2d targetAngle = robotToHub.getAngle();//.plus(Rotation2d.k180deg);
 
     SmartDashboard.putNumber("AimBot/TargetAngle_deg", targetAngle.getDegrees());
     SmartDashboard.putNumber("AimBot/DistanceToHub_m", robotToHub.getNorm());
+    SmartDashboard.putNumber("currentPose", currentPose.getRotation().getDegrees());
 
     m_drivetrain.setControl(
         m_request
