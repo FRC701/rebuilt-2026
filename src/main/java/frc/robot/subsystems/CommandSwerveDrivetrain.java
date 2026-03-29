@@ -49,6 +49,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
   private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
   private boolean m_hasAppliedOperatorPerspective = false;
+  private Alliance m_lastAlliance = null;
 
   private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization =
       new SwerveRequest.SysIdSwerveTranslation();
@@ -182,16 +183,28 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   @Override
   public void periodic() {
+    // Get current alliance
+    var allianceOptional = DriverStation.getAlliance();
+
+    // Reset perspective flag if alliance changed or robot is disabled
+    if (allianceOptional.isPresent()) {
+      Alliance currentAlliance = allianceOptional.get();
+      if (m_lastAlliance != currentAlliance) {
+        m_hasAppliedOperatorPerspective = false;
+        m_lastAlliance = currentAlliance;
+      }
+    }
+
+    // Apply operator perspective if not yet applied or robot is disabled
     if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
-      DriverStation.getAlliance()
-          .ifPresent(
-              allianceColor -> {
-                setOperatorPerspectiveForward(
-                    allianceColor == Alliance.Red
-                        ? kRedAlliancePerspectiveRotation
-                        : kBlueAlliancePerspectiveRotation);
-                m_hasAppliedOperatorPerspective = true;
-              });
+      allianceOptional.ifPresent(
+          allianceColor -> {
+            setOperatorPerspectiveForward(
+                allianceColor == Alliance.Red
+                    ? kRedAlliancePerspectiveRotation
+                    : kBlueAlliancePerspectiveRotation);
+            m_hasAppliedOperatorPerspective = true;
+          });
     }
 
     Pose2d currentPose = getState().Pose;

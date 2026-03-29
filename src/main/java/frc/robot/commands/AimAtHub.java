@@ -70,8 +70,15 @@ public class AimAtHub extends Command {
     boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
     Translation2d hubPosition = isRed ? kRedHubPosition : kBlueHubPosition;
     Translation2d robotToHub = hubPosition.minus(currentPose.getTranslation());
-    // Rotate 180° so the shooter faces the hub
-    Rotation2d targetAngle = robotToHub.getAngle();//.plus(Rotation2d.k180deg);
+    // Point the front of the robot (where the shooter is) toward the hub
+    Rotation2d targetAngle = robotToHub.getAngle();
+
+    // Compensate for operator perspective (Red alliance uses 180° perspective)
+    // FieldCentricFacingAngle interprets angles relative to operator perspective,
+    // so we must subtract the perspective to maintain field-absolute aiming
+    Rotation2d operatorPerspective = isRed ? Rotation2d.k180deg : Rotation2d.kZero;
+    targetAngle = targetAngle.minus(operatorPerspective);
+
 
     SmartDashboard.putNumber("AimBot/TargetAngle_deg", targetAngle.getDegrees());
     SmartDashboard.putNumber("AimBot/DistanceToHub_m", robotToHub.getNorm());
