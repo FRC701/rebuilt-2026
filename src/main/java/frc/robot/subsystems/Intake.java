@@ -74,17 +74,19 @@ public class Intake extends SubsystemBase {
           new Mechanism(this::voltageCallback, this::logCallback, this));
 
   public Intake(Agitator agitator) {
-    // Created Two Motors
+    // Created Three Motors
     m_IntakeMotorArm = new TalonFX(IntakeConstants.kIntakeMotorArm);
     m_IntakeMotorRoller = new TalonFX(IntakeConstants.kIntakeMotorRoller);
 
     m_Agitator = agitator;
+
+    // Used for the magnetic limit switch
     // m_reverseLimitSignal = m_IntakeMotorArm.getReverseLimit();
 
     m_IntakeState = IntakeState.S_Retract;
 
-    // Configs that use the PID values to help with motor speed
-    var m_talonFXConfigs =
+    // Configs that use the PID values to help with motor speed and limits
+    var m_armConfigs =
         new TalonFXConfiguration()
             .withSoftwareLimitSwitch(
                 new SoftwareLimitSwitchConfigs()
@@ -100,7 +102,6 @@ public class Intake extends SubsystemBase {
                     .withStatorCurrentLimit(Amps.of(40))
                     .withStatorCurrentLimitEnable(true)
                     .withSupplyCurrentLimit(40));
-    ;
 
     var m_rollerConfigs =
         new TalonFXConfiguration()
@@ -110,7 +111,7 @@ public class Intake extends SubsystemBase {
                     .withStatorCurrentLimitEnable(true)
                     .withSupplyCurrentLimit(60));
 
-    var Slot0Configs = m_talonFXConfigs.Slot0; // pid for moving down
+    var Slot0Configs = m_armConfigs.Slot0; // pid for moving down
     Slot0Configs.kP = Constants.IntakeConstants.ExtendkP;
     Slot0Configs.kI = Constants.IntakeConstants.ExtendkI;
     Slot0Configs.kD = Constants.IntakeConstants.ExtendkD;
@@ -119,7 +120,7 @@ public class Intake extends SubsystemBase {
     Slot0Configs.kA = Constants.IntakeConstants.ExtendkA;
     Slot0Configs.kG = Constants.IntakeConstants.ExtendkG;
 
-    var Slot1Configs = m_talonFXConfigs.Slot1; // pid for moving up
+    var Slot1Configs = m_armConfigs.Slot1; // pid for moving up
     Slot1Configs.kP = Constants.IntakeConstants.RetractkP;
     Slot1Configs.kI = Constants.IntakeConstants.RetractkI;
     Slot1Configs.kD = Constants.IntakeConstants.RetractkD;
@@ -128,7 +129,7 @@ public class Intake extends SubsystemBase {
     Slot1Configs.kA = Constants.IntakeConstants.RetractkA;
     Slot1Configs.kG = Constants.IntakeConstants.RetractkG;
 
-    var Slot2Configs = m_talonFXConfigs.Slot2; // pid for holding intake position once it is down
+    var Slot2Configs = m_armConfigs.Slot2; // pid for holding intake position once it is down
     Slot2Configs.kP = Constants.IntakeConstants.DownkP;
     Slot2Configs.kI = Constants.IntakeConstants.DownkI;
     Slot2Configs.kD = Constants.IntakeConstants.DownkD;
@@ -137,29 +138,28 @@ public class Intake extends SubsystemBase {
     Slot2Configs.kA = Constants.IntakeConstants.DownkA;
     Slot2Configs.kG = Constants.IntakeConstants.DownkG;
 
-    MotorOutputConfigs IntakeConfig = new MotorOutputConfigs();
-    IntakeConfig.Inverted = InvertedValue.Clockwise_Positive;
+    // Corrects the direction of rolling
+    MotorOutputConfigs ArmOutputConfigs = m_armConfigs.MotorOutput;
+    ArmOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
 
-    MotorOutputConfigs RollerIntakeConfig = new MotorOutputConfigs();
-    RollerIntakeConfig.Inverted = InvertedValue.Clockwise_Positive;
+    MotorOutputConfigs RollerOutputConfigs = m_rollerConfigs.MotorOutput;
+    RollerOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
 
     // Apply the Configs to the Motor Objects
-    m_IntakeMotorArm.getConfigurator().apply(m_talonFXConfigs);
+    m_IntakeMotorArm.getConfigurator().apply(m_armConfigs);
     m_IntakeMotorRoller.getConfigurator().apply(m_rollerConfigs);
-    m_IntakeMotorArm.getConfigurator().apply(IntakeConfig);
-    m_IntakeMotorRoller.getConfigurator().apply(RollerIntakeConfig);
 
     m_IntakeMotorArm.setPosition(0);
 
     if (Utils.isSimulation()) {
       // Zero out friction/gravity feedforward — not applicable in sim
-      m_talonFXConfigs.Slot0.kS = 0;
-      m_talonFXConfigs.Slot0.kG = 0;
-      m_talonFXConfigs.Slot1.kS = 0;
-      m_talonFXConfigs.Slot1.kG = 0;
-      m_talonFXConfigs.Slot2.kS = 0;
-      m_talonFXConfigs.Slot2.kG = 0;
-      m_IntakeMotorArm.getConfigurator().apply(m_talonFXConfigs);
+      m_armConfigs.Slot0.kS = 0;
+      m_armConfigs.Slot0.kG = 0;
+      m_armConfigs.Slot1.kS = 0;
+      m_armConfigs.Slot1.kG = 0;
+      m_armConfigs.Slot2.kS = 0;
+      m_armConfigs.Slot2.kG = 0;
+      m_IntakeMotorArm.getConfigurator().apply(m_armConfigs);
 
       m_armSimState = m_IntakeMotorArm.getSimState();
       m_rollerSimState = m_IntakeMotorRoller.getSimState();
@@ -268,11 +268,7 @@ public class Intake extends SubsystemBase {
     // When retracting we want to rollers to stay off
     m_IntakeMotorRoller.setVoltage(0);
     m_Agitator.m_AgitatorState = AgitatorState.S_Off;
-    // // If the arm has reached its destination stop the motor
-    // if (checkExtended(IntakeConstants.kRetractPosition)) {
-    //   //m_IntakeState = IntakeState.S_Retracted;
-    // }
-    // Move the arm until it reaches the destination
+    // Move the arm to the destination
     setPosition(IntakeConstants.kRetractPosition, 1);
   }
 
@@ -292,12 +288,13 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // This method will be called once per scheduler run
+
     // m_reverseLimitSignal.refresh();
     // if (m_reverseLimitSignal.getValue() == ReverseLimitValue.ClosedToGround) {
     //   m_IntakeMotorArm.setPosition(0);
     // }
-    if (!Utils.isSimulation()
-        && m_IntakeMotorArm.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
+    if (m_IntakeMotorArm.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
       m_IntakeMotorArm.setPosition(0);
     }
 
@@ -309,8 +306,6 @@ public class Intake extends SubsystemBase {
     // SmartDashboard.putNumber("ReverseSoftLimit", REVERSE_LIMIT);
     SmartDashboard.putNumber("IntakePose", m_IntakeMotorArm.getPosition().getValueAsDouble());
     SmartDashboard.putString("IntakeState", m_IntakeState.toString());
-    // This method will be called once per scheduler run
-
   }
 
   @Override

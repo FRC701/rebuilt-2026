@@ -31,7 +31,7 @@ public class Shooter extends SubsystemBase {
   public ShooterEnumState m_ShooterEnumState;
 
   private Agitator m_Agitator;
-  int aState;
+  private Boolean m_AgitatorOff;
 
   // Boolean to track the enabled status
   private boolean m_ShooterEnabled = true;
@@ -86,8 +86,7 @@ public class Shooter extends SubsystemBase {
     Slot0Configs.kV = Constants.ShooterConstants.kV;
     Slot0Configs.kS = Constants.ShooterConstants.kS;
 
-    // Applying the configs to the motors, PID
-    // Applying the configs to the motors, Voltage Limits
+    // Applying the configs to the motors
     m_ShooterMotor.getConfigurator().apply(m_TalonFXConfig);
 
     velocitySignal = m_ShooterMotor.getVelocity();
@@ -159,9 +158,9 @@ public class Shooter extends SubsystemBase {
 
   // Sets the speed to 0 by using a VelocityVotage object with 0 velocity
   public void stopping() {
-    m_ShooterMotor.setControl(voltSpeed.withVelocity(0));
-    if (aState == 0) m_Agitator.m_AgitatorState = AgitatorState.S_Off;
-    else if (aState == 1) m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
+    m_ShooterMotor.setVoltage(0);
+    if (m_AgitatorOff) m_Agitator.m_AgitatorState = AgitatorState.S_Off;
+    else m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
   }
 
   private boolean setEnabledStatus(boolean shooterStatus) {
@@ -189,8 +188,8 @@ public class Shooter extends SubsystemBase {
       runShooterStates();
     }
 
-    if (m_Agitator.m_AgitatorState == AgitatorState.S_Off) aState = 0;
-    else if (m_Agitator.m_AgitatorState == AgitatorState.S_Idle) aState = 1;
+    if (m_Agitator.m_AgitatorState == AgitatorState.S_Off) m_AgitatorOff = true;
+    else m_AgitatorOff = false;
   }
 
   @Override

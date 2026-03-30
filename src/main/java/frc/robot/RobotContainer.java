@@ -25,9 +25,9 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AimAtHub;
 import frc.robot.commands.ExtendIntake;
 import frc.robot.commands.FeederOn;
+import frc.robot.commands.LaunchToggle;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.ShootCommand;
-import frc.robot.commands.ShootingCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -69,8 +69,8 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
   private final Agitator m_Agitator = new Agitator();
   private Intake m_Intake = new Intake(m_Agitator);
-  private Feeder m_LeftFeeder = new Feeder(FeederConstants.kFeederLeftMotor, "Left Feeder");
-  private Feeder m_RightFeeder = new Feeder(FeederConstants.kFeederRightMotor, "Right Feeder");
+  private Feeder m_LeftFeeder = new Feeder(FeederConstants.kFeederLeftMotor);
+  private Feeder m_RightFeeder = new Feeder(FeederConstants.kFeederRightMotor);
   private Shooter m_LeftShooter =
       new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter", m_Agitator);
   private Shooter m_RightShooter =
@@ -78,9 +78,6 @@ public class RobotContainer {
 
   // Instantiating Shooter Commands
 
-  private ShootingCommand m_ShootingCommand = new ShootingCommand(m_LeftShooter, m_RightShooter);
-  private ShootCommand m_ShootCommand = new ShootCommand(m_LeftShooter, m_RightShooter);
-  private FeederOn m_FeederOn = new FeederOn(m_LeftFeeder, m_RightFeeder);
   private NotShootingCommand m_NotShootingCommand =
       new NotShootingCommand(m_LeftShooter, m_RightShooter, m_LeftFeeder, m_RightFeeder);
 
@@ -93,13 +90,6 @@ public class RobotContainer {
           m_Intake,
           m_Agitator);
 
-  private Command m_ShooterToggle =
-      m_ShootingCommand
-          .andThen(m_ShootCommand)
-          .andThen(m_FeederOn)
-          .andThen(Commands.idle(m_LeftShooter, m_RightShooter, m_LeftFeeder, m_RightFeeder))
-          .finallyDo(() -> m_NotShootingCommand.schedule());
-
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_xboxController =
       new CommandXboxController(OperatorConstants.kXboxControllerPort);
@@ -110,7 +100,6 @@ public class RobotContainer {
   public RobotContainer() {
 
     // NamedCommands.registerCommand(
-    //    "ShootingCommand", new ShootingCommand(m_LeftShooter, m_RightShooter));
     NamedCommands.registerCommand("ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter));
     NamedCommands.registerCommand("FeederOn", new FeederOn(m_LeftFeeder, m_RightFeeder));
     NamedCommands.registerCommand("ExtendIntake", new ExtendIntake(m_Intake));
@@ -178,9 +167,15 @@ public class RobotContainer {
     // m_ps4Controller.povRight().onTrue(m_IntakeRollerToggle);
 
     // Shooter Binding XBox
-    m_xboxController.rightTrigger().whileTrue(m_ShooterToggle);
+    m_xboxController
+        .rightTrigger()
+        .onTrue(new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter));
+    m_xboxController.x().onTrue(m_NotShootingCommand);
     // Playstation variant of ^^^
-    m_ps4Controller.R2().whileTrue(m_ShooterToggle);
+    m_ps4Controller
+        .R2()
+        .onTrue(new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter));
+    m_ps4Controller.square().onTrue(m_NotShootingCommand);
 
     // AimBot Binding - aims at hub while held
     m_xboxController
