@@ -130,8 +130,8 @@ public final class Constants {
     // Shaft A: 2x stealth(0.000141) + 1x SS flywheel(0.000790) = 0.00107
     // Shaft B: 2x stealth(0.000141) = 0.00028
     // Total mechanism-side MOI per motor = 0.00135 kg*m^2
-    public static final double kSimGearRatio = 4.0;
-    public static final double kSimMOI = 0.00135; // kg*m^2
+    public static final double kSimGearRatio = 1.29;
+    public static final double kSimMOI = 0.002; // kg*m^2
   }
 
   public static final class Vision {
