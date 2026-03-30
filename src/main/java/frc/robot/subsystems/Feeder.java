@@ -48,7 +48,10 @@ public class Feeder extends SubsystemBase {
       m_simState = m_FeederMotor.getSimState();
       m_flywheelSim =
           new FlywheelSim(
-              LinearSystemId.createFlywheelSystem(DCMotor.getKrakenX44Foc(1), Constants.FeederConstants.kSimFeederMOI, Constants.FeederConstants.kSimFeederGearRatio),
+              LinearSystemId.createFlywheelSystem(
+                  DCMotor.getKrakenX44Foc(1),
+                  Constants.FeederConstants.kSimFeederMOI,
+                  Constants.FeederConstants.kSimFeederGearRatio),
               DCMotor.getKrakenX44Foc(1));
     }
   }

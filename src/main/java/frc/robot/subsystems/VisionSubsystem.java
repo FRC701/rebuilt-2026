@@ -170,8 +170,7 @@ public class VisionSubsystem extends SubsystemBase {
         SmartDashboard.putString(prefix + "RejectionReason", "");
         SmartDashboard.putNumber(prefix + "PoseX_m", m.pose().getX());
         SmartDashboard.putNumber(prefix + "PoseY_m", m.pose().getY());
-        SmartDashboard.putNumber(
-            prefix + "PoseHeading_deg", m.pose().getRotation().getDegrees());
+        SmartDashboard.putNumber(prefix + "PoseHeading_deg", m.pose().getRotation().getDegrees());
         SmartDashboard.putNumber(prefix + "StdDevXY", m.stdDevs().get(0, 0));
         SmartDashboard.putNumber(
             prefix + "StdDevHeading_deg", Math.toDegrees(m.stdDevs().get(2, 0)));
@@ -197,8 +196,7 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   /**
-   * Returns null if no new frames were available, Optional.empty() if rejected, or the
-   * measurement.
+   * Returns null if no new frames were available, Optional.empty() if rejected, or the measurement.
    */
   private Optional<VisionMeasurement> processCamera(
       PhotonCamera camera, PhotonPoseEstimator poseEstimator, String cameraName, boolean verbose) {
@@ -221,8 +219,7 @@ public class VisionSubsystem extends SubsystemBase {
     if (verbose) {
       String prefix = "Vision/" + cameraName + "/";
       SmartDashboard.putBoolean(prefix + "TagDetected", true);
-      double[] visibleIds =
-          result.targets.stream().mapToDouble(t -> t.getFiducialId()).toArray();
+      double[] visibleIds = result.targets.stream().mapToDouble(t -> t.getFiducialId()).toArray();
       SmartDashboard.putNumberArray(prefix + "VisibleTagIDs", visibleIds);
       double[] ambiguities =
           result.targets.stream().mapToDouble(t -> t.getPoseAmbiguity()).toArray();
@@ -241,8 +238,7 @@ public class VisionSubsystem extends SubsystemBase {
             > Constants.Vision.kMaxAcceptableSingleTagAmbiguity) {
       publishRejection(
           cameraName,
-          "ambiguity_too_high:"
-              + String.format("%.2f", result.getBestTarget().getPoseAmbiguity()),
+          "ambiguity_too_high:" + String.format("%.2f", result.getBestTarget().getPoseAmbiguity()),
           verbose);
       return Optional.empty();
     }
@@ -299,10 +295,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         publishRejection(
             cameraName,
-            "pose_estimation_failed|multitag:"
-                + multiTagFailReason
-                + "|fallback:"
-                + fallbackReason,
+            "pose_estimation_failed|multitag:" + multiTagFailReason + "|fallback:" + fallbackReason,
             verbose);
       }
       return Optional.empty();
@@ -310,8 +303,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     double poseZ = estimatedPose.get().estimatedPose.getZ();
     if (Math.abs(poseZ) > Constants.Vision.kMaxPoseHeightMeters) {
-      publishRejection(
-          cameraName, "z_out_of_range:" + String.format("%.2f", poseZ), verbose);
+      publishRejection(cameraName, "z_out_of_range:" + String.format("%.2f", poseZ), verbose);
       return Optional.empty();
     }
 
@@ -332,9 +324,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     if (verbose) {
       double[] usedIds =
-          estimatedPose.get().targetsUsed.stream()
-              .mapToDouble(t -> t.getFiducialId())
-              .toArray();
+          estimatedPose.get().targetsUsed.stream().mapToDouble(t -> t.getFiducialId()).toArray();
       SmartDashboard.putNumberArray("Vision/" + cameraName + "/UsedTagIDs", usedIds);
     }
 

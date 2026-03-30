@@ -79,7 +79,6 @@ public class AimAtHub extends Command {
     Rotation2d operatorPerspective = isRed ? Rotation2d.k180deg : Rotation2d.kZero;
     targetAngle = targetAngle.minus(operatorPerspective);
 
-
     SmartDashboard.putNumber("AimBot/TargetAngle_deg", targetAngle.getDegrees());
     SmartDashboard.putNumber("AimBot/DistanceToHub_m", robotToHub.getNorm());
     SmartDashboard.putNumber("currentPose", currentPose.getRotation().getDegrees());
