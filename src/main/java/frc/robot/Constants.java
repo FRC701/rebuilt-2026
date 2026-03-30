@@ -30,6 +30,9 @@ public final class Constants {
     public static final double kAgitatorVoltIn = 4;
     public static final double kAgitatorVoltOut = -4;
     public static final double kAgitatorVoltIdle = 3;
+       // Simulation
+    public static final double kSimAgitatorGearRatio = 2; //also a planetary
+    public static final double kSimAgitatorMOI = 0.001; // kg*m^2
   }
 
   // Feeder Motor Ids = 30s
@@ -38,6 +41,9 @@ public final class Constants {
     public static final int kFeederRightMotor = 32;
     // 3 is a placeholder for motor voltage
     public static final double kFeederVolt = 3;
+       // Simulation
+    public static final double kSimFeederGearRatio = 2; //also a planetary
+    public static final double kSimFeederMOI = 0.0001; // kg*m^2
   }
 
   // Climber Motor Ids = 60s
@@ -95,7 +101,7 @@ public final class Constants {
     // Simulation
     public static final double kSimArmGearRatio = 15.0;
     public static final double kSimArmMOI = 0.1; // kg*m^2 (mechanism side)
-    public static final double kSimRollerGearRatio = 1.0;
+    public static final double kSimRollerGearRatio = 1.33; //also a planetary
     public static final double kSimRollerMOI = 0.001; // kg*m^2
   }
 
@@ -252,7 +258,7 @@ public final class Constants {
     public static final double kSimAvgLatencyMs = 35.0;
     public static final double kSimLatencyStdDevMs = 5.0;
     public static final int kSimCameraFPS = 20;
-    public static final double kSimMaxSightRangeMeters = 5.0; // max range for tag detection in sim
+    public static final double kSimMaxSightRangeMeters = 2.0; // max range for tag detection in sim
   }
 
   public static class AimBotConstants {
