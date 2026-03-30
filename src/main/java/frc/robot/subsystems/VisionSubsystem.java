@@ -195,135 +195,129 @@ public class VisionSubsystem extends SubsystemBase {
       return null; // no new frames — keep previous state
     }
 
-    Optional<VisionMeasurement> measurement = Optional.empty();
     String prefix = "Vision/" + cameraName + "/";
-    boolean tagDetected = false;
 
-    for (PhotonPipelineResult result : allResults) {
-      if (!result.hasTargets()) {
-        publishRejection(cameraName, "no_targets");
-        continue;
-      }
+    // Only process the most recent frame — older queued frames are stale
+    PhotonPipelineResult result = allResults.get(allResults.size() - 1);
 
-      tagDetected = true;
-
-      // Publish all tag IDs visible in this frame
-      double[] visibleIds = result.targets.stream().mapToDouble(t -> t.getFiducialId()).toArray();
-      SmartDashboard.putNumberArray(prefix + "VisibleTagIDs", visibleIds);
-      double[] ambiguities =
-          result.targets.stream().mapToDouble(t -> t.getPoseAmbiguity()).toArray();
-      SmartDashboard.putNumberArray(prefix + "Ambiguities", ambiguities);
-
-      int targetCount = result.targets.size();
-
-      if (targetCount < Constants.Vision.kMinAprilTagsForPose) {
-        publishRejection(cameraName, "too_few_targets:" + targetCount);
-        continue;
-      }
-
-      if (targetCount == 1
-          && result.getBestTarget().getPoseAmbiguity()
-              > Constants.Vision.kMaxAcceptableSingleTagAmbiguity) {
-        publishRejection(
-            cameraName,
-            "ambiguity_too_high:"
-                + String.format("%.2f", result.getBestTarget().getPoseAmbiguity()));
-        continue;
-      }
-
-      if (targetCount == 1) {
-        double distanceToTag =
-            result.getBestTarget().getBestCameraToTarget().getTranslation().getNorm();
-        if (distanceToTag > Constants.Vision.kMaxSingleTagDistanceMeters) {
-          publishRejection(
-              cameraName, "single_tag_too_far:" + String.format("%.2f", distanceToTag));
-          continue;
-        }
-      }
-
-      // Attempt coprocessor multi-tag first, fall back to lowest ambiguity
-      Optional<EstimatedRobotPose> estimatedPose = poseEstimator.estimateCoprocMultiTagPose(result);
-      String multiTagFailReason = "";
-
-      if (estimatedPose.isEmpty()) {
-        // Diagnose why coprocessor multi-tag failed.
-        // PnpResult is always a plain object (not Optional) -- validity is indicated by
-        // bestReprojErr being non-zero. A value of 0 means the default/invalid state.
-        var multiTagResult = result.getMultiTagResult();
-        if (multiTagResult.isEmpty()) {
-          multiTagFailReason = "no_multitag_result";
-        } else if (multiTagResult.get().estimatedPose.bestReprojErr == 0) {
-          multiTagFailReason = "multitag_transform_invalid(reproj=0)";
-        } else {
-          multiTagFailReason =
-              "multitag_estimator_rejected(reproj:"
-                  + String.format("%.2f", multiTagResult.get().estimatedPose.bestReprojErr)
-                  + "px)";
-        }
-
-        estimatedPose = poseEstimator.estimateLowestAmbiguityPose(result);
-      }
-
-      if (estimatedPose.isEmpty()) {
-        // Diagnose why lowest-ambiguity fallback also failed
-        var bestTarget = result.getBestTarget();
-        int tagId = bestTarget.getFiducialId();
-        boolean tagInLayout = m_FieldLayout.getTagPose(tagId).isPresent();
-        double ambiguity = bestTarget.getPoseAmbiguity();
-        SmartDashboard.putNumber("Vision/" + cameraName + "/ambiguity", ambiguity);
-
-        String fallbackReason;
-        if (!tagInLayout) {
-          fallbackReason = "tag_" + tagId + "_not_in_layout";
-        } else if (ambiguity < 0) {
-          fallbackReason = "ambiguity_unavailable(tag_" + tagId + ")";
-        } else {
-          fallbackReason = "lowest_ambiguity_rejected:" + String.format("%.2f", ambiguity);
-        }
-
-        publishRejection(
-            cameraName,
-            "pose_estimation_failed|multitag:"
-                + multiTagFailReason
-                + "|fallback:"
-                + fallbackReason);
-        continue;
-      }
-
-      double poseZ = estimatedPose.get().estimatedPose.getZ();
-      if (Math.abs(poseZ) > Constants.Vision.kMaxPoseHeightMeters) {
-        publishRejection(cameraName, "z_out_of_range:" + String.format("%.2f", poseZ));
-        continue;
-      }
-
-      Pose2d robotPose = estimatedPose.get().estimatedPose.toPose2d();
-      double fieldMargin = Constants.Vision.kFieldBoundaryMarginMeters;
-      if (robotPose.getX() < -fieldMargin
-          || robotPose.getX() > m_FieldLayout.getFieldLength() + fieldMargin
-          || robotPose.getY() < -fieldMargin
-          || robotPose.getY() > m_FieldLayout.getFieldWidth() + fieldMargin) {
-        publishRejection(
-            cameraName,
-            "outside_field:" + String.format("(%.2f, %.2f)", robotPose.getX(), robotPose.getY()));
-        continue;
-      }
-
-      Matrix<N3, N1> stdDevs = computeDynamicStdDevs(estimatedPose.get());
-
-      // Publish the tag IDs that actually contributed to this accepted pose estimate
-      double[] usedIds =
-          estimatedPose.get().targetsUsed.stream().mapToDouble(t -> t.getFiducialId()).toArray();
-      SmartDashboard.putNumberArray(prefix + "UsedTagIDs", usedIds);
-
-      measurement =
-          Optional.of(
-              new VisionMeasurement(robotPose, estimatedPose.get().timestampSeconds, stdDevs));
+    if (!result.hasTargets()) {
+      publishRejection(cameraName, "no_targets");
+      SmartDashboard.putBoolean(prefix + "TagDetected", false);
+      return Optional.empty();
     }
 
-    // Published once per periodic cycle, reflects whether any queued frame had visible tags
-    SmartDashboard.putBoolean(prefix + "TagDetected", tagDetected);
+    SmartDashboard.putBoolean(prefix + "TagDetected", true);
 
-    return measurement;
+    // Publish all tag IDs visible in this frame
+    double[] visibleIds = result.targets.stream().mapToDouble(t -> t.getFiducialId()).toArray();
+    SmartDashboard.putNumberArray(prefix + "VisibleTagIDs", visibleIds);
+    double[] ambiguities =
+        result.targets.stream().mapToDouble(t -> t.getPoseAmbiguity()).toArray();
+    SmartDashboard.putNumberArray(prefix + "Ambiguities", ambiguities);
+
+    int targetCount = result.targets.size();
+
+    if (targetCount < Constants.Vision.kMinAprilTagsForPose) {
+      publishRejection(cameraName, "too_few_targets:" + targetCount);
+      return Optional.empty();
+    }
+
+    if (targetCount == 1
+        && result.getBestTarget().getPoseAmbiguity()
+            > Constants.Vision.kMaxAcceptableSingleTagAmbiguity) {
+      publishRejection(
+          cameraName,
+          "ambiguity_too_high:"
+              + String.format("%.2f", result.getBestTarget().getPoseAmbiguity()));
+      return Optional.empty();
+    }
+
+    if (targetCount == 1) {
+      double distanceToTag =
+          result.getBestTarget().getBestCameraToTarget().getTranslation().getNorm();
+      if (distanceToTag > Constants.Vision.kMaxSingleTagDistanceMeters) {
+        publishRejection(
+            cameraName, "single_tag_too_far:" + String.format("%.2f", distanceToTag));
+        return Optional.empty();
+      }
+    }
+
+    // Attempt coprocessor multi-tag first, fall back to lowest ambiguity
+    Optional<EstimatedRobotPose> estimatedPose = poseEstimator.estimateCoprocMultiTagPose(result);
+    String multiTagFailReason = "";
+
+    if (estimatedPose.isEmpty()) {
+      // Diagnose why coprocessor multi-tag failed.
+      // PnpResult is always a plain object (not Optional) -- validity is indicated by
+      // bestReprojErr being non-zero. A value of 0 means the default/invalid state.
+      var multiTagResult = result.getMultiTagResult();
+      if (multiTagResult.isEmpty()) {
+        multiTagFailReason = "no_multitag_result";
+      } else if (multiTagResult.get().estimatedPose.bestReprojErr == 0) {
+        multiTagFailReason = "multitag_transform_invalid(reproj=0)";
+      } else {
+        multiTagFailReason =
+            "multitag_estimator_rejected(reproj:"
+                + String.format("%.2f", multiTagResult.get().estimatedPose.bestReprojErr)
+                + "px)";
+      }
+
+      estimatedPose = poseEstimator.estimateLowestAmbiguityPose(result);
+    }
+
+    if (estimatedPose.isEmpty()) {
+      // Diagnose why lowest-ambiguity fallback also failed
+      var bestTarget = result.getBestTarget();
+      int tagId = bestTarget.getFiducialId();
+      boolean tagInLayout = m_FieldLayout.getTagPose(tagId).isPresent();
+      double ambiguity = bestTarget.getPoseAmbiguity();
+      SmartDashboard.putNumber("Vision/" + cameraName + "/ambiguity", ambiguity);
+
+      String fallbackReason;
+      if (!tagInLayout) {
+        fallbackReason = "tag_" + tagId + "_not_in_layout";
+      } else if (ambiguity < 0) {
+        fallbackReason = "ambiguity_unavailable(tag_" + tagId + ")";
+      } else {
+        fallbackReason = "lowest_ambiguity_rejected:" + String.format("%.2f", ambiguity);
+      }
+
+      publishRejection(
+          cameraName,
+          "pose_estimation_failed|multitag:"
+              + multiTagFailReason
+              + "|fallback:"
+              + fallbackReason);
+      return Optional.empty();
+    }
+
+    double poseZ = estimatedPose.get().estimatedPose.getZ();
+    if (Math.abs(poseZ) > Constants.Vision.kMaxPoseHeightMeters) {
+      publishRejection(cameraName, "z_out_of_range:" + String.format("%.2f", poseZ));
+      return Optional.empty();
+    }
+
+    Pose2d robotPose = estimatedPose.get().estimatedPose.toPose2d();
+    double fieldMargin = Constants.Vision.kFieldBoundaryMarginMeters;
+    if (robotPose.getX() < -fieldMargin
+        || robotPose.getX() > m_FieldLayout.getFieldLength() + fieldMargin
+        || robotPose.getY() < -fieldMargin
+        || robotPose.getY() > m_FieldLayout.getFieldWidth() + fieldMargin) {
+      publishRejection(
+          cameraName,
+          "outside_field:" + String.format("(%.2f, %.2f)", robotPose.getX(), robotPose.getY()));
+      return Optional.empty();
+    }
+
+    Matrix<N3, N1> stdDevs = computeDynamicStdDevs(estimatedPose.get());
+
+    // Publish the tag IDs that actually contributed to this accepted pose estimate
+    double[] usedIds =
+        estimatedPose.get().targetsUsed.stream().mapToDouble(t -> t.getFiducialId()).toArray();
+    SmartDashboard.putNumberArray(prefix + "UsedTagIDs", usedIds);
+
+    return Optional.of(
+        new VisionMeasurement(robotPose, estimatedPose.get().timestampSeconds, stdDevs));
   }
 
   private static Matrix<N3, N1> computeDynamicStdDevs(EstimatedRobotPose estimatedPose) {
