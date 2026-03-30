@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 4.0
+        "x": 3.5,
+        "y": 0.8
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.128427230046948,
-        "y": 4.223556338028169
+        "x": 3.732941594154842,
+        "y": 0.6948790412105152
       },
       "isLocked": false,
-      "linkedName": "depot2 0.456x 7.048y"
+      "linkedName": "RightTrenchStart"
     },
     {
       "anchor": {
-        "x": 2.8833568075117375,
-        "y": 5.365692488262912
+        "x": 3.0,
+        "y": 2.5
       },
       "prevControl": {
-        "x": 1.841728847227014,
-        "y": 6.745145732964303
-      },
-      "nextControl": {
-        "x": 3.2772417840375594,
-        "y": 4.84406103286385
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.338,
-        "y": 4.0197134831460675
-      },
-      "prevControl": {
-        "x": 3.3943427230046956,
-        "y": 4.705669014084508
+        "x": 2.9606235436838984,
+        "y": 2.18305851376102
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "hub1 3.338x 4.020y"
+      "linkedName": "RightShootPos"
     }
   ],
   "rotationTargets": [],
@@ -58,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 40.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

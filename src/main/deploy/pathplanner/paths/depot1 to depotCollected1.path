@@ -12,7 +12,7 @@
         "y": 5.999102714618466
       },
       "isLocked": false,
-      "linkedName": "depot1 1.212x 5.983y"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "depotCollected 0.585x 5.965y"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
