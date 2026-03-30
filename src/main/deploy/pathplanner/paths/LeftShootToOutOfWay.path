@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.250359773853801,
-        "y": 5.3822558902463555
+        "x": 3.3114903569405785,
+        "y": 5.212507786651779
       },
       "isLocked": false,
       "linkedName": "LeftShootPos"
@@ -20,8 +20,8 @@
         "y": 7.25
       },
       "prevControl": {
-        "x": 1.0616508562937377,
-        "y": 7.414391605823162
+        "x": 1.064409945112419,
+        "y": 7.428395316859794
       },
       "nextControl": null,
       "isLocked": false,

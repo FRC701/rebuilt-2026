@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2496362778990266,
-        "y": 4.01348068087004
+        "x": 2.24861252495319,
+        "y": 4.0263023275852055
       },
       "isLocked": false,
       "linkedName": "FieldCenter"
@@ -20,8 +20,8 @@
         "y": 4.0
       },
       "prevControl": {
-        "x": 1.7203704753270075,
-        "y": 3.9848548564440986
+        "x": 1.7201464933257,
+        "y": 3.970529429533752
       },
       "nextControl": null,
       "isLocked": false,
