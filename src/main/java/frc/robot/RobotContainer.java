@@ -72,9 +72,11 @@ public class RobotContainer {
   private Feeder m_LeftFeeder = new Feeder(FeederConstants.kFeederLeftMotor, "Left Feeder");
   private Feeder m_RightFeeder = new Feeder(FeederConstants.kFeederRightMotor, "Right Feeder");
   private Shooter m_LeftShooter =
-      new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter", m_Agitator);
+      new Shooter(
+          Constants.ShooterConstants.kLeftShooterId, "Left Shooter", m_DriveTrain, m_Agitator);
   private Shooter m_RightShooter =
-      new Shooter(Constants.ShooterConstants.kRightShooterId, "Right Shooter", m_Agitator);
+      new Shooter(
+          Constants.ShooterConstants.kRightShooterId, "Right Shooter", m_DriveTrain, m_Agitator);
 
   // Instantiating Shooter Commands
 

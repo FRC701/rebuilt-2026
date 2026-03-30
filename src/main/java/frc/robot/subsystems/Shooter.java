@@ -14,9 +14,16 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,6 +38,7 @@ public class Shooter extends SubsystemBase {
   public ShooterEnumState m_ShooterEnumState;
 
   private Agitator m_Agitator;
+  private CommandSwerveDrivetrain m_drivetrain;
   int aState;
 
   // Boolean to track the enabled status
@@ -50,13 +58,21 @@ public class Shooter extends SubsystemBase {
   private FlywheelSim m_flywheelSim;
   private TalonFXSimState m_motorSimState;
 
+  private final double[] distance = {
+    Units.inchesToMeters(36), Units.inchesToMeters(61), Units.inchesToMeters(72)
+  };
+  private final double[] speed = {50, 75, 100};
+  private double a, b, c;
+
   /** Creates a new Shooter. */
-  public Shooter(int motorId, String subsystemName, Agitator agitator) {
+  public Shooter(
+      int motorId, String subsystemName, CommandSwerveDrivetrain drivetrain, Agitator agitator) {
     super(subsystemName);
 
     // gives values to the Strings that are used for Shuffleboard
     nameStrings();
     m_Agitator = agitator;
+    m_drivetrain = drivetrain;
 
     // Selects the intial state
     m_ShooterEnumState = ShooterEnumState.S_NotShooting;
@@ -91,6 +107,8 @@ public class Shooter extends SubsystemBase {
     m_ShooterMotor.getConfigurator().apply(m_TalonFXConfig);
 
     velocitySignal = m_ShooterMotor.getVelocity();
+
+    BallShooterInterpolation(distance[0], speed[0], distance[1], speed[1], distance[2], speed[2]);
 
     if (Utils.isSimulation()) {
       m_motorSimState = m_ShooterMotor.getSimState();
@@ -191,6 +209,45 @@ public class Shooter extends SubsystemBase {
 
     if (m_Agitator.m_AgitatorState == AgitatorState.S_Off) aState = 0;
     else if (m_Agitator.m_AgitatorState == AgitatorState.S_Idle) aState = 1;
+  }
+
+  private static final AprilTagFieldLayout kFieldLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+
+  private static final Translation2d kRedHubPosition =
+      new Translation2d(
+          Constants.AimBotConstants.kRedHubXMeters, Constants.AimBotConstants.kRedHubYMeters);
+
+  private static final Translation2d kBlueHubPosition =
+      new Translation2d(
+          kFieldLayout.getFieldLength() - Constants.AimBotConstants.kRedHubXMeters,
+          kFieldLayout.getFieldWidth() - Constants.AimBotConstants.kRedHubYMeters);
+
+  double DistanceToHub() {
+    Pose2d currentPose = m_drivetrain.getState().Pose;
+    // TODO: Can isRed and hubPosition be calculated once at startup?
+    boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
+    Translation2d hubPosition = isRed ? kRedHubPosition : kBlueHubPosition;
+    Translation2d robotToHub = hubPosition.minus(currentPose.getTranslation());
+    double DistanceToHub_m = robotToHub.getNorm();
+    return DistanceToHub_m;
+  }
+
+  // Call once at startup — pre-computes the quadratic coefficients
+  void BallShooterInterpolation(double x0, double y0, double x1, double y1, double x2, double y2) {
+    // Lagrange basis pre-expanded into ax^2 + bx + c
+    double d0 = (x0 - x1) * (x0 - x2);
+    double d1 = (x1 - x0) * (x1 - x2);
+    double d2 = (x2 - x0) * (x2 - x1);
+
+    a = y0 / d0 + y1 / d1 + y2 / d2;
+    b = y0 * (-x1 - x2) / d0 + y1 * (-x0 - x2) / d1 + y2 * (-x0 - x1) / d2;
+    c = y0 * (x1 * x2) / d0 + y1 * (x0 * x2) / d1 + y2 * (x0 * x1) / d2;
+  }
+
+  // Call in the robot loop — just 2 multiplies + 2 adds (Horner's method)
+  double speed(double distance) {
+    return (a * distance + b) * distance + c;
   }
 
   @Override
