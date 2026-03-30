@@ -16,12 +16,10 @@ import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 import edu.wpi.first.units.Units;
@@ -47,7 +45,7 @@ public class Intake extends SubsystemBase {
   private TalonFX m_IntakeMotorArm;
 
   private TalonFX m_IntakeMotorRoller1;
-  private TalonFX m_IntakeMotorRoller2;
+  // private TalonFX m_IntakeMotorRoller2;
 
   public IntakeState m_IntakeState;
   private Agitator m_Agitator;
@@ -68,15 +66,15 @@ public class Intake extends SubsystemBase {
     // Created Two Motors
     m_IntakeMotorArm = new TalonFX(IntakeConstants.kIntakeMotorArm);
     m_IntakeMotorRoller1 = new TalonFX(IntakeConstants.kIntakeMotorRoller1);
-    m_IntakeMotorRoller2 = new TalonFX(IntakeConstants.kIntakeMotorRoller2);
+    // m_IntakeMotorRoller2 = new TalonFX(IntakeConstants.kIntakeMotorRoller2);
 
     m_Agitator = agitator;
     // m_reverseLimitSignal = m_IntakeMotorArm.getReverseLimit();
 
     m_IntakeState = IntakeState.S_Retract;
 
-    m_IntakeMotorRoller2.setControl(
-        new Follower(m_IntakeMotorRoller1.getDeviceID(), MotorAlignmentValue.Opposed));
+    // m_IntakeMotorRoller2.setControl(
+    //     new Follower(m_IntakeMotorRoller1.getDeviceID(), MotorAlignmentValue.Opposed));
 
     // Configs that use the PID values to help with motor speed
     var m_talonFXConfigs =

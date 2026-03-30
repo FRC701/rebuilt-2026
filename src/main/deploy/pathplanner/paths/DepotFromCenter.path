@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.9479940476190487,
-        "y": 4.056595238095238
+        "x": 2.0,
+        "y": 4.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.94307164737693,
-        "y": 3.8066437028411886
+        "x": 1.9950775997578813,
+        "y": 3.75004846474595
       },
       "isLocked": false,
       "linkedName": "FieldCenter"
@@ -17,11 +17,11 @@
     {
       "anchor": {
         "x": 1.2298300283286119,
-        "y": 5.923512747875353
+        "y": 5.95
       },
       "prevControl": {
         "x": 1.5461300386784018,
-        "y": 5.280407140514535
+        "y": 5.306894392639182
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": null,

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.468720238095239,
-        "y": 0.8712976190476196
+        "x": 0.4636853932584265,
+        "y": 0.6617752808988768
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.91142261904762,
-        "y": 0.9360833333333334
+        "x": 0.9063877742108075,
+        "y": 0.7265609951845906
       },
       "isLocked": false,
       "linkedName": "Corral"
     },
     {
       "anchor": {
-        "x": 1.9479940476190487,
-        "y": 4.056595238095238
+        "x": 2.0,
+        "y": 4.0
       },
       "prevControl": {
-        "x": 2.1045595238095247,
-        "y": 3.489720238095239
+        "x": 2.156565476190476,
+        "y": 3.4331250000000004
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }
