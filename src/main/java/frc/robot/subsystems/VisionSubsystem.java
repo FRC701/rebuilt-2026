@@ -106,22 +106,35 @@ public class VisionSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("Vision/Forward/Connected", forwardConnected);
     SmartDashboard.putBoolean("Vision/Reverse/Connected", reverseConnected);
 
-    m_LatestRightVisionMeasurement =
-        rightConnected
-            ? processCamera(m_RightCamera, m_RightPoseEstimator, "Right")
-            : Optional.empty();
-    m_LatestForwardVisionMeasurement =
-        forwardConnected
-            ? processCamera(m_ForwardCamera, m_ForwardPoseEstimator, "Forward")
-            : Optional.empty();
-    m_LatestReverseVisionMeasurement =
-        reverseConnected
-            ? processCamera(m_ReverseCamera, m_ReversePoseEstimator, "Reverse")
-            : Optional.empty();
+    if (rightConnected) {
+      var result = processCamera(m_RightCamera, m_RightPoseEstimator, "Right");
+      if (result != null) {
+        m_LatestRightVisionMeasurement = result;
+        publishMeasurementTelemetry("Right", result);
+      }
+    } else {
+      m_LatestRightVisionMeasurement = Optional.empty();
+    }
 
-    publishMeasurementTelemetry("Right", m_LatestRightVisionMeasurement);
-    publishMeasurementTelemetry("Forward", m_LatestForwardVisionMeasurement);
-    publishMeasurementTelemetry("Reverse", m_LatestReverseVisionMeasurement);
+    if (forwardConnected) {
+      var result = processCamera(m_ForwardCamera, m_ForwardPoseEstimator, "Forward");
+      if (result != null) {
+        m_LatestForwardVisionMeasurement = result;
+        publishMeasurementTelemetry("Forward", result);
+      }
+    } else {
+      m_LatestForwardVisionMeasurement = Optional.empty();
+    }
+
+    if (reverseConnected) {
+      var result = processCamera(m_ReverseCamera, m_ReversePoseEstimator, "Reverse");
+      if (result != null) {
+        m_LatestReverseVisionMeasurement = result;
+        publishMeasurementTelemetry("Reverse", result);
+      }
+    } else {
+      m_LatestReverseVisionMeasurement = Optional.empty();
+    }
   }
 
   private void publishMeasurementTelemetry(
@@ -153,13 +166,19 @@ public class VisionSubsystem extends SubsystemBase {
     }
   }
 
+  /** Returns null if no new frames were available, Optional.empty() if rejected, or the measurement. */
   private Optional<VisionMeasurement> processCamera(
       PhotonCamera camera, PhotonPoseEstimator poseEstimator, String cameraName) {
+    var allResults = camera.getAllUnreadResults();
+    if (allResults.isEmpty()) {
+      return null; // no new frames — keep previous state
+    }
+
     Optional<VisionMeasurement> measurement = Optional.empty();
     String prefix = "Vision/" + cameraName + "/";
     boolean tagDetected = false;
 
-    for (PhotonPipelineResult result : camera.getAllUnreadResults()) {
+    for (PhotonPipelineResult result : allResults) {
       if (!result.hasTargets()) {
         publishRejection(cameraName, "no_targets");
         continue;
