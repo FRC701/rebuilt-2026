@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.212,
-        "y": 5.983133802814116
+        "x": 1.2298300283286119,
+        "y": 5.95
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5399765642451944,
-        "y": 5.999102714618466
+        "x": 1.4798271774233236,
+        "y": 5.948806080188435
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "DepotCenter"
     },
     {
       "anchor": {
@@ -20,12 +20,12 @@
         "y": 5.964658334635472
       },
       "prevControl": {
-        "x": 0.33540667365007837,
-        "y": 5.95040451263639
+        "x": 0.3306602526990259,
+        "y": 5.9661906325713465
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "DepotCollected"
     }
   ],
   "rotationTargets": [],
