@@ -9,6 +9,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -37,6 +39,19 @@ public class VisionSubsystem extends SubsystemBase {
   private int m_RightRejectionCount = 0;
   private int m_ForwardRejectionCount = 0;
   private int m_ReverseRejectionCount = 0;
+
+  private final StructPublisher<Pose2d> m_RightPosePublisher =
+      NetworkTableInstance.getDefault()
+          .getStructTopic("Vision/Right/Pose", Pose2d.struct)
+          .publish();
+  private final StructPublisher<Pose2d> m_ForwardPosePublisher =
+      NetworkTableInstance.getDefault()
+          .getStructTopic("Vision/Forward/Pose", Pose2d.struct)
+          .publish();
+  private final StructPublisher<Pose2d> m_ReversePosePublisher =
+      NetworkTableInstance.getDefault()
+          .getStructTopic("Vision/Reverse/Pose", Pose2d.struct)
+          .publish();
 
   // Simulation support
   private VisionSystemSim m_visionSim;
@@ -151,6 +166,12 @@ public class VisionSubsystem extends SubsystemBase {
       SmartDashboard.putNumber(prefix + "PoseHeading_deg", m.pose().getRotation().getDegrees());
       SmartDashboard.putNumber(prefix + "StdDevXY", m.stdDevs().get(0, 0));
       SmartDashboard.putNumber(prefix + "StdDevHeading_deg", Math.toDegrees(m.stdDevs().get(2, 0)));
+
+      switch (cameraName) {
+        case "Right" -> m_RightPosePublisher.set(m.pose());
+        case "Forward" -> m_ForwardPosePublisher.set(m.pose());
+        case "Reverse" -> m_ReversePosePublisher.set(m.pose());
+      }
     }
   }
 
