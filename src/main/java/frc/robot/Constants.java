@@ -222,12 +222,12 @@ public final class Constants {
     // Formula: stdDev = base * (avgDistance ^ exponent)
     // If the robot snaps/jumps to vision poses too aggressively → increase the base
     // If vision corrections feel sluggish or ignored → decrease the base
-    public static final double kSingleTagBaseXYStdDev = 0.5; // base error in meters at 1m distance
+    public static final double kSingleTagBaseXYStdDev = 1.5; // base error in meters at 1m distance
     public static final double kSingleTagBaseHeadingStdDev =
         Double.MAX_VALUE; // don't trust single-tag heading
-    public static final double kMultiTagBaseXYStdDev = 0.3; // base error in meters at 1m distance
+    public static final double kMultiTagBaseXYStdDev = 1.0; // base error in meters at 1m distance
     public static final double kMultiTagBaseHeadingStdDev =
-        0.1; // base error in radians at 1m (~5.7 deg)
+        0.45; // base error in radians at 1m (~34 deg)
     // Use different exponents for single vs multi case because in multi tag you have more corners
     // of april tags (4 each) to rely on
     public static final double kSingleTagDistanceExponent = 2.0; // quadratic scaling
@@ -235,7 +235,7 @@ public final class Constants {
 
     // Acceptance rules
     public static final int kMinAprilTagsForPose = 1;
-    public static final double kMaxAcceptableSingleTagAmbiguity = 0.2;
+    public static final double kMaxAcceptableSingleTagAmbiguity = 0.3;
 
     // Pose sanity / QC filters
     public static final double kMaxPoseHeightMeters =
@@ -258,7 +258,7 @@ public final class Constants {
     public static final double kSimAvgLatencyMs = 35.0;
     public static final double kSimLatencyStdDevMs = 5.0;
     public static final int kSimCameraFPS = 20;
-    public static final double kSimMaxSightRangeMeters = 2.0; // max range for tag detection in sim
+    public static final double kSimMaxSightRangeMeters = kMaxSingleTagDistanceMeters; //4.0; // max range for tag detection in sim
   }
 
   public static class AimBotConstants {
