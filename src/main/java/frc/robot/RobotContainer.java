@@ -49,7 +49,8 @@ public class RobotContainer {
       1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
   // speed
   private double MaxAngularRate =
-      RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max
+      RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second
+  // max
   // angular velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
@@ -110,7 +111,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     // NamedCommands.registerCommand(
-    //    "ShootingCommand", new ShootingCommand(m_LeftShooter, m_RightShooter));
+    // "ShootingCommand", new ShootingCommand(m_LeftShooter, m_RightShooter));
     NamedCommands.registerCommand("ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter));
     NamedCommands.registerCommand("FeederOn", new FeederOn(m_LeftFeeder, m_RightFeeder));
     NamedCommands.registerCommand("ExtendIntake", new ExtendIntake(m_Intake));
@@ -131,24 +132,46 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-
+    boolean ps4Controller_drive = true;
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
-    m_DriveTrain.setDefaultCommand(
-        // Drivetrain will execute this command periodically
-        m_DriveTrain.applyRequest(
-            () ->
-                m_DriveField
-                    .withVelocityX(
-                        -m_ps4Controller.getLeftY()
-                            * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(
-                        -m_ps4Controller.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(
-                        -m_ps4Controller.getRightX()
-                            * MaxAngularRate) // Drive counterclockwise with
-            // negative X (left)
-            ));
+    if (ps4Controller_drive) {
+      m_DriveTrain.setDefaultCommand(
+          // Drivetrain will execute this command periodically
+          m_DriveTrain.applyRequest(
+              () ->
+                  m_DriveField
+                      .withVelocityX(
+                          -m_ps4Controller.getLeftY()
+                              * MaxSpeed) // Drive forward with negative Y (forward)
+                      .withVelocityY(
+                          -m_ps4Controller.getLeftX()
+                              * MaxSpeed) // Drive left with negative X (left)
+                      .withRotationalRate(
+                          -m_ps4Controller.getRightX()
+                              * MaxAngularRate) // Drive counterclockwise with
+              // negative X (left)
+              ));
+
+    } else {
+      m_DriveTrain.setDefaultCommand(
+          // Drivetrain will execute this command periodically
+          m_DriveTrain.applyRequest(
+              () ->
+                  m_DriveField
+                      .withVelocityX(
+                          -m_xboxController.getLeftY()
+                              * MaxSpeed) // Drive forward with negative Y (forward)
+                      .withVelocityY(
+                          -m_xboxController.getLeftX() * MaxSpeed) // Drive left with negative X
+                      // (left)
+                      .withRotationalRate(
+                          -m_xboxController.getRightX()
+                              * MaxAngularRate) // Drive counterclockwise with
+              // negative X (left)
+              ));
+    }
+
     // Idle while the robot is disabled. This ensures the configured
     // neutral mode is applied to the drive motors while disabled.
     final var idle = new SwerveRequest.Idle();
