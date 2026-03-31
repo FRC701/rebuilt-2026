@@ -44,7 +44,7 @@ public class LaunchToggle extends InstantCommand {
       m_LeftShooter.m_ShooterEnumState = ShooterEnumState.S_Shooting;
       m_RightShooter.m_ShooterEnumState = ShooterEnumState.S_Shooting;
       m_LeftFeeder.m_FeederState = FeederState.S_On;
-      m_LeftFeeder.m_FeederState = FeederState.S_On;
+      m_RightFeeder.m_FeederState = FeederState.S_On;
     }
   }
 }
