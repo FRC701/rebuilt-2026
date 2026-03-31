@@ -4,28 +4,44 @@
     {
       "anchor": {
         "x": 3.5,
-        "y": 0.75
+        "y": 6.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.732941594154842,
-        "y": 0.6448790412105152
+        "x": 4.259097673760716,
+        "y": 5.611407881458047
       },
       "isLocked": false,
-      "linkedName": "RightTrenchStart"
+      "linkedName": "LeftBumpStart"
     },
     {
       "anchor": {
-        "x": 3.0,
-        "y": 2.5
+        "x": 5.615918966259288,
+        "y": 5.794361971622405
       },
       "prevControl": {
-        "x": 2.9606235436838984,
-        "y": 2.18305851376102
+        "x": 4.856011235948853,
+        "y": 5.899955056179561
+      },
+      "nextControl": {
+        "x": 6.24184123776655,
+        "y": 5.707386855163893
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.719685393258425,
+        "y": 5.594224719101123
+      },
+      "prevControl": {
+        "x": 6.878377833315014,
+        "y": 5.675128647954577
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "RightShootPos"
+      "linkedName": "LeftNeutralOpp"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +58,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 40.0
+    "rotation": -90.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

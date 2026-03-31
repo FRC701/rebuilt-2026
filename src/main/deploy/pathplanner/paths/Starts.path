@@ -4,15 +4,15 @@
     {
       "anchor": {
         "x": 3.5,
-        "y": 7.25
+        "y": 4.0
       },
       "prevControl": null,
       "nextControl": {
         "x": 3.289102920062154,
-        "y": 7.115752386711383
+        "y": 3.8657523867113834
       },
       "isLocked": false,
-      "linkedName": "LeftTrenchStart"
+      "linkedName": "Hub"
     },
     {
       "anchor": {
@@ -48,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 5.0,
-    "rotation": -90.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }
