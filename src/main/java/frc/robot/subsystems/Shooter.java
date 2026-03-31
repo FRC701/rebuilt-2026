@@ -165,7 +165,8 @@ public class Shooter extends SubsystemBase {
 
   // Uses PID to arrive at our shooting speed
   public void shooting() {
-    m_ShooterMotor.setControl(voltSpeed.withVelocity(Constants.ShooterConstants.shootRev));
+    //m_ShooterMotor.setControl(voltSpeed.withVelocity(Constants.ShooterConstants.shootRev));
+    m_ShooterMotor.setControl(voltSpeed.withVelocity(speed(DistanceToHub())));
     m_Agitator.m_AgitatorState = AgitatorState.S_In;
   }
 
