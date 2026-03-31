@@ -30,6 +30,9 @@ public final class Constants {
     public static final double kAgitatorVoltIn = 4;
     public static final double kAgitatorVoltOut = -4;
     public static final double kAgitatorVoltIdle = 3;
+    // Simulation
+    public static final double kSimAgitatorGearRatio = 2; // also a planetary
+    public static final double kSimAgitatorMOI = 0.001; // kg*m^2
   }
 
   // Feeder Motor Ids = 30s
@@ -38,6 +41,9 @@ public final class Constants {
     public static final int kFeederRightMotor = 32;
     // 3 is a placeholder for motor voltage
     public static final double kFeederVolt = 3;
+    // Simulation
+    public static final double kSimFeederGearRatio = 2; // also a planetary
+    public static final double kSimFeederMOI = 0.0001; // kg*m^2
   }
 
   // Climber Motor Ids = 60s
@@ -95,7 +101,7 @@ public final class Constants {
     // Simulation
     public static final double kSimArmGearRatio = 15.0;
     public static final double kSimArmMOI = 0.1; // kg*m^2 (mechanism side)
-    public static final double kSimRollerGearRatio = 1.0;
+    public static final double kSimRollerGearRatio = 1.33; // also a planetary
     public static final double kSimRollerMOI = 0.001; // kg*m^2
   }
 
@@ -124,8 +130,8 @@ public final class Constants {
     // Shaft A: 2x stealth(0.000141) + 1x SS flywheel(0.000790) = 0.00107
     // Shaft B: 2x stealth(0.000141) = 0.00028
     // Total mechanism-side MOI per motor = 0.00135 kg*m^2
-    public static final double kSimGearRatio = 4.0;
-    public static final double kSimMOI = 0.00135; // kg*m^2
+    public static final double kSimGearRatio = 1.29;
+    public static final double kSimMOI = 0.002; // kg*m^2
   }
 
   public static final class Vision {
@@ -216,12 +222,12 @@ public final class Constants {
     // Formula: stdDev = base * (avgDistance ^ exponent)
     // If the robot snaps/jumps to vision poses too aggressively → increase the base
     // If vision corrections feel sluggish or ignored → decrease the base
-    public static final double kSingleTagBaseXYStdDev = 0.5; // base error in meters at 1m distance
+    public static final double kSingleTagBaseXYStdDev = 1.5; // base error in meters at 1m distance
     public static final double kSingleTagBaseHeadingStdDev =
         Double.MAX_VALUE; // don't trust single-tag heading
-    public static final double kMultiTagBaseXYStdDev = 0.3; // base error in meters at 1m distance
+    public static final double kMultiTagBaseXYStdDev = 1.0; // base error in meters at 1m distance
     public static final double kMultiTagBaseHeadingStdDev =
-        0.1; // base error in radians at 1m (~5.7 deg)
+        0.45; // base error in radians at 1m (~34 deg)
     // Use different exponents for single vs multi case because in multi tag you have more corners
     // of april tags (4 each) to rely on
     public static final double kSingleTagDistanceExponent = 2.0; // quadratic scaling
@@ -229,7 +235,7 @@ public final class Constants {
 
     // Acceptance rules
     public static final int kMinAprilTagsForPose = 1;
-    public static final double kMaxAcceptableSingleTagAmbiguity = 0.2;
+    public static final double kMaxAcceptableSingleTagAmbiguity = 0.3;
 
     // Pose sanity / QC filters
     public static final double kMaxPoseHeightMeters =
@@ -252,7 +258,8 @@ public final class Constants {
     public static final double kSimAvgLatencyMs = 35.0;
     public static final double kSimLatencyStdDevMs = 5.0;
     public static final int kSimCameraFPS = 20;
-    public static final double kSimMaxSightRangeMeters = 5.0; // max range for tag detection in sim
+    public static final double kSimMaxSightRangeMeters =
+        kMaxSingleTagDistanceMeters; // 4.0; // max range for tag detection in sim
   }
 
   public static class AimBotConstants {

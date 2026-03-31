@@ -54,7 +54,10 @@ public class Agitator extends SubsystemBase {
       m_simState = m_AgitatorLeftMotor.getSimState();
       m_flywheelSim =
           new FlywheelSim(
-              LinearSystemId.createFlywheelSystem(DCMotor.getKrakenX44Foc(1), 0.001, 1.0),
+              LinearSystemId.createFlywheelSystem(
+                  DCMotor.getKrakenX44Foc(1),
+                  Constants.AgitatorConstants.kSimAgitatorMOI,
+                  Constants.AgitatorConstants.kSimAgitatorGearRatio),
               DCMotor.getKrakenX44Foc(1));
     }
   }
