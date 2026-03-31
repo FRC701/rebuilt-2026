@@ -46,6 +46,61 @@
           "data": {
             "pathName": "SlightTurnLeftBumpBackwards"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftBumpToNeutral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ExtendIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftNeutralToDisrupt"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RightNeutralToShoot"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShootCommand"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "FeederOn"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopShooting"
+          }
         }
       ]
     }

@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 3.5,
-        "y": 0.75
+        "y": 0.8
       },
       "prevControl": null,
       "nextControl": {
         "x": 3.732941594154842,
-        "y": 0.6448790412105152
+        "y": 0.6948790412105152
       },
       "isLocked": false,
       "linkedName": "RightTrenchStart"
