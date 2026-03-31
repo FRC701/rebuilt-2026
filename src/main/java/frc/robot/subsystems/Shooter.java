@@ -31,7 +31,7 @@ public class Shooter extends SubsystemBase {
   public ShooterEnumState m_ShooterEnumState;
 
   private Agitator m_Agitator;
-  private Boolean m_AgitatorOff;
+  private boolean m_AgitatorOff;
 
   // Boolean to track the enabled status
   private boolean m_ShooterEnabled = true;
