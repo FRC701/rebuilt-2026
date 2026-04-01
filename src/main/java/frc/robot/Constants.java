@@ -271,4 +271,13 @@ public final class Constants {
     public static final double kI = 0.0;
     public static final double kD = 0.0;
   }
+
+  public static class UtilityConstants {
+    public static final boolean tuningMode = false;
+    public static boolean disableHAL = false;
+
+    public static void disableHAL() {
+      disableHAL = true;
+    }
+  }
 }

@@ -5,14 +5,14 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package org.littletonrobotics.frc2026.util;
+package frc.robot.Utility;
 
+import frc.robot.Constants;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.frc2026.Constants;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
@@ -58,7 +58,7 @@ public class LoggedTunableNumber implements DoubleSupplier {
     if (!hasDefault) {
       hasDefault = true;
       this.defaultValue = defaultValue;
-      if (Constants.tuningMode && !Constants.disableHAL) {
+      if (Constants.UtilityConstants.tuningMode && !Constants.UtilityConstants.disableHAL) {
         dashboardNumber = new LoggedNetworkNumber(key, defaultValue);
       }
     }
@@ -73,7 +73,9 @@ public class LoggedTunableNumber implements DoubleSupplier {
     if (!hasDefault) {
       return 0.0;
     } else {
-      return Constants.tuningMode && !Constants.disableHAL ? dashboardNumber.get() : defaultValue;
+      return Constants.UtilityConstants.tuningMode && !Constants.UtilityConstants.disableHAL
+          ? dashboardNumber.get()
+          : defaultValue;
     }
   }
 
