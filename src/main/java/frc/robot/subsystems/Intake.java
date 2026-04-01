@@ -214,7 +214,6 @@ public class Intake extends SubsystemBase {
   }
 
   public void CycleUp() {
-    m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
     m_Timer.start();
     m_IntakeMotorRoller.setVoltage(7);
     if (m_Timer.hasElapsed(0.15)) {
@@ -227,7 +226,6 @@ public class Intake extends SubsystemBase {
 
   public void Down() {
     // If motor has reached its destination the stop the arm and start the rollers
-    m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
     m_Timer.start();
     m_IntakeMotorRoller.setVoltage(7);
     if (m_Timer.hasElapsed(0.35)) {
@@ -254,7 +252,6 @@ public class Intake extends SubsystemBase {
   // Extends the intake out and starts the rollers
   public void ExtendPosition() {
     // If motor has reached its destination the stop the arm and start the rollers
-    m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
     m_IntakeMotorRoller.setVoltage(6.5);
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeState = IntakeState.S_Down;

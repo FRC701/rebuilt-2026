@@ -27,9 +27,8 @@ public final class Constants {
   public static class AgitatorConstants {
     public static final int kAgitatorLeftMotor = 21;
     public static final int kAgitatorRightMotor = 22;
-    public static final double kAgitatorVoltIn = 4;
+    public static final double kAgitatorVoltIn = 6;
     public static final double kAgitatorVoltOut = -4;
-    public static final double kAgitatorVoltIdle = 3;
     // Simulation
     public static final double kSimAgitatorGearRatio = 2; // also a planetary
     public static final double kSimAgitatorMOI = 0.001; // kg*m^2
