@@ -69,8 +69,7 @@ public class Agitator extends SubsystemBase {
   public enum AgitatorState {
     S_In,
     S_Off,
-    S_Out,
-    S_Idle
+    S_Out
   }
 
   public void runAgitatorState() {
@@ -83,9 +82,6 @@ public class Agitator extends SubsystemBase {
         break;
       case S_Out:
         AgitatorOuttaking();
-        break;
-      case S_Idle:
-        AgitatorIdling();
         break;
     }
   }
@@ -102,10 +98,6 @@ public class Agitator extends SubsystemBase {
 
   public void AgitatorOuttaking() {
     m_AgitatorLeftMotor.setVoltage(Constants.AgitatorConstants.kAgitatorVoltIn);
-  }
-
-  public void AgitatorIdling() {
-    m_AgitatorLeftMotor.setVoltage(Constants.AgitatorConstants.kAgitatorVoltIdle);
   }
 
   @Override

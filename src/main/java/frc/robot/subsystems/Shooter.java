@@ -31,7 +31,6 @@ public class Shooter extends SubsystemBase {
   public ShooterEnumState m_ShooterEnumState;
 
   private Agitator m_Agitator;
-  private boolean m_AgitatorOff;
 
   // Boolean to track the enabled status
   private boolean m_ShooterEnabled = true;
@@ -159,8 +158,7 @@ public class Shooter extends SubsystemBase {
   // Sets the speed to 0 by using a VelocityVotage object with 0 velocity
   public void stopping() {
     m_ShooterMotor.setVoltage(0);
-    if (m_AgitatorOff) m_Agitator.m_AgitatorState = AgitatorState.S_Off;
-    else m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
+    m_Agitator.m_AgitatorState = AgitatorState.S_Off;
   }
 
   private boolean setEnabledStatus(boolean shooterStatus) {
@@ -187,9 +185,6 @@ public class Shooter extends SubsystemBase {
     if (m_ShooterEnabled) {
       runShooterStates();
     }
-
-    if (m_Agitator.m_AgitatorState == AgitatorState.S_Off) m_AgitatorOff = true;
-    else m_AgitatorOff = false;
   }
 
   @Override
