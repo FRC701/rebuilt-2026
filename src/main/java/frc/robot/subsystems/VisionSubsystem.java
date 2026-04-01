@@ -14,6 +14,7 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Utility.LoggedTunableNumber;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -341,22 +342,35 @@ public class VisionSubsystem extends SubsystemBase {
     }
     double avgDistance = totalDistance / estimatedPose.targetsUsed.size();
 
-    double baseXY;
-    double baseHeading;
-    double exponent;
+    // double
+    LoggedTunableNumber baseXY;
+    LoggedTunableNumber baseHeading;
+    LoggedTunableNumber exponent;
     if (isMultiTag) {
-      baseXY = Constants.Vision.kMultiTagBaseXYStdDev;
-      baseHeading = Constants.Vision.kMultiTagBaseHeadingStdDev;
-      exponent = Constants.Vision.kMultiTagDistanceExponent;
+      baseXY =
+          new LoggedTunableNumber(
+              "Vision/MultiBaseXY",
+              Constants.Vision.kMultiTagBaseXYStdDev); // Constants.Vision.kMultiTagBaseXYStdDev;
+      baseHeading =
+          new LoggedTunableNumber(
+              "Vision/MultiBaseHeading", Constants.Vision.kMultiTagBaseHeadingStdDev);
+      exponent =
+          new LoggedTunableNumber(
+              "Vision/Multiexponent", Constants.Vision.kMultiTagDistanceExponent);
     } else {
-      baseXY = Constants.Vision.kSingleTagBaseXYStdDev;
-      baseHeading = Constants.Vision.kSingleTagBaseHeadingStdDev;
-      exponent = Constants.Vision.kSingleTagDistanceExponent;
+      baseXY =
+          new LoggedTunableNumber("Vision/MultiBaseXY", Constants.Vision.kSingleTagBaseXYStdDev);
+      baseHeading =
+          new LoggedTunableNumber(
+              "Vision/SingleBaseHeading", Constants.Vision.kSingleTagBaseHeadingStdDev);
+      exponent =
+          new LoggedTunableNumber(
+              "Vision/SingleExponent", Constants.Vision.kSingleTagDistanceExponent);
     }
 
-    double distanceFactor = Math.pow(avgDistance, exponent);
-    double xyStdDev = baseXY * distanceFactor;
-    double headingStdDev = baseHeading * distanceFactor;
+    double distanceFactor = Math.pow(avgDistance, exponent.getAsDouble());
+    double xyStdDev = baseXY.getAsDouble() * distanceFactor;
+    double headingStdDev = baseHeading.getAsDouble() * distanceFactor;
 
     return VecBuilder.fill(xyStdDev, xyStdDev, headingStdDev);
   }
