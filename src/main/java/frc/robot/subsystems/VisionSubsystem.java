@@ -54,6 +54,21 @@ public class VisionSubsystem extends SubsystemBase {
           .getStructTopic("Vision/Reverse/Pose", Pose2d.struct)
           .publish();
 
+  // Tunable std dev parameters — multi-tag
+  private static final LoggedTunableNumber multiBaseXY =
+      new LoggedTunableNumber("Vision/MultiBaseXY", Constants.Vision.kMultiTagBaseXYStdDev);
+  private static final LoggedTunableNumber multiBaseHeading =
+      new LoggedTunableNumber("Vision/MultiBaseHeading", Constants.Vision.kMultiTagBaseHeadingStdDev);
+  private static final LoggedTunableNumber multiExponent =
+      new LoggedTunableNumber("Vision/MultiExponent", Constants.Vision.kMultiTagDistanceExponent);
+
+  // Tunable std dev parameters — single-tag
+  private static final LoggedTunableNumber singleBaseXY =
+      new LoggedTunableNumber("Vision/SingleBaseXY", Constants.Vision.kSingleTagBaseXYStdDev);
+  private static final LoggedTunableNumber singleBaseHeading =
+      new LoggedTunableNumber("Vision/SingleBaseHeading", Constants.Vision.kSingleTagBaseHeadingStdDev);
+  private static final LoggedTunableNumber singleExponent =
+      new LoggedTunableNumber("Vision/SingleExponent", Constants.Vision.kSingleTagDistanceExponent);
   // Simulation support
   private VisionSystemSim m_visionSim;
   private Pose2d m_simRobotPose = new Pose2d();
@@ -342,35 +357,13 @@ public class VisionSubsystem extends SubsystemBase {
     }
     double avgDistance = totalDistance / estimatedPose.targetsUsed.size();
 
-    // double
-    LoggedTunableNumber baseXY;
-    LoggedTunableNumber baseHeading;
-    LoggedTunableNumber exponent;
-    if (isMultiTag) {
-      baseXY =
-          new LoggedTunableNumber(
-              "Vision/MultiBaseXY",
-              Constants.Vision.kMultiTagBaseXYStdDev); // Constants.Vision.kMultiTagBaseXYStdDev;
-      baseHeading =
-          new LoggedTunableNumber(
-              "Vision/MultiBaseHeading", Constants.Vision.kMultiTagBaseHeadingStdDev);
-      exponent =
-          new LoggedTunableNumber(
-              "Vision/Multiexponent", Constants.Vision.kMultiTagDistanceExponent);
-    } else {
-      baseXY =
-          new LoggedTunableNumber("Vision/MultiBaseXY", Constants.Vision.kSingleTagBaseXYStdDev);
-      baseHeading =
-          new LoggedTunableNumber(
-              "Vision/SingleBaseHeading", Constants.Vision.kSingleTagBaseHeadingStdDev);
-      exponent =
-          new LoggedTunableNumber(
-              "Vision/SingleExponent", Constants.Vision.kSingleTagDistanceExponent);
-    }
+    LoggedTunableNumber xyTunable = isMultiTag ? multiBaseXY : singleBaseXY;
+    LoggedTunableNumber headingTunable = isMultiTag ? multiBaseHeading : singleBaseHeading;
+    LoggedTunableNumber exponentTunable = isMultiTag ? multiExponent : singleExponent;
 
-    double distanceFactor = Math.pow(avgDistance, exponent.getAsDouble());
-    double xyStdDev = baseXY.getAsDouble() * distanceFactor;
-    double headingStdDev = baseHeading.getAsDouble() * distanceFactor;
+    double distanceFactor = Math.pow(avgDistance, exponentTunable.getAsDouble());
+    double xyStdDev = xyTunable.getAsDouble() * distanceFactor;
+    double headingStdDev = headingTunable.getAsDouble() * distanceFactor;
 
     return VecBuilder.fill(xyStdDev, xyStdDev, headingStdDev);
   }
