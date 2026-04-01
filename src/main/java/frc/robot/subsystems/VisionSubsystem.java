@@ -58,7 +58,8 @@ public class VisionSubsystem extends SubsystemBase {
   private static final LoggedTunableNumber multiBaseXY =
       new LoggedTunableNumber("Vision/MultiBaseXY", Constants.Vision.kMultiTagBaseXYStdDev);
   private static final LoggedTunableNumber multiBaseHeading =
-      new LoggedTunableNumber("Vision/MultiBaseHeading", Constants.Vision.kMultiTagBaseHeadingStdDev);
+      new LoggedTunableNumber(
+          "Vision/MultiBaseHeading", Constants.Vision.kMultiTagBaseHeadingStdDev);
   private static final LoggedTunableNumber multiExponent =
       new LoggedTunableNumber("Vision/MultiExponent", Constants.Vision.kMultiTagDistanceExponent);
 
@@ -66,7 +67,8 @@ public class VisionSubsystem extends SubsystemBase {
   private static final LoggedTunableNumber singleBaseXY =
       new LoggedTunableNumber("Vision/SingleBaseXY", Constants.Vision.kSingleTagBaseXYStdDev);
   private static final LoggedTunableNumber singleBaseHeading =
-      new LoggedTunableNumber("Vision/SingleBaseHeading", Constants.Vision.kSingleTagBaseHeadingStdDev);
+      new LoggedTunableNumber(
+          "Vision/SingleBaseHeading", Constants.Vision.kSingleTagBaseHeadingStdDev);
   private static final LoggedTunableNumber singleExponent =
       new LoggedTunableNumber("Vision/SingleExponent", Constants.Vision.kSingleTagDistanceExponent);
   // Simulation support
