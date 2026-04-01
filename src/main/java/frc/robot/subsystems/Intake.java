@@ -99,9 +99,9 @@ public class Intake extends SubsystemBase {
                     .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(40))
+                    .withStatorCurrentLimit(Amps.of(60))
                     .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(40));
+                    .withSupplyCurrentLimit(60));
 
     var m_rollerConfigs =
         new TalonFXConfiguration()
