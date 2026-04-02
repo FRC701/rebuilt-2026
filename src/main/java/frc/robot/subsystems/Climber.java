@@ -59,11 +59,11 @@ public class Climber extends SubsystemBase {
     m_ClimberFollower.getConfigurator().apply(m_TalonFXConfig);
 
     var Slot0Configs = new Slot0Configs();
-    Slot0Configs.kS = Constants.ClimberConstants.kS;
-    Slot0Configs.kG = Constants.ClimberConstants.kG;
-    Slot0Configs.kP = Constants.ClimberConstants.kP;
-    Slot0Configs.kI = Constants.ClimberConstants.kI;
-    Slot0Configs.kD = Constants.ClimberConstants.kD;
+    Slot0Configs.kS = Constants.ClimberConstants.kS.get();
+    Slot0Configs.kG = Constants.ClimberConstants.kG.get();
+    Slot0Configs.kP = Constants.ClimberConstants.kP.get();
+    Slot0Configs.kI = Constants.ClimberConstants.kI.get();
+    Slot0Configs.kD = Constants.ClimberConstants.kD.get();
 
     m_ClimberLeader.getConfigurator().apply(Slot0Configs);
 

@@ -54,23 +54,6 @@ public class VisionSubsystem extends SubsystemBase {
           .getStructTopic("Vision/Reverse/Pose", Pose2d.struct)
           .publish();
 
-  // Tunable std dev parameters — multi-tag
-  private static final LoggedTunableNumber multiBaseXY =
-      new LoggedTunableNumber("Vision/MultiBaseXY", Constants.Vision.kMultiTagBaseXYStdDev);
-  private static final LoggedTunableNumber multiBaseHeading =
-      new LoggedTunableNumber(
-          "Vision/MultiBaseHeading", Constants.Vision.kMultiTagBaseHeadingStdDev);
-  private static final LoggedTunableNumber multiExponent =
-      new LoggedTunableNumber("Vision/MultiExponent", Constants.Vision.kMultiTagDistanceExponent);
-
-  // Tunable std dev parameters — single-tag
-  private static final LoggedTunableNumber singleBaseXY =
-      new LoggedTunableNumber("Vision/SingleBaseXY", Constants.Vision.kSingleTagBaseXYStdDev);
-  private static final LoggedTunableNumber singleBaseHeading =
-      new LoggedTunableNumber(
-          "Vision/SingleBaseHeading", Constants.Vision.kSingleTagBaseHeadingStdDev);
-  private static final LoggedTunableNumber singleExponent =
-      new LoggedTunableNumber("Vision/SingleExponent", Constants.Vision.kSingleTagDistanceExponent);
   // Simulation support
   private VisionSystemSim m_visionSim;
   private Pose2d m_simRobotPose = new Pose2d();
@@ -359,9 +342,12 @@ public class VisionSubsystem extends SubsystemBase {
     }
     double avgDistance = totalDistance / estimatedPose.targetsUsed.size();
 
-    LoggedTunableNumber xyTunable = isMultiTag ? multiBaseXY : singleBaseXY;
-    LoggedTunableNumber headingTunable = isMultiTag ? multiBaseHeading : singleBaseHeading;
-    LoggedTunableNumber exponentTunable = isMultiTag ? multiExponent : singleExponent;
+    LoggedTunableNumber xyTunable =
+        isMultiTag ? Constants.Vision.kMultiTagBaseXYStdDev : Constants.Vision.kSingleTagBaseXYStdDev;
+    LoggedTunableNumber headingTunable =
+        isMultiTag ? Constants.Vision.kMultiTagBaseHeadingStdDev : Constants.Vision.kSingleTagBaseHeadingStdDev;
+    LoggedTunableNumber exponentTunable =
+        isMultiTag ? Constants.Vision.kMultiTagDistanceExponent : Constants.Vision.kSingleTagDistanceExponent;
 
     double distanceFactor = Math.pow(avgDistance, exponentTunable.getAsDouble());
     double xyStdDev = xyTunable.getAsDouble() * distanceFactor;

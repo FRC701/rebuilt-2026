@@ -58,7 +58,9 @@ public class AimAtHub extends Command {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     m_request.HeadingController.setPID(
-        Constants.AimBotConstants.kP, Constants.AimBotConstants.kI, Constants.AimBotConstants.kD);
+        Constants.AimBotConstants.kP.get(),
+        Constants.AimBotConstants.kI.get(),
+        Constants.AimBotConstants.kD.get());
     m_request.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
 
     addRequirements(drivetrain);

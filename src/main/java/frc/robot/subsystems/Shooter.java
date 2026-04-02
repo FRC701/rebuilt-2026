@@ -79,11 +79,11 @@ public class Shooter extends SubsystemBase {
 
     // Configs that use the PID values to help with motor speed
     Slot0Configs Slot0Configs = m_TalonFXConfig.Slot0;
-    Slot0Configs.kP = Constants.ShooterConstants.kP;
-    Slot0Configs.kI = Constants.ShooterConstants.kI;
-    Slot0Configs.kD = Constants.ShooterConstants.kD;
-    Slot0Configs.kV = Constants.ShooterConstants.kV;
-    Slot0Configs.kS = Constants.ShooterConstants.kS;
+    Slot0Configs.kP = Constants.ShooterConstants.kP.get();
+    Slot0Configs.kI = Constants.ShooterConstants.kI.get();
+    Slot0Configs.kD = Constants.ShooterConstants.kD.get();
+    Slot0Configs.kV = Constants.ShooterConstants.kV.get();
+    Slot0Configs.kS = Constants.ShooterConstants.kS.get();
 
     // Applying the configs to the motors
     m_ShooterMotor.getConfigurator().apply(m_TalonFXConfig);

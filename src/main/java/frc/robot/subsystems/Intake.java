@@ -112,31 +112,31 @@ public class Intake extends SubsystemBase {
                     .withSupplyCurrentLimit(60));
 
     var Slot0Configs = m_armConfigs.Slot0; // pid for moving down
-    Slot0Configs.kP = Constants.IntakeConstants.ExtendkP;
-    Slot0Configs.kI = Constants.IntakeConstants.ExtendkI;
-    Slot0Configs.kD = Constants.IntakeConstants.ExtendkD;
-    Slot0Configs.kS = Constants.IntakeConstants.ExtendkS;
-    Slot0Configs.kV = Constants.IntakeConstants.ExtendkV;
-    Slot0Configs.kA = Constants.IntakeConstants.ExtendkA;
-    Slot0Configs.kG = Constants.IntakeConstants.ExtendkG;
+    Slot0Configs.kP = Constants.IntakeConstants.ExtendkP.get();
+    Slot0Configs.kI = Constants.IntakeConstants.ExtendkI.get();
+    Slot0Configs.kD = Constants.IntakeConstants.ExtendkD.get();
+    Slot0Configs.kS = Constants.IntakeConstants.ExtendkS.get();
+    Slot0Configs.kV = Constants.IntakeConstants.ExtendkV.get();
+    Slot0Configs.kA = Constants.IntakeConstants.ExtendkA.get();
+    Slot0Configs.kG = Constants.IntakeConstants.ExtendkG.get();
 
     var Slot1Configs = m_armConfigs.Slot1; // pid for moving up
-    Slot1Configs.kP = Constants.IntakeConstants.RetractkP;
-    Slot1Configs.kI = Constants.IntakeConstants.RetractkI;
-    Slot1Configs.kD = Constants.IntakeConstants.RetractkD;
-    Slot1Configs.kS = Constants.IntakeConstants.RetractkS;
-    Slot1Configs.kV = Constants.IntakeConstants.RetractkV;
-    Slot1Configs.kA = Constants.IntakeConstants.RetractkA;
-    Slot1Configs.kG = Constants.IntakeConstants.RetractkG;
+    Slot1Configs.kP = Constants.IntakeConstants.RetractkP.get();
+    Slot1Configs.kI = Constants.IntakeConstants.RetractkI.get();
+    Slot1Configs.kD = Constants.IntakeConstants.RetractkD.get();
+    Slot1Configs.kS = Constants.IntakeConstants.RetractkS.get();
+    Slot1Configs.kV = Constants.IntakeConstants.RetractkV.get();
+    Slot1Configs.kA = Constants.IntakeConstants.RetractkA.get();
+    Slot1Configs.kG = Constants.IntakeConstants.RetractkG.get();
 
     var Slot2Configs = m_armConfigs.Slot2; // pid for holding intake position once it is down
-    Slot2Configs.kP = Constants.IntakeConstants.DownkP;
-    Slot2Configs.kI = Constants.IntakeConstants.DownkI;
-    Slot2Configs.kD = Constants.IntakeConstants.DownkD;
-    Slot2Configs.kS = Constants.IntakeConstants.DownkS;
-    Slot2Configs.kV = Constants.IntakeConstants.DownkV;
-    Slot2Configs.kA = Constants.IntakeConstants.DownkA;
-    Slot2Configs.kG = Constants.IntakeConstants.DownkG;
+    Slot2Configs.kP = Constants.IntakeConstants.DownkP.get();
+    Slot2Configs.kI = Constants.IntakeConstants.DownkI.get();
+    Slot2Configs.kD = Constants.IntakeConstants.DownkD.get();
+    Slot2Configs.kS = Constants.IntakeConstants.DownkS.get();
+    Slot2Configs.kV = Constants.IntakeConstants.DownkV.get();
+    Slot2Configs.kA = Constants.IntakeConstants.DownkA.get();
+    Slot2Configs.kG = Constants.IntakeConstants.DownkG.get();
 
     // Corrects the direction of rolling
     MotorOutputConfigs ArmOutputConfigs = m_armConfigs.MotorOutput;

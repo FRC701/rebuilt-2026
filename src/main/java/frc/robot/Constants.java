@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Utility.LoggedTunableNumber;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -57,11 +58,11 @@ public final class Constants {
     public static final double kLockPosition = 0;
 
     // PID Constants for Climbing
-    public static final double kP = 0.1;
-    public static final double kI = 0.1;
-    public static final double kD = 0;
-    public static final double kS = 0;
-    public static final double kG = 0;
+    public static final LoggedTunableNumber kP = new LoggedTunableNumber("Climber/kP", 0.1);
+    public static final LoggedTunableNumber kI = new LoggedTunableNumber("Climber/kI", 0.1);
+    public static final LoggedTunableNumber kD = new LoggedTunableNumber("Climber/kD", 0);
+    public static final LoggedTunableNumber kS = new LoggedTunableNumber("Climber/kS", 0);
+    public static final LoggedTunableNumber kG = new LoggedTunableNumber("Climber/kG", 0);
   }
 
   public static class IntakeConstants {
@@ -73,29 +74,29 @@ public final class Constants {
     public static final double kRetractPosition = 0; // Intake is retract ed and in the bot
 
     // PID Constants for Intake Extension
-    public static final double ExtendkP = 1.51337; // 1.51227
-    public static final double ExtendkI = 0; // 0
-    public static final double ExtendkD = 0.3; // 0.3
-    public static final double ExtendkS = 2.4686; // 2.4686
-    public static final double ExtendkV = 1; // 1
-    public static final double ExtendkA = 1.01164; // 1.01164
-    public static final double ExtendkG = 1; // 0.46724, 1
+    public static final LoggedTunableNumber ExtendkP = new LoggedTunableNumber("Intake/Extend/kP", 1.51337);
+    public static final LoggedTunableNumber ExtendkI = new LoggedTunableNumber("Intake/Extend/kI", 0);
+    public static final LoggedTunableNumber ExtendkD = new LoggedTunableNumber("Intake/Extend/kD", 0.3);
+    public static final LoggedTunableNumber ExtendkS = new LoggedTunableNumber("Intake/Extend/kS", 2.4686);
+    public static final LoggedTunableNumber ExtendkV = new LoggedTunableNumber("Intake/Extend/kV", 1);
+    public static final LoggedTunableNumber ExtendkA = new LoggedTunableNumber("Intake/Extend/kA", 1.01164);
+    public static final LoggedTunableNumber ExtendkG = new LoggedTunableNumber("Intake/Extend/kG", 1);
 
-    public static final double RetractkP = 5.0;
-    public static final double RetractkI = 0;
-    public static final double RetractkD = 0.3;
-    public static final double RetractkS = 2.4686;
-    public static final double RetractkV = 1;
-    public static final double RetractkA = 1.01164;
-    public static final double RetractkG = 1.5;
+    public static final LoggedTunableNumber RetractkP = new LoggedTunableNumber("Intake/Retract/kP", 5.0);
+    public static final LoggedTunableNumber RetractkI = new LoggedTunableNumber("Intake/Retract/kI", 0);
+    public static final LoggedTunableNumber RetractkD = new LoggedTunableNumber("Intake/Retract/kD", 0.3);
+    public static final LoggedTunableNumber RetractkS = new LoggedTunableNumber("Intake/Retract/kS", 2.4686);
+    public static final LoggedTunableNumber RetractkV = new LoggedTunableNumber("Intake/Retract/kV", 1);
+    public static final LoggedTunableNumber RetractkA = new LoggedTunableNumber("Intake/Retract/kA", 1.01164);
+    public static final LoggedTunableNumber RetractkG = new LoggedTunableNumber("Intake/Retract/kG", 1.5);
 
-    public static final double DownkP = 1.51337; // 1.51227
-    public static final double DownkI = 0; // 0
-    public static final double DownkD = 0.3; // 0.3
-    public static final double DownkS = 2.4686; // 2.4686
-    public static final double DownkV = 1; // 1
-    public static final double DownkA = 1.01164; // 1.01164
-    public static final double DownkG = 1; // 0.46724, 1
+    public static final LoggedTunableNumber DownkP = new LoggedTunableNumber("Intake/Down/kP", 1.51337);
+    public static final LoggedTunableNumber DownkI = new LoggedTunableNumber("Intake/Down/kI", 0);
+    public static final LoggedTunableNumber DownkD = new LoggedTunableNumber("Intake/Down/kD", 0.3);
+    public static final LoggedTunableNumber DownkS = new LoggedTunableNumber("Intake/Down/kS", 2.4686);
+    public static final LoggedTunableNumber DownkV = new LoggedTunableNumber("Intake/Down/kV", 1);
+    public static final LoggedTunableNumber DownkA = new LoggedTunableNumber("Intake/Down/kA", 1.01164);
+    public static final LoggedTunableNumber DownkG = new LoggedTunableNumber("Intake/Down/kG", 1);
 
     // Simulation
     public static final double kSimArmGearRatio = 15.0;
@@ -112,11 +113,11 @@ public final class Constants {
     public static final int kRightShooterId = 42;
 
     // PID Constants for Shooting
-    public static final double kP = 0.1;
-    public static final double kI = 0;
-    public static final double kD = 0;
-    public static final double kV = 0.12;
-    public static final double kS = 0.1;
+    public static final LoggedTunableNumber kP = new LoggedTunableNumber("Shooter/kP", 0.1);
+    public static final LoggedTunableNumber kI = new LoggedTunableNumber("Shooter/kI", 0);
+    public static final LoggedTunableNumber kD = new LoggedTunableNumber("Shooter/kD", 0);
+    public static final LoggedTunableNumber kV = new LoggedTunableNumber("Shooter/kV", 0.12);
+    public static final LoggedTunableNumber kS = new LoggedTunableNumber("Shooter/kS", 0.1);
 
     /*
      * Desired Rotations per second for shooter Motors
@@ -221,16 +222,19 @@ public final class Constants {
     // Formula: stdDev = base * (avgDistance ^ exponent)
     // If the robot snaps/jumps to vision poses too aggressively → increase the base
     // If vision corrections feel sluggish or ignored → decrease the base
-    public static final double kSingleTagBaseXYStdDev = 1.5; // base error in meters at 1m distance
-    public static final double kSingleTagBaseHeadingStdDev =
-        Double.MAX_VALUE; // don't trust single-tag heading
-    public static final double kMultiTagBaseXYStdDev = 1.0; // base error in meters at 1m distance
-    public static final double kMultiTagBaseHeadingStdDev =
-        0.45; // base error in radians at 1m (~34 deg)
-    // Use different exponents for single vs multi case because in multi tag you have more corners
-    // of april tags (4 each) to rely on
-    public static final double kSingleTagDistanceExponent = 2.0; // quadratic scaling
-    public static final double kMultiTagDistanceExponent = 1.0; // linear scaling
+    public static final LoggedTunableNumber kMultiTagBaseXYStdDev =
+        new LoggedTunableNumber("Vision/Multi/BaseXY", 1.0);
+    public static final LoggedTunableNumber kMultiTagBaseHeadingStdDev =
+        new LoggedTunableNumber("Vision/Multi/BaseHeading", 0.45);
+    public static final LoggedTunableNumber kMultiTagDistanceExponent =
+        new LoggedTunableNumber("Vision/Multi/Exponent", 1.0);
+
+    public static final LoggedTunableNumber kSingleTagBaseXYStdDev =
+        new LoggedTunableNumber("Vision/Single/BaseXY", 1.5);
+    public static final LoggedTunableNumber kSingleTagBaseHeadingStdDev =
+        new LoggedTunableNumber("Vision/Single/BaseHeading", Double.MAX_VALUE);
+    public static final LoggedTunableNumber kSingleTagDistanceExponent =
+        new LoggedTunableNumber("Vision/Single/Exponent", 2.0);
 
     // Acceptance rules
     public static final int kMinAprilTagsForPose = 1;
@@ -267,13 +271,13 @@ public final class Constants {
     public static final double kRedHubYMeters = Units.inchesToMeters(158.845);
 
     // Heading PID constants for aiming at the hub
-    public static final double kP = 7.0;
-    public static final double kI = 0.0;
-    public static final double kD = 0.0;
+    public static final LoggedTunableNumber kP = new LoggedTunableNumber("AimBot/kP", 7.0);
+    public static final LoggedTunableNumber kI = new LoggedTunableNumber("AimBot/kI", 0.0);
+    public static final LoggedTunableNumber kD = new LoggedTunableNumber("AimBot/kD", 0.0);
   }
 
   public static class UtilityConstants {
-    public static final boolean tuningMode = false;
+    public static final boolean tuningMode = true;
     public static boolean disableHAL = false;
 
     public static void disableHAL() {
