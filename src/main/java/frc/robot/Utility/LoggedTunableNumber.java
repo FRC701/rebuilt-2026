@@ -7,13 +7,14 @@
 
 package frc.robot.Utility;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.Constants;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
  * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or
@@ -26,7 +27,7 @@ public class LoggedTunableNumber implements DoubleSupplier {
   private final String key;
   private boolean hasDefault = false;
   private double defaultValue;
-  private LoggedNetworkNumber dashboardNumber;
+  private NetworkTableEntry entry;
   private Map<Integer, Double> lastHasChangedValues = new HashMap<>();
 
   /**
@@ -59,7 +60,8 @@ public class LoggedTunableNumber implements DoubleSupplier {
       hasDefault = true;
       this.defaultValue = defaultValue;
       if (Constants.UtilityConstants.tuningMode && !Constants.UtilityConstants.disableHAL) {
-        dashboardNumber = new LoggedNetworkNumber(key, defaultValue);
+        entry = NetworkTableInstance.getDefault().getEntry(key);
+        entry.setDefaultDouble(defaultValue);
       }
     }
   }
@@ -74,7 +76,7 @@ public class LoggedTunableNumber implements DoubleSupplier {
       return 0.0;
     } else {
       return Constants.UtilityConstants.tuningMode && !Constants.UtilityConstants.disableHAL
-          ? dashboardNumber.get()
+          ? entry.getDouble(defaultValue)
           : defaultValue;
     }
   }
