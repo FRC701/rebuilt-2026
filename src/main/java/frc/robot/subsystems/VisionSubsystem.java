@@ -7,8 +7,12 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -60,15 +64,38 @@ public class VisionSubsystem extends SubsystemBase {
 
   public VisionSubsystem() {
     m_FieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+
+    Transform3d rightTransform =
+        buildTransform(
+            Constants.Vision.kRightRollDeg,
+            Constants.Vision.kRightPitchDeg,
+            Constants.Vision.kRightYawDeg,
+            Constants.Vision.kRightForwardIn,
+            Constants.Vision.kRightLeftIn,
+            Constants.Vision.kRightUpIn);
+    Transform3d forwardTransform =
+        buildTransform(
+            Constants.Vision.kForwardRollDeg,
+            Constants.Vision.kForwardPitchDeg,
+            Constants.Vision.kForwardYawDeg,
+            Constants.Vision.kForwardForwardIn,
+            Constants.Vision.kForwardLeftIn,
+            Constants.Vision.kForwardUpIn);
+    Transform3d reverseTransform =
+        buildTransform(
+            Constants.Vision.kReverseRollDeg,
+            Constants.Vision.kReversePitchDeg,
+            Constants.Vision.kReverseYawDeg,
+            Constants.Vision.kReverseForwardIn,
+            Constants.Vision.kReverseLeftIn,
+            Constants.Vision.kReverseUpIn);
+
     m_RightCamera = new PhotonCamera(Constants.Vision.kRightCameraName);
-    m_RightPoseEstimator =
-        new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kRightRobotToCam3d);
+    m_RightPoseEstimator = new PhotonPoseEstimator(m_FieldLayout, rightTransform);
     m_ForwardCamera = new PhotonCamera(Constants.Vision.kForwardCameraName);
-    m_ForwardPoseEstimator =
-        new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kForwardRobotToCam3d);
+    m_ForwardPoseEstimator = new PhotonPoseEstimator(m_FieldLayout, forwardTransform);
     m_ReverseCamera = new PhotonCamera(Constants.Vision.kReverseCameraName);
-    m_ReversePoseEstimator =
-        new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kReverseRobotToCam3d);
+    m_ReversePoseEstimator = new PhotonPoseEstimator(m_FieldLayout, reverseTransform);
 
     SmartDashboard.putBoolean("Vision/VerboseTelemetry", false);
 
@@ -96,10 +123,28 @@ public class VisionSubsystem extends SubsystemBase {
       forwardCameraSim.setMaxSightRange(Constants.Vision.kSimMaxSightRangeMeters);
       reverseCameraSim.setMaxSightRange(Constants.Vision.kSimMaxSightRangeMeters);
 
-      m_visionSim.addCamera(rightCameraSim, Constants.Vision.kRightRobotToCam3d);
-      m_visionSim.addCamera(forwardCameraSim, Constants.Vision.kForwardRobotToCam3d);
-      m_visionSim.addCamera(reverseCameraSim, Constants.Vision.kReverseRobotToCam3d);
+      m_visionSim.addCamera(rightCameraSim, rightTransform);
+      m_visionSim.addCamera(forwardCameraSim, forwardTransform);
+      m_visionSim.addCamera(reverseCameraSim, reverseTransform);
     }
+  }
+
+  private static Transform3d buildTransform(
+      LoggedTunableNumber rollDeg,
+      LoggedTunableNumber pitchDeg,
+      LoggedTunableNumber yawDeg,
+      LoggedTunableNumber forwardIn,
+      LoggedTunableNumber leftIn,
+      LoggedTunableNumber upIn) {
+    return new Transform3d(
+        new Translation3d(
+            Units.inchesToMeters(forwardIn.get()),
+            Units.inchesToMeters(leftIn.get()),
+            Units.inchesToMeters(upIn.get())),
+        new Rotation3d(
+            Units.degreesToRadians(rollDeg.get()),
+            Units.degreesToRadians(pitchDeg.get()),
+            Units.degreesToRadians(yawDeg.get())));
   }
 
   public Optional<VisionMeasurement> getLatestRightVisionMeasurement() {
@@ -116,6 +161,60 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () ->
+            m_RightPoseEstimator.setRobotToCameraTransform(
+                buildTransform(
+                    Constants.Vision.kRightRollDeg,
+                    Constants.Vision.kRightPitchDeg,
+                    Constants.Vision.kRightYawDeg,
+                    Constants.Vision.kRightForwardIn,
+                    Constants.Vision.kRightLeftIn,
+                    Constants.Vision.kRightUpIn)),
+        Constants.Vision.kRightRollDeg,
+        Constants.Vision.kRightPitchDeg,
+        Constants.Vision.kRightYawDeg,
+        Constants.Vision.kRightForwardIn,
+        Constants.Vision.kRightLeftIn,
+        Constants.Vision.kRightUpIn);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () ->
+            m_ForwardPoseEstimator.setRobotToCameraTransform(
+                buildTransform(
+                    Constants.Vision.kForwardRollDeg,
+                    Constants.Vision.kForwardPitchDeg,
+                    Constants.Vision.kForwardYawDeg,
+                    Constants.Vision.kForwardForwardIn,
+                    Constants.Vision.kForwardLeftIn,
+                    Constants.Vision.kForwardUpIn)),
+        Constants.Vision.kForwardRollDeg,
+        Constants.Vision.kForwardPitchDeg,
+        Constants.Vision.kForwardYawDeg,
+        Constants.Vision.kForwardForwardIn,
+        Constants.Vision.kForwardLeftIn,
+        Constants.Vision.kForwardUpIn);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () ->
+            m_ReversePoseEstimator.setRobotToCameraTransform(
+                buildTransform(
+                    Constants.Vision.kReverseRollDeg,
+                    Constants.Vision.kReversePitchDeg,
+                    Constants.Vision.kReverseYawDeg,
+                    Constants.Vision.kReverseForwardIn,
+                    Constants.Vision.kReverseLeftIn,
+                    Constants.Vision.kReverseUpIn)),
+        Constants.Vision.kReverseRollDeg,
+        Constants.Vision.kReversePitchDeg,
+        Constants.Vision.kReverseYawDeg,
+        Constants.Vision.kReverseForwardIn,
+        Constants.Vision.kReverseLeftIn,
+        Constants.Vision.kReverseUpIn);
+
     boolean verbose = SmartDashboard.getBoolean("Vision/VerboseTelemetry", false);
 
     if (verbose) {

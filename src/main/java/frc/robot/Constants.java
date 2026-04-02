@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Utility.LoggedTunableNumber;
 
@@ -173,67 +170,52 @@ public final class Constants {
     // one backwards (0,-2.78,24.75)
     // one facing right rotated  90 CW  (top pointing intake) (must match photonvision ui) in )
 
-    public static final double kRightCameraMountPitchAngleRad = Units.degreesToRadians(0);
-    public static final double kRightCameraMountRollAngleRad = Units.degreesToRadians(-90);
-    public static final double kRightCameraMountYawAngleRad = Units.degreesToRadians(-90);
-
-    public static final double kRightCameraForwardMeters = Units.inchesToMeters(-3.78);
-    public static final double kRightCameraLeftMeters = Units.inchesToMeters(-3);
-    public static final double kRightCameraUpMeters = Units.inchesToMeters(22);
-
-    // Robot to right camera transform
-    public static final Transform3d kRightRobotToCam3d =
-        new Transform3d(
-            new Translation3d(
-                kRightCameraForwardMeters, kRightCameraLeftMeters, kRightCameraUpMeters),
-            new Rotation3d(
-                kRightCameraMountRollAngleRad,
-                kRightCameraMountPitchAngleRad,
-                kRightCameraMountYawAngleRad));
+    public static final LoggedTunableNumber kRightPitchDeg =
+        new LoggedTunableNumber("Vision/Right/PitchDeg", 0);
+    public static final LoggedTunableNumber kRightRollDeg =
+        new LoggedTunableNumber("Vision/Right/RollDeg", -90);
+    public static final LoggedTunableNumber kRightYawDeg =
+        new LoggedTunableNumber("Vision/Right/YawDeg", -90);
+    public static final LoggedTunableNumber kRightForwardIn =
+        new LoggedTunableNumber("Vision/Right/ForwardIn", -3.78);
+    public static final LoggedTunableNumber kRightLeftIn =
+        new LoggedTunableNumber("Vision/Right/LeftIn", -3);
+    public static final LoggedTunableNumber kRightUpIn =
+        new LoggedTunableNumber("Vision/Right/UpIn", 22);
 
     // Forward camera name
     // Must match camera set in PhotonVision UI
     public static final String kForwardCameraName = "forwardPhotonvisionCamera";
 
-    public static final double kForwardCameraMountPitchAngleRad = Units.degreesToRadians(0);
-    public static final double kForwardCameraMountRollAngleRad = Units.degreesToRadians(0);
-    public static final double kForwardCameraMountYawAngleRad = Units.degreesToRadians(0);
-
-    public static final double kForwardCameraForwardMeters = Units.inchesToMeters(0);
-    public static final double kForwardCameraLeftMeters = Units.inchesToMeters(0);
-    public static final double kForwardCameraUpMeters = Units.inchesToMeters(22);
-
-    // Robot to forward camera transform
-    public static final Transform3d kForwardRobotToCam3d =
-        new Transform3d(
-            new Translation3d(
-                kForwardCameraForwardMeters, kForwardCameraLeftMeters, kForwardCameraUpMeters),
-            new Rotation3d(
-                kForwardCameraMountRollAngleRad,
-                kForwardCameraMountPitchAngleRad,
-                kForwardCameraMountYawAngleRad));
+    public static final LoggedTunableNumber kForwardPitchDeg =
+        new LoggedTunableNumber("Vision/Forward/PitchDeg", 0);
+    public static final LoggedTunableNumber kForwardRollDeg =
+        new LoggedTunableNumber("Vision/Forward/RollDeg", 0);
+    public static final LoggedTunableNumber kForwardYawDeg =
+        new LoggedTunableNumber("Vision/Forward/YawDeg", 0);
+    public static final LoggedTunableNumber kForwardForwardIn =
+        new LoggedTunableNumber("Vision/Forward/ForwardIn", 0);
+    public static final LoggedTunableNumber kForwardLeftIn =
+        new LoggedTunableNumber("Vision/Forward/LeftIn", 0);
+    public static final LoggedTunableNumber kForwardUpIn =
+        new LoggedTunableNumber("Vision/Forward/UpIn", 22);
 
     // Reverse camera name (same position as forward, facing backward)
     // Must match camera set in PhotonVision UI
     public static final String kReverseCameraName = "reversePhotonvisionCamera";
 
-    public static final double kReverseCameraMountPitchAngleRad = Units.degreesToRadians(0);
-    public static final double kReverseCameraMountRollAngleRad = Units.degreesToRadians(0);
-    public static final double kReverseCameraMountYawAngleRad = Units.degreesToRadians(180);
-
-    public static final double kReverseCameraForwardMeters = Units.inchesToMeters(0);
-    public static final double kReverseCameraLeftMeters = Units.inchesToMeters(0);
-    public static final double kReverseCameraUpMeters = Units.inchesToMeters(22);
-
-    // Robot to reverse camera transform
-    public static final Transform3d kReverseRobotToCam3d =
-        new Transform3d(
-            new Translation3d(
-                kReverseCameraForwardMeters, kReverseCameraLeftMeters, kReverseCameraUpMeters),
-            new Rotation3d(
-                kReverseCameraMountRollAngleRad,
-                kReverseCameraMountPitchAngleRad,
-                kReverseCameraMountYawAngleRad));
+    public static final LoggedTunableNumber kReversePitchDeg =
+        new LoggedTunableNumber("Vision/Reverse/PitchDeg", 0);
+    public static final LoggedTunableNumber kReverseRollDeg =
+        new LoggedTunableNumber("Vision/Reverse/RollDeg", 0);
+    public static final LoggedTunableNumber kReverseYawDeg =
+        new LoggedTunableNumber("Vision/Reverse/YawDeg", 180);
+    public static final LoggedTunableNumber kReverseForwardIn =
+        new LoggedTunableNumber("Vision/Reverse/ForwardIn", 0);
+    public static final LoggedTunableNumber kReverseLeftIn =
+        new LoggedTunableNumber("Vision/Reverse/LeftIn", 0);
+    public static final LoggedTunableNumber kReverseUpIn =
+        new LoggedTunableNumber("Vision/Reverse/UpIn", 22);
 
     // Dynamic std-dev scaling constants
     // Formula: stdDev = base * (avgDistance ^ exponent)
@@ -294,7 +276,7 @@ public final class Constants {
   }
 
   public static class UtilityConstants {
-    public static final boolean tuningMode = true;
+    public static final boolean tuningMode = false;
     public static boolean disableHAL = false;
 
     public static void disableHAL() {
