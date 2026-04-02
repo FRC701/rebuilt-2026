@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Utility.LoggedTunableNumber;
 import frc.robot.subsystems.Agitator.AgitatorState;
 
 public class Shooter extends SubsystemBase {
@@ -179,6 +180,23 @@ public class Shooter extends SubsystemBase {
     //     "ShooterCurrent", m_ShooterMotor.getStatorCurrent().getValueAsDouble());
     // SmartDashboard.putBoolean("NoBallsInShooter", CurrentCHeck());
     // SmartDashboard.putBoolean("ShooterUpToSpeed", UpToSpeed());
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> {
+          var slot0 = new Slot0Configs();
+          slot0.kP = Constants.ShooterConstants.kP.get();
+          slot0.kI = Constants.ShooterConstants.kI.get();
+          slot0.kD = Constants.ShooterConstants.kD.get();
+          slot0.kV = Constants.ShooterConstants.kV.get();
+          slot0.kS = Constants.ShooterConstants.kS.get();
+          m_ShooterMotor.getConfigurator().apply(slot0);
+        },
+        Constants.ShooterConstants.kP,
+        Constants.ShooterConstants.kI,
+        Constants.ShooterConstants.kD,
+        Constants.ShooterConstants.kV,
+        Constants.ShooterConstants.kS);
+
     velocitySignal.refresh();
 
     setEnabledStatus(SmartDashboard.getBoolean(m_EnabledString, m_ShooterEnabled));

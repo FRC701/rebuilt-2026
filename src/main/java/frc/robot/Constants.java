@@ -74,28 +74,45 @@ public final class Constants {
     public static final double kRetractPosition = 0; // Intake is retract ed and in the bot
 
     // PID Constants for Intake Extension
-    public static final LoggedTunableNumber ExtendkP = new LoggedTunableNumber("Intake/Extend/kP", 1.51337);
-    public static final LoggedTunableNumber ExtendkI = new LoggedTunableNumber("Intake/Extend/kI", 0);
-    public static final LoggedTunableNumber ExtendkD = new LoggedTunableNumber("Intake/Extend/kD", 0.3);
-    public static final LoggedTunableNumber ExtendkS = new LoggedTunableNumber("Intake/Extend/kS", 2.4686);
-    public static final LoggedTunableNumber ExtendkV = new LoggedTunableNumber("Intake/Extend/kV", 1);
-    public static final LoggedTunableNumber ExtendkA = new LoggedTunableNumber("Intake/Extend/kA", 1.01164);
-    public static final LoggedTunableNumber ExtendkG = new LoggedTunableNumber("Intake/Extend/kG", 1);
+    public static final LoggedTunableNumber ExtendkP =
+        new LoggedTunableNumber("Intake/Extend/kP", 1.51337);
+    public static final LoggedTunableNumber ExtendkI =
+        new LoggedTunableNumber("Intake/Extend/kI", 0);
+    public static final LoggedTunableNumber ExtendkD =
+        new LoggedTunableNumber("Intake/Extend/kD", 0.3);
+    public static final LoggedTunableNumber ExtendkS =
+        new LoggedTunableNumber("Intake/Extend/kS", 2.4686);
+    public static final LoggedTunableNumber ExtendkV =
+        new LoggedTunableNumber("Intake/Extend/kV", 1);
+    public static final LoggedTunableNumber ExtendkA =
+        new LoggedTunableNumber("Intake/Extend/kA", 1.01164);
+    public static final LoggedTunableNumber ExtendkG =
+        new LoggedTunableNumber("Intake/Extend/kG", 1);
 
-    public static final LoggedTunableNumber RetractkP = new LoggedTunableNumber("Intake/Retract/kP", 5.0);
-    public static final LoggedTunableNumber RetractkI = new LoggedTunableNumber("Intake/Retract/kI", 0);
-    public static final LoggedTunableNumber RetractkD = new LoggedTunableNumber("Intake/Retract/kD", 0.3);
-    public static final LoggedTunableNumber RetractkS = new LoggedTunableNumber("Intake/Retract/kS", 2.4686);
-    public static final LoggedTunableNumber RetractkV = new LoggedTunableNumber("Intake/Retract/kV", 1);
-    public static final LoggedTunableNumber RetractkA = new LoggedTunableNumber("Intake/Retract/kA", 1.01164);
-    public static final LoggedTunableNumber RetractkG = new LoggedTunableNumber("Intake/Retract/kG", 1.5);
+    public static final LoggedTunableNumber RetractkP =
+        new LoggedTunableNumber("Intake/Retract/kP", 5.0);
+    public static final LoggedTunableNumber RetractkI =
+        new LoggedTunableNumber("Intake/Retract/kI", 0);
+    public static final LoggedTunableNumber RetractkD =
+        new LoggedTunableNumber("Intake/Retract/kD", 0.3);
+    public static final LoggedTunableNumber RetractkS =
+        new LoggedTunableNumber("Intake/Retract/kS", 2.4686);
+    public static final LoggedTunableNumber RetractkV =
+        new LoggedTunableNumber("Intake/Retract/kV", 1);
+    public static final LoggedTunableNumber RetractkA =
+        new LoggedTunableNumber("Intake/Retract/kA", 1.01164);
+    public static final LoggedTunableNumber RetractkG =
+        new LoggedTunableNumber("Intake/Retract/kG", 1.5);
 
-    public static final LoggedTunableNumber DownkP = new LoggedTunableNumber("Intake/Down/kP", 1.51337);
+    public static final LoggedTunableNumber DownkP =
+        new LoggedTunableNumber("Intake/Down/kP", 1.51337);
     public static final LoggedTunableNumber DownkI = new LoggedTunableNumber("Intake/Down/kI", 0);
     public static final LoggedTunableNumber DownkD = new LoggedTunableNumber("Intake/Down/kD", 0.3);
-    public static final LoggedTunableNumber DownkS = new LoggedTunableNumber("Intake/Down/kS", 2.4686);
+    public static final LoggedTunableNumber DownkS =
+        new LoggedTunableNumber("Intake/Down/kS", 2.4686);
     public static final LoggedTunableNumber DownkV = new LoggedTunableNumber("Intake/Down/kV", 1);
-    public static final LoggedTunableNumber DownkA = new LoggedTunableNumber("Intake/Down/kA", 1.01164);
+    public static final LoggedTunableNumber DownkA =
+        new LoggedTunableNumber("Intake/Down/kA", 1.01164);
     public static final LoggedTunableNumber DownkG = new LoggedTunableNumber("Intake/Down/kG", 1);
 
     // Simulation

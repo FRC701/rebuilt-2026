@@ -343,11 +343,17 @@ public class VisionSubsystem extends SubsystemBase {
     double avgDistance = totalDistance / estimatedPose.targetsUsed.size();
 
     LoggedTunableNumber xyTunable =
-        isMultiTag ? Constants.Vision.kMultiTagBaseXYStdDev : Constants.Vision.kSingleTagBaseXYStdDev;
+        isMultiTag
+            ? Constants.Vision.kMultiTagBaseXYStdDev
+            : Constants.Vision.kSingleTagBaseXYStdDev;
     LoggedTunableNumber headingTunable =
-        isMultiTag ? Constants.Vision.kMultiTagBaseHeadingStdDev : Constants.Vision.kSingleTagBaseHeadingStdDev;
+        isMultiTag
+            ? Constants.Vision.kMultiTagBaseHeadingStdDev
+            : Constants.Vision.kSingleTagBaseHeadingStdDev;
     LoggedTunableNumber exponentTunable =
-        isMultiTag ? Constants.Vision.kMultiTagDistanceExponent : Constants.Vision.kSingleTagDistanceExponent;
+        isMultiTag
+            ? Constants.Vision.kMultiTagDistanceExponent
+            : Constants.Vision.kSingleTagDistanceExponent;
 
     double distanceFactor = Math.pow(avgDistance, exponentTunable.getAsDouble());
     double xyStdDev = xyTunable.getAsDouble() * distanceFactor;
