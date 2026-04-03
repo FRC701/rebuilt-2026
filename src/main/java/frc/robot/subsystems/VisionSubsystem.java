@@ -115,7 +115,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    boolean verbose = SmartDashboard.getBoolean("Vision/VerboseTelemetry", false);
+    boolean verbose = SmartDashboard.getBoolean("Vision/VerboseTelemetry", true);
 
     if (verbose) {
       SmartDashboard.putBoolean("Vision/Right/Connected", m_RightCamera.isConnected());

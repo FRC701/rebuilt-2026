@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Agitator.AgitatorState;
+import frc.robot.subsystems.Intake.IntakeState;
 
 public class Shooter extends SubsystemBase {
 
@@ -34,6 +35,7 @@ public class Shooter extends SubsystemBase {
   public ShooterEnumState m_ShooterEnumState;
 
   private Agitator m_Agitator;
+  private Intake m_Intake;
 
   // Boolean to track the enabled status
   private boolean m_ShooterEnabled = true;
@@ -53,12 +55,13 @@ public class Shooter extends SubsystemBase {
   private TalonFXSimState m_motorSimState;
 
   /** Creates a new Shooter. */
-  public Shooter(int motorId, String subsystemName, Agitator agitator) {
+  public Shooter(int motorId, String subsystemName, Agitator agitator, Intake intake) {
     super(subsystemName);
 
     // gives values to the Strings that are used for Shuffleboard
     nameStrings();
-    m_Agitator = agitator;
+    m_Agitator = agitator; 
+    m_Intake = intake;
 
     // Selects the intial state
     m_ShooterEnumState = ShooterEnumState.S_NotShooting;
@@ -162,7 +165,7 @@ public class Shooter extends SubsystemBase {
   public void passing() {
     m_ShooterMotor.setControl(voltSpeed.withVelocity(Constants.ShooterConstants.passRev));
     m_Agitator.m_AgitatorState = AgitatorState.S_In;
-  }
+    }
 
   // Sets the speed to 0 by using a VelocityVotage object with 0 velocity
   public void stopping() {
