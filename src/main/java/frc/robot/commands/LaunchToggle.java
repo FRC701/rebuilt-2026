@@ -15,15 +15,21 @@ import frc.robot.subsystems.Shooter.ShooterEnumState;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class LaunchToggle extends InstantCommand {
 
-  Feeder m_Feeder;
+  Feeder m_LeftFeeder;
+  Feeder m_RightFeeder;
   Shooter m_LeftShooter;
   Shooter m_RightShooter;
 
-  public LaunchToggle(Feeder tempfeeder, Shooter tempLeftShooter, Shooter tempRightShooter) {
+  public LaunchToggle(
+      Feeder tempLeftFeeder,
+      Feeder tempRightFeeder,
+      Shooter tempLeftShooter,
+      Shooter tempRightShooter) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_LeftShooter = tempLeftShooter;
     m_RightShooter = tempRightShooter;
-    m_Feeder = tempfeeder;
+    m_LeftFeeder = tempLeftFeeder;
+    m_RightFeeder = tempRightFeeder;
   }
 
   // Called when the command is initially scheduled.
@@ -32,11 +38,13 @@ public class LaunchToggle extends InstantCommand {
     if (m_LeftShooter.m_ShooterEnumState == ShooterEnumState.S_Shooting) {
       m_LeftShooter.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
       m_RightShooter.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
-      m_Feeder.m_FeederState = FeederState.S_Off;
+      m_LeftFeeder.m_FeederState = FeederState.S_Off;
+      m_RightFeeder.m_FeederState = FeederState.S_Off;
     } else {
       m_LeftShooter.m_ShooterEnumState = ShooterEnumState.S_Shooting;
       m_RightShooter.m_ShooterEnumState = ShooterEnumState.S_Shooting;
-      m_Feeder.m_FeederState = FeederState.S_On;
+      m_LeftFeeder.m_FeederState = FeederState.S_On;
+      m_RightFeeder.m_FeederState = FeederState.S_On;
     }
   }
 }

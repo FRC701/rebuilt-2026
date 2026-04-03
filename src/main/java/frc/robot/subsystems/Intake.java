@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -22,6 +23,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
+import com.ctre.phoenix6.sim.TalonFXSimState;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
@@ -29,6 +33,8 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -44,8 +50,7 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   private TalonFX m_IntakeMotorArm;
 
-  private TalonFX m_IntakeMotorRoller1;
-  // private TalonFX m_IntakeMotorRoller2;
+  private TalonFX m_IntakeMotorRoller;
 
   public IntakeState m_IntakeState;
   private Agitator m_Agitator;
@@ -56,6 +61,12 @@ public class Intake extends SubsystemBase {
   private double FORWARD_LIMIT = 5.3; // Placeholder
   private double REVERSE_LIMIT = 0;
 
+  // Simulation
+  private SingleJointedArmSim m_armSim;
+  private FlywheelSim m_rollerSim;
+  private TalonFXSimState m_armSimState;
+  private TalonFXSimState m_rollerSimState;
+
   private final SysIdRoutine m_SysID =
       new SysIdRoutine(
           // Config default is 1 volt/sec, 7V step, 10 sec timeout
@@ -63,12 +74,14 @@ public class Intake extends SubsystemBase {
           new Mechanism(this::voltageCallback, this::logCallback, this));
 
   public Intake(Agitator agitator) {
-    // Created Two Motors
+    // Created Three Motors
     m_IntakeMotorArm = new TalonFX(IntakeConstants.kIntakeMotorArm);
     m_IntakeMotorRoller1 = new TalonFX(IntakeConstants.kIntakeMotorRoller1);
     // m_IntakeMotorRoller2 = new TalonFX(IntakeConstants.kIntakeMotorRoller2);
 
     m_Agitator = agitator;
+
+    // Used for the magnetic limit switch
     // m_reverseLimitSignal = m_IntakeMotorArm.getReverseLimit();
 
     m_IntakeState = IntakeState.S_Retract;
@@ -90,10 +103,9 @@ public class Intake extends SubsystemBase {
                     .withReverseLimitSource(ReverseLimitSourceValue.LimitSwitchPin))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(40))
+                    .withStatorCurrentLimit(Amps.of(60))
                     .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(40));
-    ;
+                    .withSupplyCurrentLimit(60));
 
     var m_rollerConfigs =
         new TalonFXConfiguration()
@@ -103,7 +115,7 @@ public class Intake extends SubsystemBase {
                     .withStatorCurrentLimitEnable(true)
                     .withSupplyCurrentLimit(60));
 
-    var Slot0Configs = m_talonFXConfigs.Slot0; // pid for moving down
+    var Slot0Configs = m_armConfigs.Slot0; // pid for moving down
     Slot0Configs.kP = Constants.IntakeConstants.ExtendkP;
     Slot0Configs.kI = Constants.IntakeConstants.ExtendkI;
     Slot0Configs.kD = Constants.IntakeConstants.ExtendkD;
@@ -112,7 +124,7 @@ public class Intake extends SubsystemBase {
     Slot0Configs.kA = Constants.IntakeConstants.ExtendkA;
     Slot0Configs.kG = Constants.IntakeConstants.ExtendkG;
 
-    var Slot1Configs = m_talonFXConfigs.Slot1; // pid for moving up
+    var Slot1Configs = m_armConfigs.Slot1; // pid for moving up
     Slot1Configs.kP = Constants.IntakeConstants.RetractkP;
     Slot1Configs.kI = Constants.IntakeConstants.RetractkI;
     Slot1Configs.kD = Constants.IntakeConstants.RetractkD;
@@ -121,7 +133,7 @@ public class Intake extends SubsystemBase {
     Slot1Configs.kA = Constants.IntakeConstants.RetractkA;
     Slot1Configs.kG = Constants.IntakeConstants.RetractkG;
 
-    var Slot2Configs = m_talonFXConfigs.Slot2; // pid for holding intake position once it is down
+    var Slot2Configs = m_armConfigs.Slot2; // pid for holding intake position once it is down
     Slot2Configs.kP = Constants.IntakeConstants.DownkP;
     Slot2Configs.kI = Constants.IntakeConstants.DownkI;
     Slot2Configs.kD = Constants.IntakeConstants.DownkD;
@@ -130,19 +142,51 @@ public class Intake extends SubsystemBase {
     Slot2Configs.kA = Constants.IntakeConstants.DownkA;
     Slot2Configs.kG = Constants.IntakeConstants.DownkG;
 
-    MotorOutputConfigs IntakeConfig = new MotorOutputConfigs();
-    IntakeConfig.Inverted = InvertedValue.Clockwise_Positive;
+    // Corrects the direction of rolling
+    MotorOutputConfigs ArmOutputConfigs = m_armConfigs.MotorOutput;
+    ArmOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
 
-    MotorOutputConfigs RollerIntakeConfig = new MotorOutputConfigs();
-    RollerIntakeConfig.Inverted = InvertedValue.Clockwise_Positive;
+    MotorOutputConfigs RollerOutputConfigs = m_rollerConfigs.MotorOutput;
+    RollerOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
 
     // Apply the Configs to the Motor Objects
-    m_IntakeMotorArm.getConfigurator().apply(m_talonFXConfigs);
-    m_IntakeMotorRoller1.getConfigurator().apply(m_rollerConfigs);
-    m_IntakeMotorArm.getConfigurator().apply(IntakeConfig);
-    m_IntakeMotorRoller1.getConfigurator().apply(RollerIntakeConfig);
+    m_IntakeMotorArm.getConfigurator().apply(m_armConfigs);
+    m_IntakeMotorRoller.getConfigurator().apply(m_rollerConfigs);
 
     m_IntakeMotorArm.setPosition(0);
+
+    if (Utils.isSimulation()) {
+      // Zero out friction/gravity feedforward — not applicable in sim
+      m_armConfigs.Slot0.kS = 0;
+      m_armConfigs.Slot0.kG = 0;
+      m_armConfigs.Slot1.kS = 0;
+      m_armConfigs.Slot1.kG = 0;
+      m_armConfigs.Slot2.kS = 0;
+      m_armConfigs.Slot2.kG = 0;
+      m_IntakeMotorArm.getConfigurator().apply(m_armConfigs);
+
+      m_armSimState = m_IntakeMotorArm.getSimState();
+      m_rollerSimState = m_IntakeMotorRoller.getSimState();
+
+      m_armSim =
+          new SingleJointedArmSim(
+              DCMotor.getFalcon500(1),
+              IntakeConstants.kSimArmGearRatio,
+              IntakeConstants.kSimArmMOI,
+              0.3, // arm length meters
+              0.0, // min angle rad (retracted)
+              FORWARD_LIMIT * 2.0 * Math.PI / IntakeConstants.kSimArmGearRatio, // max angle rad
+              false, // gravity disabled — real PID gains don't match sim gravity model
+              0.0); // starting angle rad
+
+      m_rollerSim =
+          new FlywheelSim(
+              LinearSystemId.createFlywheelSystem(
+                  DCMotor.getKrakenX44Foc(1),
+                  IntakeConstants.kSimRollerMOI,
+                  IntakeConstants.kSimRollerGearRatio),
+              DCMotor.getKrakenX44Foc(1));
+    }
   }
 
   public enum IntakeState {
@@ -174,9 +218,8 @@ public class Intake extends SubsystemBase {
   }
 
   public void CycleUp() {
-    m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
     m_Timer.start();
-    m_IntakeMotorRoller1.setVoltage(7);
+    m_IntakeMotorRoller.setVoltage(7);
     if (m_Timer.hasElapsed(0.15)) {
       m_IntakeState = IntakeState.S_Down;
       m_Timer.reset();
@@ -187,9 +230,8 @@ public class Intake extends SubsystemBase {
 
   public void Down() {
     // If motor has reached its destination the stop the arm and start the rollers
-    m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
     m_Timer.start();
-    m_IntakeMotorRoller1.setVoltage(7);
+    m_IntakeMotorRoller.setVoltage(7);
     if (m_Timer.hasElapsed(0.35)) {
       m_IntakeState = IntakeState.S_ExtendCycleUp;
       m_Timer.reset();
@@ -214,8 +256,7 @@ public class Intake extends SubsystemBase {
   // Extends the intake out and starts the rollers
   public void ExtendPosition() {
     // If motor has reached its destination the stop the arm and start the rollers
-    m_Agitator.m_AgitatorState = AgitatorState.S_Idle;
-    m_IntakeMotorRoller1.setVoltage(6.5);
+    m_IntakeMotorRoller.setVoltage(6.5);
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeState = IntakeState.S_Down;
     }
@@ -226,13 +267,9 @@ public class Intake extends SubsystemBase {
   // Pulls the intake back in and stops the rollers
   public void RetractPosition() {
     // When retracting we want to rollers to stay off
-    m_IntakeMotorRoller1.setVoltage(0);
+    m_IntakeMotorRoller.setVoltage(0);
     m_Agitator.m_AgitatorState = AgitatorState.S_Off;
-    // // If the arm has reached its destination stop the motor
-    // if (checkExtended(IntakeConstants.kRetractPosition)) {
-    //   //m_IntakeState = IntakeState.S_Retracted;
-    // }
-    // Move the arm until it reaches the destination
+    // Move the arm to the destination
     setPosition(IntakeConstants.kRetractPosition, 1);
   }
 
@@ -243,7 +280,7 @@ public class Intake extends SubsystemBase {
     m_Agitator.m_AgitatorState = AgitatorState.S_Out;
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeMotorArm.setVoltage(0);
-      m_IntakeMotorRoller1.setVoltage(-8);
+      m_IntakeMotorRoller.setVoltage(-8);
     } else {
       // Move the arm until it reaches its destination
       setPosition(IntakeConstants.kExtensionPosition, 0);
@@ -252,6 +289,8 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // This method will be called once per scheduler run
+
     // m_reverseLimitSignal.refresh();
     // if (m_reverseLimitSignal.getValue() == ReverseLimitValue.ClosedToGround) {
     //   m_IntakeMotorArm.setPosition(0);
@@ -268,8 +307,36 @@ public class Intake extends SubsystemBase {
     // SmartDashboard.putNumber("ReverseSoftLimit", REVERSE_LIMIT);
     SmartDashboard.putNumber("IntakePose", m_IntakeMotorArm.getPosition().getValueAsDouble());
     SmartDashboard.putString("IntakeState", m_IntakeState.toString());
-    // This method will be called once per scheduler run
+  }
 
+  @Override
+  public void simulationPeriodic() {
+    if (m_armSimState == null) return;
+
+    m_armSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+    m_rollerSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+
+    // Arm simulation
+    m_armSim.setInputVoltage(m_armSimState.getMotorVoltage());
+    m_armSim.update(0.02);
+
+    double armRadians = m_armSim.getAngleRads();
+    double armRadPerSec = m_armSim.getVelocityRadPerSec();
+    double armRotorRotations = armRadians / (2.0 * Math.PI) * IntakeConstants.kSimArmGearRatio;
+    double armRotorRPS = armRadPerSec / (2.0 * Math.PI) * IntakeConstants.kSimArmGearRatio;
+
+    m_armSimState.setRawRotorPosition(armRotorRotations);
+    m_armSimState.setRotorVelocity(armRotorRPS);
+
+    // Roller simulation
+    m_rollerSim.setInputVoltage(m_rollerSimState.getMotorVoltage());
+    m_rollerSim.update(0.02);
+
+    double rollerRadPerSec = m_rollerSim.getAngularVelocityRadPerSec();
+    double rollerRotorRPS = rollerRadPerSec / (2.0 * Math.PI) * IntakeConstants.kSimRollerGearRatio;
+
+    m_rollerSimState.addRotorPosition(rollerRotorRPS * 0.02);
+    m_rollerSimState.setRotorVelocity(rollerRotorRPS);
   }
 
   // A (resusable) voltage out for driving the motor during sysId
