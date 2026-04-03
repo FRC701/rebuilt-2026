@@ -32,7 +32,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 2.5
           }
         },
         {
@@ -72,6 +72,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "AutoAim"
+          }
+        },
+        {
           "type": "sequential",
           "data": {
             "commands": [
@@ -93,7 +99,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 2.5
           }
         },
         {
