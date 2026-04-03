@@ -4,6 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.util.datalog.StringLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,11 +26,24 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   private SendableChooser<Command> m_Chooser = new SendableChooser<>();
 
+  // Logging entries - reused to avoid allocations
+  private DoubleLogEntry m_batteryVoltageLog;
+  private StringLogEntry m_matchInfoLog;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   public Robot() {
+    // Start DataLogManager for competition logging
+    DataLogManager.start();
+    DriverStation.startDataLog(DataLogManager.getLog());
+
+    // Initialize log entries once to avoid allocations in periodic
+    DataLog log = DataLogManager.getLog();
+    m_batteryVoltageLog = new DoubleLogEntry(log, "/robot/batteryVoltage");
+    m_matchInfoLog = new StringLogEntry(log, "/robot/matchInfo");
+
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
@@ -45,6 +64,9 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
+    // Log battery voltage every cycle for brownout detection
+    m_batteryVoltageLog.append(RobotController.getBatteryVoltage());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -57,6 +79,15 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    // Log match info for competition analysis
+    m_matchInfoLog.append(
+        "Auto: "
+            + DriverStation.getEventName()
+            + " M"
+            + DriverStation.getMatchNumber()
+            + " "
+            + DriverStation.getAlliance().toString());
+
     m_autonomousCommand = m_robotContainer.getAutonomusCommand();
 
     // schedule the autonomous command (example)
@@ -73,6 +104,15 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    // Log match info for competition analysis
+    m_matchInfoLog.append(
+        "Teleop: "
+            + DriverStation.getEventName()
+            + " M"
+            + DriverStation.getMatchNumber()
+            + " "
+            + DriverStation.getAlliance().toString());
+
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

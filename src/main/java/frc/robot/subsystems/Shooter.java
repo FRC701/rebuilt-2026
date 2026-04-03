@@ -20,6 +20,7 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -43,14 +44,14 @@ public class Shooter extends SubsystemBase {
 
   private StatusSignal<AngularVelocity> velocitySignal;
 
-  private String m_StateString;
   private String m_EnabledString;
-  private String m_RevolutionsErrorString;
-  private String m_SpeedString;
 
   // Simulation
   private FlywheelSim m_flywheelSim;
   private TalonFXSimState m_motorSimState;
+
+  // Logging - throttle to every 10th cycle (200ms)
+  private int m_logCounter = 0;
 
   /** Creates a new Shooter. */
   public Shooter(int motorId, String subsystemName, Agitator agitator) {
@@ -71,12 +72,11 @@ public class Shooter extends SubsystemBase {
         new TalonFXConfiguration()
             .withVoltage(
                 new VoltageConfigs().withPeakForwardVoltage(10).withPeakReverseVoltage(-10))
-                .withCurrentLimits(
+            .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))
                     .withStatorCurrentLimitEnable(true)
                     .withSupplyCurrentLimit(60));
-
 
     MotorOutputConfigs shooterConfig = m_TalonFXConfig.MotorOutput;
 
@@ -112,10 +112,7 @@ public class Shooter extends SubsystemBase {
   }
 
   private void nameStrings() {
-    m_StateString = getName() + " State";
     m_EnabledString = getName() + " Enabled";
-    m_RevolutionsErrorString = getName() + "Revolutions Error";
-    m_SpeedString = getName() + " Speed";
   }
 
   public double VoltageCheck() {
@@ -178,17 +175,20 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // The current State
-    // SmartDashboard.putString(m_StateString, m_ShooterEnumState.toString());
-    // SmartDashboard.putBoolean(m_EnabledString, m_ShooterEnabled);
-    // SmartDashboard.putNumber(
-    //     "RevolutionsError", m_ShooterMotor.getClosedLoopError().refresh().getValueAsDouble());
-    // SmartDashboard.putNumber("ShooterSpeed", velocitySignal.getValueAsDouble());
-    // SmartDashboard.putNumber(
-    //     "ShooterCurrent", m_ShooterMotor.getStatorCurrent().getValueAsDouble());
-    // SmartDashboard.putBoolean("NoBallsInShooter", CurrentCHeck());
-    // SmartDashboard.putBoolean("ShooterUpToSpeed", UpToSpeed());
     velocitySignal.refresh();
+
+    // Log critical values every 10th cycle (200ms) for match analysis
+    if (++m_logCounter >= 10) {
+      DataLogManager.log(
+          getName()
+              + " v:"
+              + velocitySignal.getValueAsDouble()
+              + " i:"
+              + m_ShooterMotor.getStatorCurrent().getValueAsDouble()
+              + " s:"
+              + m_ShooterEnumState.name());
+      m_logCounter = 0;
+    }
 
     setEnabledStatus(SmartDashboard.getBoolean(m_EnabledString, m_ShooterEnabled));
     if (m_ShooterEnabled) {

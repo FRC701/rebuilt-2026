@@ -31,6 +31,7 @@ import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -60,6 +61,9 @@ public class Intake extends SubsystemBase {
 
   private double FORWARD_LIMIT = 5.3; // Placeholder
   private double REVERSE_LIMIT = 0;
+
+  // Logging - throttle to every 10th cycle (200ms)
+  private int m_logCounter = 0;
 
   // Simulation
   private SingleJointedArmSim m_armSim;
@@ -296,11 +300,19 @@ public class Intake extends SubsystemBase {
     }
 
     RunIntakeState();
-    // SmartDashboard.putBoolean("CheckExtended",
-    // checkExtended(IntakeConstants.kExtensionPosition));
-    // SmartDashboard.putBoolean("CheckRetracted", checkExtended(IntakeConstants.kRetractPosition));
-    // SmartDashboard.putNumber("ForwardSoftLimit", FORWARD_LIMIT);
-    // SmartDashboard.putNumber("ReverseSoftLimit", REVERSE_LIMIT);
+
+    // Log critical values every 10th cycle (200ms) for match analysis
+    if (++m_logCounter >= 10) {
+      DataLogManager.log(
+          "Intake pos:"
+              + m_IntakeMotorArm.getPosition().getValueAsDouble()
+              + " i:"
+              + m_IntakeMotorArm.getStatorCurrent().getValueAsDouble()
+              + " s:"
+              + m_IntakeState.name());
+      m_logCounter = 0;
+    }
+
     SmartDashboard.putNumber("IntakePose", m_IntakeMotorArm.getPosition().getValueAsDouble());
     SmartDashboard.putString("IntakeState", m_IntakeState.toString());
   }

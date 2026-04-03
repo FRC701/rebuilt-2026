@@ -15,6 +15,7 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,6 +30,9 @@ public class Agitator extends SubsystemBase {
   // Simulation
   private FlywheelSim m_flywheelSim;
   private TalonFXSimState m_simState;
+
+  // Logging - throttle to every 10th cycle (200ms)
+  private int m_logCounter = 0;
 
   /** Creates a new Aggitator. */
   public Agitator() {
@@ -103,6 +107,16 @@ public class Agitator extends SubsystemBase {
   @Override
   public void periodic() {
     runAgitatorState();
+
+    // Log critical values every 10th cycle (200ms) for match analysis
+    if (++m_logCounter >= 10) {
+      DataLogManager.log(
+          "Agitator i:"
+              + m_AgitatorLeftMotor.getStatorCurrent().getValueAsDouble()
+              + " s:"
+              + m_AgitatorState.name());
+      m_logCounter = 0;
+    }
   }
 
   @Override
