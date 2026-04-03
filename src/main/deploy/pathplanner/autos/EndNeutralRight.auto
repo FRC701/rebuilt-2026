@@ -7,13 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftTrenchToShootingPos"
+            "pathName": "SlightTurnRightBump"
           }
         },
         {
           "type": "sequential",
           "data": {
             "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ExtendIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAim"
+                }
+              },
               {
                 "type": "named",
                 "data": {
@@ -44,31 +56,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftShootPosToDepot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ExtendIntake"
+            "pathName": "SlightTurnRightBumpBackwards"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DepotToDepotCollected"
+            "pathName": "RightBumpToNeutralIntake"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DepotCollectedToShootingPos"
+            "pathName": "RightNeutralDrive"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RightEndNeutralToShoot"
           }
         },
         {
           "type": "sequential",
           "data": {
             "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAim"
+                }
+              },
               {
                 "type": "named",
                 "data": {
@@ -94,12 +112,6 @@
           "type": "named",
           "data": {
             "name": "StopShooting"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftShootToOutOfWay"
           }
         }
       ]
