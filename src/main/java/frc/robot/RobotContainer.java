@@ -101,7 +101,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     // NamedCommands.registerCommand(
-    NamedCommands.registerCommand("ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter));
+    NamedCommands.registerCommand("ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter, m_Intake));
     NamedCommands.registerCommand("StopShooting", m_NotShootingCommand);
     NamedCommands.registerCommand("FeederOn", new FeederOn(m_LeftFeeder, m_RightFeeder));
     NamedCommands.registerCommand("ExtendIntake", new ExtendIntake(m_Intake));
