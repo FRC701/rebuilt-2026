@@ -41,6 +41,11 @@ public class VisionSubsystem extends SubsystemBase {
   private int m_ForwardRejectionCount = 0;
   private int m_ReverseRejectionCount = 0;
 
+  // Track rejection reasons for logging
+  private String m_RightRejectionReason = "";
+  private String m_ForwardRejectionReason = "";
+  private String m_ReverseRejectionReason = "";
+
   private final StructPublisher<Pose2d> m_RightPosePublisher =
       NetworkTableInstance.getDefault()
           .getStructTopic("Vision/Right/Pose", Pose2d.struct)
@@ -159,35 +164,54 @@ public class VisionSubsystem extends SubsystemBase {
 
     // Log critical vision data every 10th cycle (200ms) for match analysis
     if (++m_logCounter >= 10) {
-      logVisionMeasurement("Right", m_LatestRightVisionMeasurement, m_RightCamera.isConnected());
       logVisionMeasurement(
-          "Forward", m_LatestForwardVisionMeasurement, m_ForwardCamera.isConnected());
+          "Right",
+          m_LatestRightVisionMeasurement,
+          m_RightCamera.isConnected(),
+          m_RightRejectionReason);
       logVisionMeasurement(
-          "Reverse", m_LatestReverseVisionMeasurement, m_ReverseCamera.isConnected());
+          "Forward",
+          m_LatestForwardVisionMeasurement,
+          m_ForwardCamera.isConnected(),
+          m_ForwardRejectionReason);
+      logVisionMeasurement(
+          "Reverse",
+          m_LatestReverseVisionMeasurement,
+          m_ReverseCamera.isConnected(),
+          m_ReverseRejectionReason);
       m_logCounter = 0;
     }
   }
 
   private void logVisionMeasurement(
-      String camera, Optional<VisionMeasurement> measurement, boolean connected) {
+      String camera,
+      Optional<VisionMeasurement> measurement,
+      boolean connected,
+      String rejectionReason) {
     if (!connected) {
       DataLogManager.log("Vision/" + camera + " disconnected");
       return;
     }
     if (measurement.isEmpty()) {
-      DataLogManager.log("Vision/" + camera + " no_pose");
+      DataLogManager.log("Vision/" + camera + " rejected:" + rejectionReason);
       return;
     }
     VisionMeasurement m = measurement.get();
     DataLogManager.log(
         "Vision/"
             + camera
+            + " t:"
+            + String.format("%.3f", m.timestampSeconds())
             + " x:"
             + String.format("%.2f", m.pose().getX())
             + " y:"
             + String.format("%.2f", m.pose().getY())
             + " h:"
-            + String.format("%.1f", m.pose().getRotation().getDegrees()));
+            + String.format("%.1f", m.pose().getRotation().getDegrees())
+            + " stdXY:"
+            + String.format("%.3f", m.stdDevs().get(0, 0))
+            + " stdH:"
+            + String.format("%.2f", Math.toDegrees(m.stdDevs().get(2, 0))));
   }
 
   private void publishMeasurementTelemetry(
@@ -217,17 +241,28 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   private void publishRejection(String cameraName, String reason, boolean verbose) {
-    if (!verbose) {
-      return;
-    }
-    String prefix = "Vision/" + cameraName + "/";
-    SmartDashboard.putString(prefix + "RejectionReason", reason);
+    // Store rejection reason for logging
     if (cameraName.equals("Right")) {
-      SmartDashboard.putNumber(prefix + "RejectionCount", ++m_RightRejectionCount);
+      m_RightRejectionReason = reason;
+      if (verbose) {
+        SmartDashboard.putString("Vision/" + cameraName + "/RejectionReason", reason);
+        SmartDashboard.putNumber(
+            "Vision/" + cameraName + "/RejectionCount", ++m_RightRejectionCount);
+      }
     } else if (cameraName.equals("Forward")) {
-      SmartDashboard.putNumber(prefix + "RejectionCount", ++m_ForwardRejectionCount);
+      m_ForwardRejectionReason = reason;
+      if (verbose) {
+        SmartDashboard.putString("Vision/" + cameraName + "/RejectionReason", reason);
+        SmartDashboard.putNumber(
+            "Vision/" + cameraName + "/RejectionCount", ++m_ForwardRejectionCount);
+      }
     } else {
-      SmartDashboard.putNumber(prefix + "RejectionCount", ++m_ReverseRejectionCount);
+      m_ReverseRejectionReason = reason;
+      if (verbose) {
+        SmartDashboard.putString("Vision/" + cameraName + "/RejectionReason", reason);
+        SmartDashboard.putNumber(
+            "Vision/" + cameraName + "/RejectionCount", ++m_ReverseRejectionCount);
+      }
     }
   }
 
