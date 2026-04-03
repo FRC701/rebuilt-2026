@@ -15,6 +15,7 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Utility.LoggedTunableNumber;
 
 public class Climber extends SubsystemBase {
   /** Creates a new Climber. */
@@ -59,11 +60,11 @@ public class Climber extends SubsystemBase {
     m_ClimberFollower.getConfigurator().apply(m_TalonFXConfig);
 
     var Slot0Configs = new Slot0Configs();
-    Slot0Configs.kS = Constants.ClimberConstants.kS;
-    Slot0Configs.kG = Constants.ClimberConstants.kG;
-    Slot0Configs.kP = Constants.ClimberConstants.kP;
-    Slot0Configs.kI = Constants.ClimberConstants.kI;
-    Slot0Configs.kD = Constants.ClimberConstants.kD;
+    Slot0Configs.kS = Constants.ClimberConstants.kS.get();
+    Slot0Configs.kG = Constants.ClimberConstants.kG.get();
+    Slot0Configs.kP = Constants.ClimberConstants.kP.get();
+    Slot0Configs.kI = Constants.ClimberConstants.kI.get();
+    Slot0Configs.kD = Constants.ClimberConstants.kD.get();
 
     m_ClimberLeader.getConfigurator().apply(Slot0Configs);
 
@@ -153,6 +154,23 @@ public class Climber extends SubsystemBase {
     // SmartDashboard.putBoolean(
     //     "SetpointReached", SetpointReached(Constants.ClimberConstants.kExtensionPosition));
     // SmartDashboard.putString("ClimberState", m_ClimberState.toString());
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> {
+          var slot0 = new Slot0Configs();
+          slot0.kP = Constants.ClimberConstants.kP.get();
+          slot0.kI = Constants.ClimberConstants.kI.get();
+          slot0.kD = Constants.ClimberConstants.kD.get();
+          slot0.kS = Constants.ClimberConstants.kS.get();
+          slot0.kG = Constants.ClimberConstants.kG.get();
+          m_ClimberLeader.getConfigurator().apply(slot0);
+        },
+        Constants.ClimberConstants.kP,
+        Constants.ClimberConstants.kI,
+        Constants.ClimberConstants.kD,
+        Constants.ClimberConstants.kS,
+        Constants.ClimberConstants.kG);
+
     runClimberState();
   }
 }

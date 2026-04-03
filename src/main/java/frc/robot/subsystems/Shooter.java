@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Utility.LoggedTunableNumber;
 import frc.robot.subsystems.Agitator.AgitatorState;
 
 public class Shooter extends SubsystemBase {
@@ -79,11 +80,11 @@ public class Shooter extends SubsystemBase {
 
     // Configs that use the PID values to help with motor speed
     Slot0Configs Slot0Configs = m_TalonFXConfig.Slot0;
-    Slot0Configs.kP = Constants.ShooterConstants.kP;
-    Slot0Configs.kI = Constants.ShooterConstants.kI;
-    Slot0Configs.kD = Constants.ShooterConstants.kD;
-    Slot0Configs.kV = Constants.ShooterConstants.kV;
-    Slot0Configs.kS = Constants.ShooterConstants.kS;
+    Slot0Configs.kP = Constants.ShooterConstants.kP.get();
+    Slot0Configs.kI = Constants.ShooterConstants.kI.get();
+    Slot0Configs.kD = Constants.ShooterConstants.kD.get();
+    Slot0Configs.kV = Constants.ShooterConstants.kV.get();
+    Slot0Configs.kS = Constants.ShooterConstants.kS.get();
 
     // Applying the configs to the motors
     m_ShooterMotor.getConfigurator().apply(m_TalonFXConfig);
@@ -179,6 +180,23 @@ public class Shooter extends SubsystemBase {
     //     "ShooterCurrent", m_ShooterMotor.getStatorCurrent().getValueAsDouble());
     // SmartDashboard.putBoolean("NoBallsInShooter", CurrentCHeck());
     // SmartDashboard.putBoolean("ShooterUpToSpeed", UpToSpeed());
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> {
+          var slot0 = new Slot0Configs();
+          slot0.kP = Constants.ShooterConstants.kP.get();
+          slot0.kI = Constants.ShooterConstants.kI.get();
+          slot0.kD = Constants.ShooterConstants.kD.get();
+          slot0.kV = Constants.ShooterConstants.kV.get();
+          slot0.kS = Constants.ShooterConstants.kS.get();
+          m_ShooterMotor.getConfigurator().apply(slot0);
+        },
+        Constants.ShooterConstants.kP,
+        Constants.ShooterConstants.kI,
+        Constants.ShooterConstants.kD,
+        Constants.ShooterConstants.kV,
+        Constants.ShooterConstants.kS);
+
     velocitySignal.refresh();
 
     setEnabledStatus(SmartDashboard.getBoolean(m_EnabledString, m_ShooterEnabled));

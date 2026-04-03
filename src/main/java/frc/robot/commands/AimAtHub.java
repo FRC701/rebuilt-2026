@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.Utility.LoggedTunableNumber;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import java.util.function.DoubleSupplier;
@@ -58,7 +59,9 @@ public class AimAtHub extends Command {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     m_request.HeadingController.setPID(
-        Constants.AimBotConstants.kP, Constants.AimBotConstants.kI, Constants.AimBotConstants.kD);
+        Constants.AimBotConstants.kP.get(),
+        Constants.AimBotConstants.kI.get(),
+        Constants.AimBotConstants.kD.get());
     m_request.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
 
     addRequirements(drivetrain);
@@ -66,6 +69,17 @@ public class AimAtHub extends Command {
 
   @Override
   public void execute() {
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () ->
+            m_request.HeadingController.setPID(
+                Constants.AimBotConstants.kP.get(),
+                Constants.AimBotConstants.kI.get(),
+                Constants.AimBotConstants.kD.get()),
+        Constants.AimBotConstants.kP,
+        Constants.AimBotConstants.kI,
+        Constants.AimBotConstants.kD);
+
     Pose2d currentPose = m_drivetrain.getState().Pose;
     boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
     Translation2d hubPosition = isRed ? kRedHubPosition : kBlueHubPosition;

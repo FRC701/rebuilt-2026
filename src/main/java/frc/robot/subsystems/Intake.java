@@ -15,6 +15,9 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.Slot1Configs;
+import com.ctre.phoenix6.configs.Slot2Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -44,6 +47,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.Utility.LoggedTunableNumber;
 import frc.robot.subsystems.Agitator.AgitatorState;
 
 public class Intake extends SubsystemBase {
@@ -112,31 +116,31 @@ public class Intake extends SubsystemBase {
                     .withSupplyCurrentLimit(60));
 
     var Slot0Configs = m_armConfigs.Slot0; // pid for moving down
-    Slot0Configs.kP = Constants.IntakeConstants.ExtendkP;
-    Slot0Configs.kI = Constants.IntakeConstants.ExtendkI;
-    Slot0Configs.kD = Constants.IntakeConstants.ExtendkD;
-    Slot0Configs.kS = Constants.IntakeConstants.ExtendkS;
-    Slot0Configs.kV = Constants.IntakeConstants.ExtendkV;
-    Slot0Configs.kA = Constants.IntakeConstants.ExtendkA;
-    Slot0Configs.kG = Constants.IntakeConstants.ExtendkG;
+    Slot0Configs.kP = Constants.IntakeConstants.ExtendkP.get();
+    Slot0Configs.kI = Constants.IntakeConstants.ExtendkI.get();
+    Slot0Configs.kD = Constants.IntakeConstants.ExtendkD.get();
+    Slot0Configs.kS = Constants.IntakeConstants.ExtendkS.get();
+    Slot0Configs.kV = Constants.IntakeConstants.ExtendkV.get();
+    Slot0Configs.kA = Constants.IntakeConstants.ExtendkA.get();
+    Slot0Configs.kG = Constants.IntakeConstants.ExtendkG.get();
 
     var Slot1Configs = m_armConfigs.Slot1; // pid for moving up
-    Slot1Configs.kP = Constants.IntakeConstants.RetractkP;
-    Slot1Configs.kI = Constants.IntakeConstants.RetractkI;
-    Slot1Configs.kD = Constants.IntakeConstants.RetractkD;
-    Slot1Configs.kS = Constants.IntakeConstants.RetractkS;
-    Slot1Configs.kV = Constants.IntakeConstants.RetractkV;
-    Slot1Configs.kA = Constants.IntakeConstants.RetractkA;
-    Slot1Configs.kG = Constants.IntakeConstants.RetractkG;
+    Slot1Configs.kP = Constants.IntakeConstants.RetractkP.get();
+    Slot1Configs.kI = Constants.IntakeConstants.RetractkI.get();
+    Slot1Configs.kD = Constants.IntakeConstants.RetractkD.get();
+    Slot1Configs.kS = Constants.IntakeConstants.RetractkS.get();
+    Slot1Configs.kV = Constants.IntakeConstants.RetractkV.get();
+    Slot1Configs.kA = Constants.IntakeConstants.RetractkA.get();
+    Slot1Configs.kG = Constants.IntakeConstants.RetractkG.get();
 
     var Slot2Configs = m_armConfigs.Slot2; // pid for holding intake position once it is down
-    Slot2Configs.kP = Constants.IntakeConstants.DownkP;
-    Slot2Configs.kI = Constants.IntakeConstants.DownkI;
-    Slot2Configs.kD = Constants.IntakeConstants.DownkD;
-    Slot2Configs.kS = Constants.IntakeConstants.DownkS;
-    Slot2Configs.kV = Constants.IntakeConstants.DownkV;
-    Slot2Configs.kA = Constants.IntakeConstants.DownkA;
-    Slot2Configs.kG = Constants.IntakeConstants.DownkG;
+    Slot2Configs.kP = Constants.IntakeConstants.DownkP.get();
+    Slot2Configs.kI = Constants.IntakeConstants.DownkI.get();
+    Slot2Configs.kD = Constants.IntakeConstants.DownkD.get();
+    Slot2Configs.kS = Constants.IntakeConstants.DownkS.get();
+    Slot2Configs.kV = Constants.IntakeConstants.DownkV.get();
+    Slot2Configs.kA = Constants.IntakeConstants.DownkA.get();
+    Slot2Configs.kG = Constants.IntakeConstants.DownkG.get();
 
     // Corrects the direction of rolling
     MotorOutputConfigs ArmOutputConfigs = m_armConfigs.MotorOutput;
@@ -294,6 +298,69 @@ public class Intake extends SubsystemBase {
     if (m_IntakeMotorArm.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
       m_IntakeMotorArm.setPosition(0);
     }
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> {
+          var slot0 = new Slot0Configs();
+          slot0.kP = IntakeConstants.ExtendkP.get();
+          slot0.kI = IntakeConstants.ExtendkI.get();
+          slot0.kD = IntakeConstants.ExtendkD.get();
+          slot0.kS = IntakeConstants.ExtendkS.get();
+          slot0.kV = IntakeConstants.ExtendkV.get();
+          slot0.kA = IntakeConstants.ExtendkA.get();
+          slot0.kG = IntakeConstants.ExtendkG.get();
+          m_IntakeMotorArm.getConfigurator().apply(slot0);
+        },
+        IntakeConstants.ExtendkP,
+        IntakeConstants.ExtendkI,
+        IntakeConstants.ExtendkD,
+        IntakeConstants.ExtendkS,
+        IntakeConstants.ExtendkV,
+        IntakeConstants.ExtendkA,
+        IntakeConstants.ExtendkG);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> {
+          var slot1 = new Slot1Configs();
+          slot1.kP = IntakeConstants.RetractkP.get();
+          slot1.kI = IntakeConstants.RetractkI.get();
+          slot1.kD = IntakeConstants.RetractkD.get();
+          slot1.kS = IntakeConstants.RetractkS.get();
+          slot1.kV = IntakeConstants.RetractkV.get();
+          slot1.kA = IntakeConstants.RetractkA.get();
+          slot1.kG = IntakeConstants.RetractkG.get();
+          m_IntakeMotorArm.getConfigurator().apply(slot1);
+        },
+        IntakeConstants.RetractkP,
+        IntakeConstants.RetractkI,
+        IntakeConstants.RetractkD,
+        IntakeConstants.RetractkS,
+        IntakeConstants.RetractkV,
+        IntakeConstants.RetractkA,
+        IntakeConstants.RetractkG);
+
+    LoggedTunableNumber.ifChanged(
+        hashCode(),
+        () -> {
+          var slot2 = new Slot2Configs();
+          slot2.kP = IntakeConstants.DownkP.get();
+          slot2.kI = IntakeConstants.DownkI.get();
+          slot2.kD = IntakeConstants.DownkD.get();
+          slot2.kS = IntakeConstants.DownkS.get();
+          slot2.kV = IntakeConstants.DownkV.get();
+          slot2.kA = IntakeConstants.DownkA.get();
+          slot2.kG = IntakeConstants.DownkG.get();
+          m_IntakeMotorArm.getConfigurator().apply(slot2);
+        },
+        IntakeConstants.DownkP,
+        IntakeConstants.DownkI,
+        IntakeConstants.DownkD,
+        IntakeConstants.DownkS,
+        IntakeConstants.DownkV,
+        IntakeConstants.DownkA,
+        IntakeConstants.DownkG);
 
     RunIntakeState();
     // SmartDashboard.putBoolean("CheckExtended",
