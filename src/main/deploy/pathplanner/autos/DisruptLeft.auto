@@ -17,6 +17,12 @@
               {
                 "type": "named",
                 "data": {
+                  "name": "ExtendIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
                   "name": "ShootCommand"
                 }
               },
@@ -51,12 +57,6 @@
           "type": "path",
           "data": {
             "pathName": "LeftBumpToNeutral"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ExtendIntake"
           }
         },
         {
