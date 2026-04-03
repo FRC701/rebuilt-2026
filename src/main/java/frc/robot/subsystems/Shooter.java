@@ -4,8 +4,11 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Amps;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -67,7 +70,13 @@ public class Shooter extends SubsystemBase {
     var m_TalonFXConfig =
         new TalonFXConfiguration()
             .withVoltage(
-                new VoltageConfigs().withPeakForwardVoltage(10).withPeakReverseVoltage(-10));
+                new VoltageConfigs().withPeakForwardVoltage(10).withPeakReverseVoltage(-10))
+                .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(Amps.of(60))
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(60));
+
 
     MotorOutputConfigs shooterConfig = m_TalonFXConfig.MotorOutput;
 
