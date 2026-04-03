@@ -11,6 +11,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -56,6 +57,9 @@ public class VisionSubsystem extends SubsystemBase {
   // Simulation support
   private VisionSystemSim m_visionSim;
   private Pose2d m_simRobotPose = new Pose2d();
+
+  // Logging - throttle to every 10th cycle (200ms)
+  private int m_logCounter = 0;
 
   public VisionSubsystem() {
     m_FieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
@@ -152,6 +156,38 @@ public class VisionSubsystem extends SubsystemBase {
     } else {
       m_LatestReverseVisionMeasurement = Optional.empty();
     }
+
+    // Log critical vision data every 10th cycle (200ms) for match analysis
+    if (++m_logCounter >= 10) {
+      logVisionMeasurement("Right", m_LatestRightVisionMeasurement, m_RightCamera.isConnected());
+      logVisionMeasurement(
+          "Forward", m_LatestForwardVisionMeasurement, m_ForwardCamera.isConnected());
+      logVisionMeasurement(
+          "Reverse", m_LatestReverseVisionMeasurement, m_ReverseCamera.isConnected());
+      m_logCounter = 0;
+    }
+  }
+
+  private void logVisionMeasurement(
+      String camera, Optional<VisionMeasurement> measurement, boolean connected) {
+    if (!connected) {
+      DataLogManager.log("Vision/" + camera + " disconnected");
+      return;
+    }
+    if (measurement.isEmpty()) {
+      DataLogManager.log("Vision/" + camera + " no_pose");
+      return;
+    }
+    VisionMeasurement m = measurement.get();
+    DataLogManager.log(
+        "Vision/"
+            + camera
+            + " x:"
+            + String.format("%.2f", m.pose().getX())
+            + " y:"
+            + String.format("%.2f", m.pose().getY())
+            + " h:"
+            + String.format("%.1f", m.pose().getRotation().getDegrees()));
   }
 
   private void publishMeasurementTelemetry(
