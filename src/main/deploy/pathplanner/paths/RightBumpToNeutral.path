@@ -4,31 +4,52 @@
     {
       "anchor": {
         "x": 3.5,
-        "y": 0.8
+        "y": 2.1
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.0546259617565115,
-        "y": 0.7910608670273507
+        "x": 4.597947586119168,
+        "y": 2.442056939459818
       },
       "isLocked": false,
-      "linkedName": "RightTrenchStart"
+      "linkedName": "RightBumpStart"
     },
     {
       "anchor": {
-        "x": 0.4636853932584265,
-        "y": 0.6617752808988768
+        "x": 5.4176962806193805,
+        "y": 2.373744548251467
       },
       "prevControl": {
-        "x": 0.009783964749267293,
-        "y": 0.6632692688616821
+        "x": 4.901870786516854,
+        "y": 2.3738651685393255
+      },
+      "nextControl": {
+        "x": 5.908846654523112,
+        "y": 2.37362969797718
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.58720224719101,
+        "y": 2.2719550561797757
+      },
+      "prevControl": {
+        "x": 6.292412919163526,
+        "y": 2.2305581424965566
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Corral"
+      "linkedName": "RightNeutral"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 51.379479172681705
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
