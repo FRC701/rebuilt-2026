@@ -5,10 +5,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShooterEnumState;
-import frc.robot.subsystems.Intake.IntakeState;
-import frc.robot.subsystems.Intake;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ShootCommand extends Command {
@@ -30,7 +30,7 @@ public class ShootCommand extends Command {
   public void initialize() {
     m_LeftShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_Shooting;
     m_RightShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_Shooting;
-    m_Intake.m_IntakeState = IntakeState.S_ShootingCycleUp;
+    m_Intake.m_IntakeState = IntakeState.S_ShootingCycleDown;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -39,9 +39,7 @@ public class ShootCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    m_Intake.m_IntakeState = IntakeState.S_Extend;
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

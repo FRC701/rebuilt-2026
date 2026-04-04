@@ -75,7 +75,8 @@ public class RobotContainer {
   private Shooter m_LeftShooter =
       new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter", m_Agitator, m_Intake);
   private Shooter m_RightShooter =
-      new Shooter(Constants.ShooterConstants.kRightShooterId, "Right Shooter", m_Agitator, m_Intake);
+      new Shooter(
+          Constants.ShooterConstants.kRightShooterId, "Right Shooter", m_Agitator, m_Intake);
 
   // Instantiating Shooter Commands
 
@@ -101,11 +102,17 @@ public class RobotContainer {
   public RobotContainer() {
 
     // NamedCommands.registerCommand(
-    NamedCommands.registerCommand("ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter, m_Intake));
+    NamedCommands.registerCommand(
+        "ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter, m_Intake));
     NamedCommands.registerCommand("StopShooting", m_NotShootingCommand);
     NamedCommands.registerCommand("FeederOn", new FeederOn(m_LeftFeeder, m_RightFeeder));
     NamedCommands.registerCommand("ExtendIntake", new ExtendIntake(m_Intake));
-    NamedCommands.registerCommand("AutoAim", new AimAtHub(m_DriveTrain, () -> m_ps4Controller.getLeftY()*MaxSpeed, () -> m_ps4Controller.getLeftX() * MaxSpeed));
+    NamedCommands.registerCommand(
+        "AutoAim",
+        new AimAtHub(
+            m_DriveTrain,
+            () -> m_ps4Controller.getLeftY() * MaxSpeed,
+            () -> m_ps4Controller.getLeftX() * MaxSpeed));
     // builds auto chooser
     autoChooser = AutoBuilder.buildAutoChooser("Shoot");
     SmartDashboard.putData("Auto Mode", autoChooser);
@@ -194,12 +201,14 @@ public class RobotContainer {
     // Shooter Binding XBox
     m_xboxController
         .rightTrigger()
-        .onTrue(new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter));
+        .onTrue(
+            new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
     m_xboxController.x().onTrue(m_NotShootingCommand);
     // Playstation variant of ^^^
     m_ps4Controller
         .R2()
-        .onTrue(new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter));
+        .onTrue(
+            new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
     m_ps4Controller.square().onTrue(m_NotShootingCommand);
 
     // AimBot Binding - aims at hub while held

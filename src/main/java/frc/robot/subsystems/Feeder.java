@@ -36,13 +36,13 @@ public class Feeder extends SubsystemBase {
     m_FeederState = FeederState.S_Off;
 
     // Creates the Configs objects
-    var m_TalonFXConfig = new TalonFXConfiguration()
-    .withCurrentLimits(
+    var m_TalonFXConfig =
+        new TalonFXConfiguration()
+            .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))
                     .withStatorCurrentLimitEnable(true)
                     .withSupplyCurrentLimit(60));
-
 
     // Applies the MotorOutput configs
     MotorOutputConfigs feederConfig = m_TalonFXConfig.MotorOutput;

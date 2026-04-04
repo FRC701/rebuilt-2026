@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Agitator.AgitatorState;
-import frc.robot.subsystems.Intake.IntakeState;
 
 public class Shooter extends SubsystemBase {
 
@@ -60,7 +59,7 @@ public class Shooter extends SubsystemBase {
 
     // gives values to the Strings that are used for Shuffleboard
     nameStrings();
-    m_Agitator = agitator; 
+    m_Agitator = agitator;
     m_Intake = intake;
 
     // Selects the intial state
@@ -74,12 +73,11 @@ public class Shooter extends SubsystemBase {
         new TalonFXConfiguration()
             .withVoltage(
                 new VoltageConfigs().withPeakForwardVoltage(10).withPeakReverseVoltage(-10))
-                .withCurrentLimits(
+            .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))
                     .withStatorCurrentLimitEnable(true)
                     .withSupplyCurrentLimit(60));
-
 
     MotorOutputConfigs shooterConfig = m_TalonFXConfig.MotorOutput;
 
@@ -165,7 +163,7 @@ public class Shooter extends SubsystemBase {
   public void passing() {
     m_ShooterMotor.setControl(voltSpeed.withVelocity(Constants.ShooterConstants.passRev));
     m_Agitator.m_AgitatorState = AgitatorState.S_In;
-    }
+  }
 
   // Sets the speed to 0 by using a VelocityVotage object with 0 velocity
   public void stopping() {

@@ -218,7 +218,7 @@ public class Intake extends SubsystemBase {
       case S_ShootingCycleDown:
         ShootingCycleDown();
         break;
-      }
+    }
   }
 
   public void ShootingCycleUp() {
@@ -240,7 +240,7 @@ public class Intake extends SubsystemBase {
       m_Timer.reset();
       m_Timer.stop();
     }
-    setPosition(IntakeConstants.kExtensionPosition, 0);
+    setPosition(IntakeConstants.kExtensionPosition, 2);
   }
 
   public void ExtendCycleUp() {
