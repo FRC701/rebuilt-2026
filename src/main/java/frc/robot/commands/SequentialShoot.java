@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Feeder;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
@@ -18,6 +19,7 @@ public class SequentialShoot extends SequentialCommandGroup {
   Shooter m_RightShooter;
   Feeder m_LeftFeeder;
   Feeder m_RightFeeder;
+  Intake m_Intake;
 
   public SequentialShoot(
       Shooter leftShooter, Shooter rightShooter, Feeder leftFeeder, Feeder rightFeeder) {
@@ -30,6 +32,7 @@ public class SequentialShoot extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
         // new ShootingCommand(m_LeftShooter, m_RightShooter),
-        new ShootCommand(m_LeftShooter, m_RightShooter), new FeederOn(m_LeftFeeder, m_RightFeeder));
+        new ShootCommand(m_LeftShooter, m_RightShooter, m_Intake),
+        new FeederOn(m_LeftFeeder, m_RightFeeder));
   }
 }

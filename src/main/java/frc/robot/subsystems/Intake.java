@@ -190,7 +190,9 @@ public class Intake extends SubsystemBase {
     S_Retract,
     S_Outtake,
     S_Down,
-    S_ExtendCycleUp
+    S_ExtendCycleUp,
+    S_ShootingCycleUp,
+    S_ShootingCycleDown
   }
 
   public void RunIntakeState() {
@@ -208,12 +210,40 @@ public class Intake extends SubsystemBase {
         Down();
         break;
       case S_ExtendCycleUp:
-        CycleUp();
+        ExtendCycleUp();
+        break;
+      case S_ShootingCycleUp:
+        ShootingCycleUp();
+        break;
+      case S_ShootingCycleDown:
+        ShootingCycleDown();
         break;
     }
   }
 
-  public void CycleUp() {
+  public void ShootingCycleUp() {
+    m_Timer.start();
+    m_IntakeMotorRoller.setVoltage(7);
+    if (m_Timer.hasElapsed(.2)) {
+      m_IntakeState = IntakeState.S_ShootingCycleDown;
+      m_Timer.reset();
+      m_Timer.stop();
+    }
+    setPosition(2.5, 1);
+  }
+
+  public void ShootingCycleDown() {
+    m_Timer.start();
+    m_IntakeMotorRoller.setVoltage(7);
+    if (m_Timer.hasElapsed(.2)) {
+      m_IntakeState = IntakeState.S_ShootingCycleUp;
+      m_Timer.reset();
+      m_Timer.stop();
+    }
+    setPosition(IntakeConstants.kExtensionPosition, 2);
+  }
+
+  public void ExtendCycleUp() {
     m_Timer.start();
     m_IntakeMotorRoller.setVoltage(7);
     if (m_Timer.hasElapsed(0.15)) {
