@@ -30,6 +30,7 @@ import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.ShootCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
@@ -76,6 +77,7 @@ public class RobotContainer {
       new Shooter(Constants.ShooterConstants.kLeftShooterId, "Left Shooter", m_Agitator);
   private Shooter m_RightShooter =
       new Shooter(Constants.ShooterConstants.kRightShooterId, "Right Shooter", m_Agitator);
+  private Climber m_Climber = new Climber();
 
   // Instantiating Shooter Commands
 
@@ -200,6 +202,11 @@ public class RobotContainer {
         .R2()
         .onTrue(new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter));
     m_ps4Controller.square().onTrue(m_NotShootingCommand);
+
+    // Playstation Climber Binding
+    // m_ps4Controller.R1().onTrue(new ClimberUpDownToggle(m_Climber, m_Agitator, m_LeftFeeder,
+    // m_RightFeeder, m_LeftShooter, m_RightShooter));
+    // m_ps4Controller.circle().onTrue(new ClimberLock(m_Climber));
 
     // AimBot Binding - aims at hub while held
     m_xboxController

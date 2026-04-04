@@ -20,20 +20,23 @@ import frc.robot.subsystems.Shooter.ShooterEnumState;
 public class ClimberUpDownToggle extends InstantCommand {
   Climber m_Climber;
   Agitator m_Agitator;
-  Feeder m_Feeder;
+  Feeder m_LeftFeeder;
+  Feeder m_RightFeeder;
   Shooter m_LeftShooter;
   Shooter m_RightShooter;
 
   public ClimberUpDownToggle(
       Climber climber,
       Agitator agitator,
-      Feeder feeder,
+      Feeder rightfeeder,
+      Feeder leftfeeder,
       Shooter leftShooter,
       Shooter rightShooter) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_Climber = climber;
     m_Agitator = agitator;
-    m_Feeder = feeder;
+    m_RightFeeder = rightfeeder;
+    m_LeftFeeder = leftfeeder;
     m_LeftShooter = leftShooter;
     m_RightShooter = rightShooter;
   }
@@ -44,7 +47,8 @@ public class ClimberUpDownToggle extends InstantCommand {
 
     if (m_Climber.m_ClimberState == ClimberState.S_Retract) {
       m_Agitator.m_AgitatorState = AgitatorState.S_Off;
-      m_Feeder.m_FeederState = FeederState.S_Off;
+      m_RightFeeder.m_FeederState = FeederState.S_Off;
+      m_LeftFeeder.m_FeederState = FeederState.S_Off;
       m_LeftShooter.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
       m_RightShooter.m_ShooterEnumState = ShooterEnumState.S_NotShooting;
       m_Climber.m_ClimberState = ClimberState.S_Extend;
