@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5001120372232086,
-        "y": 5.95740558321346
+        "x": 1.5001275782460364,
+        "y": 5.9615779657282495
       },
       "isLocked": false,
       "linkedName": "DepotCenter"
@@ -20,8 +20,8 @@
         "y": 5.95
       },
       "prevControl": {
-        "x": 0.20013669289958336,
-        "y": 5.941733938976582
+        "x": 0.20017278397671065,
+        "y": 5.940706877055978
       },
       "nextControl": null,
       "isLocked": false,
