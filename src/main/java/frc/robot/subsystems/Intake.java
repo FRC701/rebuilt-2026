@@ -223,7 +223,7 @@ public class Intake extends SubsystemBase {
 
   public void ShootingCycleUp() {
     m_Timer.start();
-    m_IntakeMotorRoller.setVoltage(7);
+    m_IntakeMotorRoller.setVoltage(4);
     if (m_Timer.hasElapsed(.2)) {
       m_IntakeState = IntakeState.S_ShootingCycleDown;
       m_Timer.reset();
@@ -234,7 +234,7 @@ public class Intake extends SubsystemBase {
 
   public void ShootingCycleDown() {
     m_Timer.start();
-    m_IntakeMotorRoller.setVoltage(7);
+    m_IntakeMotorRoller.setVoltage(4);
     if (m_Timer.hasElapsed(.2)) {
       m_IntakeState = IntakeState.S_ShootingCycleUp;
       m_Timer.reset();
