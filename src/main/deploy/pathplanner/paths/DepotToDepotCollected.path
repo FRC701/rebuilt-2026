@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5007023664363333,
-        "y": 5.969376668433036
+        "x": 1.5001120372232086,
+        "y": 5.95740558321346
       },
       "isLocked": false,
       "linkedName": "DepotCenter"
@@ -20,8 +20,8 @@
         "y": 5.95
       },
       "prevControl": {
-        "x": 0.19289209813131286,
-        "y": 5.936657378339133
+        "x": 0.20013669289958336,
+        "y": 5.941733938976582
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,7 +47,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.5,
+    "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -64,5 +64,5 @@
     "velocity": 5.0,
     "rotation": 180.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }
