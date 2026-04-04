@@ -68,7 +68,7 @@ public final class Constants {
     public static final int kIntakeMotorArm = 11;
     public static final int kIntakeMotorRoller = 12;
     // The number of rotations using the falcon's encoder
-    public static final double kExtensionPosition = 4.9; // 4.7
+    public static final double kExtensionPosition = 4.7; // 4.7
     public static final double kExtentionCycleUpPos = kExtensionPosition - 0.8;
     public static final double kRetractPosition = 0; // Intake is retract ed and in the bot
 
