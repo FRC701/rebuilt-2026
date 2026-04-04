@@ -58,7 +58,7 @@ public class Intake extends SubsystemBase {
   Timer m_Timer = new Timer();
   // private final StatusSignal<ReverseLimitValue> m_reverseLimitSignal;
 
-  private double FORWARD_LIMIT = 5.3; // Placeholder
+  private double FORWARD_LIMIT = 5.0; // Placeholder
   private double REVERSE_LIMIT = 0;
 
   // Simulation
