@@ -211,7 +211,7 @@ public class RobotContainer {
         .R2()
         .onTrue(
             new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
-    m_ps4Controller.square().onTrue(m_NotShootingCommand);
+  //  m_ps4Controller.square().onTrue(m_NotShootingCommand);
 
     // Playstation Climber Binding
     // m_ps4Controller.R1().onTrue(new ClimberUpDownToggle(m_Climber, m_Agitator, m_LeftFeeder,

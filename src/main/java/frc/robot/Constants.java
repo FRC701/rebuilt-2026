@@ -122,7 +122,7 @@ public final class Constants {
      * Desired Rotations per second for shooter Motors
      * WARNING: CURRENTLY TEMPORARY NUMBERS
      */
-    public static final double shootRev = 75;
+    public static final double shootRev = 90;
     public static final double passRev = 1;
 
     // Simulation (4:1 gearing, each motor drives 2 shafts)
