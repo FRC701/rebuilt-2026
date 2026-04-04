@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.585,
-        "y": 5.964658334635472
+        "x": 0.45,
+        "y": 5.95
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0451399754455246,
-        "y": 4.865673781786271
+        "x": 1.9101399754455242,
+        "y": 4.851015447150799
       },
       "isLocked": false,
       "linkedName": "DepotCollected"
