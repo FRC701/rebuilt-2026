@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SlightTurnLeftBump"
+            "pathName": "SlightTurnRightBump"
           }
         },
         {
@@ -18,6 +18,12 @@
                 "type": "named",
                 "data": {
                   "name": "ExtendIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAim"
                 }
               },
               {
@@ -50,31 +56,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SlightTurnLeftBumpBackwards"
+            "pathName": "SlightTurnRightBumpBackwards"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LeftBumpToNeutral"
+            "pathName": "RightBumpToNeutralIntake"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LeftNeutralToDisrupt"
+            "pathName": "RightNeutralDrive"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "RightNeutralToShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AutoAim"
+            "pathName": "RightEndNeutralToShoot"
           }
         }
       ]

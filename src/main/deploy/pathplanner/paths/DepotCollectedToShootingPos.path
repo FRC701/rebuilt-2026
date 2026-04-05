@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.585,
-        "y": 5.964658334635472
+        "x": 0.45,
+        "y": 5.95
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0451399754455246,
-        "y": 4.865673781786271
+        "x": 2.3166895310583526,
+        "y": 4.8796378478884215
       },
       "isLocked": false,
       "linkedName": "DepotCollected"
     },
     {
       "anchor": {
-        "x": 3.0,
-        "y": 5.5
+        "x": 3.2,
+        "y": 5.3
       },
       "prevControl": {
-        "x": 1.722143003597963,
-        "y": 5.576429312995995
+        "x": 1.8609993371566507,
+        "y": 5.766169705998102
       },
       "nextControl": null,
       "isLocked": false,

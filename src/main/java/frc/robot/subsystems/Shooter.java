@@ -35,6 +35,7 @@ public class Shooter extends SubsystemBase {
   public ShooterEnumState m_ShooterEnumState;
 
   private Agitator m_Agitator;
+  private Intake m_Intake;
 
   // Boolean to track the enabled status
   private boolean m_ShooterEnabled = true;
@@ -54,12 +55,13 @@ public class Shooter extends SubsystemBase {
   private int m_logCounter = 0;
 
   /** Creates a new Shooter. */
-  public Shooter(int motorId, String subsystemName, Agitator agitator) {
+  public Shooter(int motorId, String subsystemName, Agitator agitator, Intake intake) {
     super(subsystemName);
 
     // gives values to the Strings that are used for Shuffleboard
     nameStrings();
     m_Agitator = agitator;
+    m_Intake = intake;
 
     // Selects the intial state
     m_ShooterEnumState = ShooterEnumState.S_NotShooting;

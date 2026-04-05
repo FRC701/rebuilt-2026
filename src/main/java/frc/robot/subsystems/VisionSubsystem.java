@@ -78,7 +78,7 @@ public class VisionSubsystem extends SubsystemBase {
     m_ReversePoseEstimator =
         new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kReverseRobotToCam3d);
 
-    SmartDashboard.putBoolean("Vision/VerboseTelemetry", false);
+    SmartDashboard.putBoolean("Vision/VerboseTelemetry", true);
 
     if (Utils.isSimulation()) {
       m_visionSim = new VisionSystemSim("main");
@@ -124,7 +124,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    boolean verbose = SmartDashboard.getBoolean("Vision/VerboseTelemetry", false);
+    boolean verbose = SmartDashboard.getBoolean("Vision/VerboseTelemetry", true);
 
     if (verbose) {
       SmartDashboard.putBoolean("Vision/Right/Connected", m_RightCamera.isConnected());

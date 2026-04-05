@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.Follower;
@@ -13,6 +14,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -25,6 +27,9 @@ public class Climber extends SubsystemBase {
   public ClimberState m_ClimberState;
 
   private TalonFXConfiguration m_TalonFXConfig;
+
+  private double FORWARD_LIMIT = 4; // Placeholder
+  private double REVERSE_LIMIT = 0;
 
   public final double GearRatio = 6.1;
   private final double kSproketCircumference = 2 * Math.PI;
@@ -53,7 +58,13 @@ public class Climber extends SubsystemBase {
     m_TalonFXConfig =
         new TalonFXConfiguration()
             .withVoltage(
-                new VoltageConfigs().withPeakForwardVoltage(12).withPeakReverseVoltage(-12));
+                new VoltageConfigs().withPeakForwardVoltage(12).withPeakReverseVoltage(-12))
+            .withSoftwareLimitSwitch(
+                new SoftwareLimitSwitchConfigs()
+                    .withForwardSoftLimitThreshold(FORWARD_LIMIT)
+                    .withForwardSoftLimitEnable(true)
+                    .withReverseSoftLimitThreshold(REVERSE_LIMIT)
+                    .withReverseSoftLimitEnable(true));
 
     m_ClimberLeader.getConfigurator().apply(m_TalonFXConfig);
     m_ClimberFollower.getConfigurator().apply(m_TalonFXConfig);
@@ -147,12 +158,12 @@ public class Climber extends SubsystemBase {
     // This method will be called once per scheduler run
 
     // Shuffleboard.getTab("Test");
-    // SmartDashboard.putNumber("ClimberMotorPosition", LimitCheck());
+    SmartDashboard.putNumber("ClimberMotorPosition", LimitCheck());
     // SmartDashboard.putNumber("ClimberMotorRaw",
     // m_ClimberLeader.getPosition().getValueAsDouble());
-    // SmartDashboard.putBoolean(
-    //     "SetpointReached", SetpointReached(Constants.ClimberConstants.kExtensionPosition));
-    // SmartDashboard.putString("ClimberState", m_ClimberState.toString());
+    SmartDashboard.putBoolean(
+        "SetpointReached", SetpointReached(Constants.ClimberConstants.kExtensionPosition));
+    SmartDashboard.putString("ClimberState", m_ClimberState.toString());
     runClimberState();
   }
 }

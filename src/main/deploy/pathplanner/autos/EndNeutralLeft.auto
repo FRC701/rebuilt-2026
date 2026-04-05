@@ -23,6 +23,12 @@
               {
                 "type": "named",
                 "data": {
+                  "name": "AutoAim"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
                   "name": "ShootCommand"
                 }
               },
@@ -30,12 +36,6 @@
                 "type": "named",
                 "data": {
                   "name": "FeederOn"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "AutoAim"
                 }
               }
             ]
@@ -74,13 +74,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "EndNeutralToShoot"
+            "pathName": "LeftEndNeutralToShoot"
           }
         },
         {
           "type": "sequential",
           "data": {
             "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAim"
+                }
+              },
               {
                 "type": "named",
                 "data": {
@@ -91,12 +97,6 @@
                 "type": "named",
                 "data": {
                   "name": "FeederOn"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "AutoAim"
                 }
               }
             ]
