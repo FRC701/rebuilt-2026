@@ -1,0 +1,123 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SlightTurnLeftTrench"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShootCommand"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "FeederOn"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAim"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopShooting"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TurnLeftTrenchBackwards"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftTrenchToNeutral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ExtendIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftNeutralToDisrupt"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RightNeutralToShootTrench"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShootCommand"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "FeederOn"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAim"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopShooting"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

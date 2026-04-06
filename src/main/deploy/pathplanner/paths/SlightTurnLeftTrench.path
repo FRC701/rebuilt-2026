@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.591145746814201,
-        "y": 4.773380409896361
+        "x": 3.5,
+        "y": 7.25
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.941416438192496,
-        "y": 4.628935658704286
+        "x": 3.7353582984951843,
+        "y": 7.334299889261207
       },
       "isLocked": false,
-      "linkedName": "LeftNeutralEnd"
+      "linkedName": "LeftTrenchStart"
     },
     {
       "anchor": {
-        "x": 5.377351598846921,
-        "y": 5.26488567313449
+        "x": 3.041794754695628,
+        "y": 6.35021786082491
       },
       "prevControl": {
-        "x": 6.976928531938343,
-        "y": 5.059073253706672
+        "x": 3.2327872492569245,
+        "y": 6.844165467427025
       },
       "nextControl": {
-        "x": 3.7997690394441967,
-        "y": 5.4678681472380015
+        "x": 2.8508022601343317,
+        "y": 5.856270254222794
       },
       "isLocked": false,
       "linkedName": null
@@ -36,20 +36,15 @@
         "y": 5.3
       },
       "prevControl": {
-        "x": 2.9500467463926534,
-        "y": 5.3048343573617815
+        "x": 2.9736371931650614,
+        "y": 5.406112580224063
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "LeftShootPos"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1.029661016949142,
-      "rotationDegrees": -52.51880190933421
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
