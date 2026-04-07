@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SlightTurnRightBump"
+            "pathName": "SlightTurnLeftBump"
           }
         },
         {
           "type": "sequential",
           "data": {
             "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ExtendIntake"
+                }
+              },
               {
                 "type": "named",
                 "data": {
@@ -32,7 +38,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 2.5
           }
         },
         {
@@ -44,62 +50,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SlightTurnRightBumpBackwards"
+            "pathName": "SlightTurnLeftBumpBackwards"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "RightBumpToNeutral"
+            "pathName": "LeftBumpToNeutral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftNeutralToDisrupt"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RightNeutralToShoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ExtendIntake"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "RightNeutralToDisrupt"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftNeutralToShoot"
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "ShootCommand"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "FeederOn"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 5.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopShooting"
+            "name": "AutoAim"
           }
         }
       ]

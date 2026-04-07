@@ -27,7 +27,7 @@ public final class Constants {
   public static class AgitatorConstants {
     public static final int kAgitatorLeftMotor = 21;
     public static final int kAgitatorRightMotor = 22;
-    public static final double kAgitatorVoltIn = 6;
+    public static final double kAgitatorVoltIn = 7;
     public static final double kAgitatorVoltOut = -4;
     // Simulation
     public static final double kSimAgitatorGearRatio = 2; // also a planetary
@@ -68,7 +68,7 @@ public final class Constants {
     public static final int kIntakeMotorArm = 11;
     public static final int kIntakeMotorRoller = 12;
     // The number of rotations using the falcon's encoder
-    public static final double kExtensionPosition = 4.9; // 4.7
+    public static final double kExtensionPosition = 4.5; // 4.7
     public static final double kExtentionCycleUpPos = kExtensionPosition - 0.8;
     public static final double kRetractPosition = 0; // Intake is retract ed and in the bot
 
@@ -122,7 +122,7 @@ public final class Constants {
      * Desired Rotations per second for shooter Motors
      * WARNING: CURRENTLY TEMPORARY NUMBERS
      */
-    public static final double shootRev = 75;
+    public static final double shootRev = 100;
     public static final double passRev = 1;
 
     // Simulation (4:1 gearing, each motor drives 2 shafts)

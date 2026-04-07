@@ -7,13 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftTrenchToShootingPos"
+            "pathName": "SlightTurnLeftBump"
           }
         },
         {
           "type": "sequential",
           "data": {
             "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ExtendIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAim"
+                }
+              },
               {
                 "type": "named",
                 "data": {
@@ -44,37 +56,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftShootPosToDepot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ExtendIntake"
+            "pathName": "SlightTurnLeftBumpBackwards"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DepotToDepotCollected"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
+            "pathName": "LeftBumpToNeutralIntake"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DepotCollectedToShootingPos"
+            "pathName": "LeftNeutralDrive"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftEndNeutralToShoot"
           }
         },
         {
           "type": "sequential",
           "data": {
             "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAim"
+                }
+              },
               {
                 "type": "named",
                 "data": {
@@ -97,9 +109,9 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "LeftShootToOutOfWay"
+            "name": "StopShooting"
           }
         }
       ]

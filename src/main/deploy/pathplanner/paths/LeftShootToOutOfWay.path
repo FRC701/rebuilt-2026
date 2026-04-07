@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.0,
-        "y": 5.5
+        "x": 3.2,
+        "y": 5.3
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.3114903569405785,
-        "y": 5.212507786651779
+        "x": 3.685690277522645,
+        "y": 4.8185600265276385
       },
       "isLocked": false,
       "linkedName": "LeftShootPos"
@@ -20,8 +20,8 @@
         "y": 7.25
       },
       "prevControl": {
-        "x": 1.064409945112419,
-        "y": 7.428395316859794
+        "x": 1.0718946449866857,
+        "y": 7.425437973413914
       },
       "nextControl": null,
       "isLocked": false,

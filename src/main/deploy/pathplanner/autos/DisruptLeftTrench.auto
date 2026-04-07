@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftTrenchToShootingPos"
+            "pathName": "SlightTurnLeftTrench"
           }
         },
         {
@@ -24,6 +24,12 @@
                 "type": "named",
                 "data": {
                   "name": "FeederOn"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAim"
                 }
               }
             ]
@@ -44,7 +50,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftShootPosToDepot"
+            "pathName": "TurnLeftTrenchBackwards"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftTrenchToNeutral"
           }
         },
         {
@@ -56,19 +68,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "DepotToDepotCollected"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
+            "pathName": "LeftNeutralToDisrupt"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DepotCollectedToShootingPos"
+            "pathName": "RightNeutralToShootTrench"
           }
         },
         {
@@ -86,6 +92,12 @@
                 "data": {
                   "name": "FeederOn"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAim"
+                }
               }
             ]
           }
@@ -97,9 +109,9 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "LeftShootToOutOfWay"
+            "name": "StopShooting"
           }
         }
       ]

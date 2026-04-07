@@ -31,6 +31,7 @@ import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -58,8 +59,11 @@ public class Intake extends SubsystemBase {
   Timer m_Timer = new Timer();
   // private final StatusSignal<ReverseLimitValue> m_reverseLimitSignal;
 
-  private double FORWARD_LIMIT = 5.3; // Placeholder
+  private double FORWARD_LIMIT = 5.0; // Placeholder
   private double REVERSE_LIMIT = 0;
+
+  // Logging - throttle to every 10th cycle (200ms)
+  private int m_logCounter = 0;
 
   // Simulation
   private SingleJointedArmSim m_armSim;
@@ -190,7 +194,9 @@ public class Intake extends SubsystemBase {
     S_Retract,
     S_Outtake,
     S_Down,
-    S_ExtendCycleUp
+    S_ExtendCycleUp,
+    S_ShootingCycleUp,
+    S_ShootingCycleDown
   }
 
   public void RunIntakeState() {
@@ -208,12 +214,40 @@ public class Intake extends SubsystemBase {
         Down();
         break;
       case S_ExtendCycleUp:
-        CycleUp();
+        ExtendCycleUp();
+        break;
+      case S_ShootingCycleUp:
+        ShootingCycleUp();
+        break;
+      case S_ShootingCycleDown:
+        ShootingCycleDown();
         break;
     }
   }
 
-  public void CycleUp() {
+  public void ShootingCycleUp() {
+    m_Timer.start();
+    m_IntakeMotorRoller.setVoltage(4);
+    if (m_Timer.hasElapsed(.2)) {
+      m_IntakeState = IntakeState.S_ShootingCycleDown;
+      m_Timer.reset();
+      m_Timer.stop();
+    }
+    setPosition(3, 1);
+  }
+
+  public void ShootingCycleDown() {
+    m_Timer.start();
+    m_IntakeMotorRoller.setVoltage(4);
+    if (m_Timer.hasElapsed(.2)) {
+      m_IntakeState = IntakeState.S_ShootingCycleUp;
+      m_Timer.reset();
+      m_Timer.stop();
+    }
+    setPosition(IntakeConstants.kExtensionPosition, 2);
+  }
+
+  public void ExtendCycleUp() {
     m_Timer.start();
     m_IntakeMotorRoller.setVoltage(7);
     if (m_Timer.hasElapsed(0.15)) {
@@ -296,11 +330,19 @@ public class Intake extends SubsystemBase {
     }
 
     RunIntakeState();
-    // SmartDashboard.putBoolean("CheckExtended",
-    // checkExtended(IntakeConstants.kExtensionPosition));
-    // SmartDashboard.putBoolean("CheckRetracted", checkExtended(IntakeConstants.kRetractPosition));
-    // SmartDashboard.putNumber("ForwardSoftLimit", FORWARD_LIMIT);
-    // SmartDashboard.putNumber("ReverseSoftLimit", REVERSE_LIMIT);
+
+    // Log critical values every 10th cycle (200ms) for match analysis
+    if (++m_logCounter >= 10) {
+      DataLogManager.log(
+          "Intake pos:"
+              + m_IntakeMotorArm.getPosition().getValueAsDouble()
+              + " i:"
+              + m_IntakeMotorArm.getStatorCurrent().getValueAsDouble()
+              + " s:"
+              + m_IntakeState.name());
+      m_logCounter = 0;
+    }
+
     SmartDashboard.putNumber("IntakePose", m_IntakeMotorArm.getPosition().getValueAsDouble());
     SmartDashboard.putString("IntakeState", m_IntakeState.toString());
   }
