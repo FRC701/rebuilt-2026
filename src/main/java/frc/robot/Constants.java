@@ -145,16 +145,6 @@ public final class Constants {
     // 90° is aligned with the positive Y axis, and -90° is aligned with the
     // negative Y axis.
 
-    // robot coordination system is centered on the floor. So a camer at the center, facing forward
-    // on the floor, is 0,0,0,0,0,0
-
-    //  two on mast:
-
-    // one backwards (0,-2.78,24.75,0,0,0)
-    // or
-    // one backwards (0,-2.78,24.75)
-    // one facing right rotated  90 CW  (top pointing intake) (must match photonvision ui) in )
-
     public static final double kRightCameraMountPitchAngleRad = Units.degreesToRadians(0);
     public static final double kRightCameraMountRollAngleRad = Units.degreesToRadians(-90);
     public static final double kRightCameraMountYawAngleRad = Units.degreesToRadians(-90);
@@ -181,9 +171,9 @@ public final class Constants {
     public static final double kForwardCameraMountRollAngleRad = Units.degreesToRadians(0);
     public static final double kForwardCameraMountYawAngleRad = Units.degreesToRadians(0);
 
-    public static final double kForwardCameraForwardMeters = Units.inchesToMeters(0);
+    public static final double kForwardCameraForwardMeters = Units.inchesToMeters(-2);
     public static final double kForwardCameraLeftMeters = Units.inchesToMeters(0);
-    public static final double kForwardCameraUpMeters = Units.inchesToMeters(22);
+    public static final double kForwardCameraUpMeters = Units.inchesToMeters(21.5);
 
     // Robot to forward camera transform
     public static final Transform3d kForwardRobotToCam3d =
@@ -203,9 +193,9 @@ public final class Constants {
     public static final double kReverseCameraMountRollAngleRad = Units.degreesToRadians(0);
     public static final double kReverseCameraMountYawAngleRad = Units.degreesToRadians(180);
 
-    public static final double kReverseCameraForwardMeters = Units.inchesToMeters(0);
-    public static final double kReverseCameraLeftMeters = Units.inchesToMeters(0);
-    public static final double kReverseCameraUpMeters = Units.inchesToMeters(22);
+    public static final double kReverseCameraForwardMeters = Units.inchesToMeters(7.5);
+    public static final double kReverseCameraLeftMeters = Units.inchesToMeters(11);
+    public static final double kReverseCameraUpMeters = Units.inchesToMeters(12);
 
     // Robot to reverse camera transform
     public static final Transform3d kReverseRobotToCam3d =
@@ -222,8 +212,9 @@ public final class Constants {
     // If the robot snaps/jumps to vision poses too aggressively → increase the base
     // If vision corrections feel sluggish or ignored → decrease the base
     public static final double kSingleTagBaseXYStdDev = 1.5; // base error in meters at 1m distance
-    public static final double kSingleTagBaseHeadingStdDev =
-        Double.MAX_VALUE; // don't trust single-tag heading
+    // Large but finite — Kalman gain rounds to ~0 without overflowing when multiplied
+    // by distance factors. Effectively ignores single-tag heading.
+    public static final double kSingleTagBaseHeadingStdDev = 10.0; // radians (~573°)
     public static final double kMultiTagBaseXYStdDev = 1.0; // base error in meters at 1m distance
     public static final double kMultiTagBaseHeadingStdDev =
         0.45; // base error in radians at 1m (~34 deg)
@@ -234,14 +225,14 @@ public final class Constants {
 
     // Acceptance rules
     public static final int kMinAprilTagsForPose = 1;
-    public static final double kMaxAcceptableSingleTagAmbiguity = 0.3;
+    public static final double kMaxAcceptableSingleTagAmbiguity = 0.2;
 
     // Pose sanity / QC filters
     public static final double kMaxPoseHeightMeters =
         0.75; // reject if estimated Z is off the floor
     public static final double kFieldBoundaryMarginMeters =
         0.5; // allow slightly outside field edge
-    public static final double kMaxSingleTagDistanceMeters = 4.0; // max reliable single-tag range
+    public static final double kMaxSingleTagDistanceMeters = 2.5; // max reliable single-tag range
 
     // Speed filters — reject vision when robot is moving too fast (motion blur)
     // These will only filter out extreme motion blur. Can tighten based on testing.
