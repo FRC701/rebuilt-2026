@@ -223,13 +223,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             || Math.abs(speeds.omegaRadiansPerSecond) > Constants.Vision.kMaxVisionRotationSpeed;
 
     if (!tooFast) {
-      m_visionSubsystem.getLatestRightVisionMeasurement().ifPresent(m -> tryFuseVision(m, "Right"));
-      m_visionSubsystem
-          .getLatestForwardVisionMeasurement()
-          .ifPresent(m -> tryFuseVision(m, "Forward"));
-      m_visionSubsystem
-          .getLatestReverseVisionMeasurement()
-          .ifPresent(m -> tryFuseVision(m, "Reverse"));
+      for (var m : m_visionSubsystem.drainRightMeasurements()) {
+        tryFuseVision(m, "Right");
+      }
+      for (var m : m_visionSubsystem.drainForwardMeasurements()) {
+        tryFuseVision(m, "Forward");
+      }
+      for (var m : m_visionSubsystem.drainReverseMeasurements()) {
+        tryFuseVision(m, "Reverse");
+      }
+    } else {
+      // Dropping stale frames while too-fast avoids a burst of queued measurements getting
+      // fused all at once the moment the robot slows down.
+      m_visionSubsystem.drainRightMeasurements();
+      m_visionSubsystem.drainForwardMeasurements();
+      m_visionSubsystem.drainReverseMeasurements();
     }
   }
 

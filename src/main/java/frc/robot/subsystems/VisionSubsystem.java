@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -33,9 +35,20 @@ public class VisionSubsystem extends SubsystemBase {
   private final PhotonPoseEstimator m_ReversePoseEstimator;
   private final AprilTagFieldLayout m_FieldLayout;
 
-  private Optional<VisionMeasurement> m_LatestRightVisionMeasurement = Optional.empty();
-  private Optional<VisionMeasurement> m_LatestForwardVisionMeasurement = Optional.empty();
-  private Optional<VisionMeasurement> m_LatestReverseVisionMeasurement = Optional.empty();
+  // Queued measurements from every processed frame since the last drain.
+  private final List<VisionMeasurement> m_RightMeasurements = new ArrayList<>();
+  private final List<VisionMeasurement> m_ForwardMeasurements = new ArrayList<>();
+  private final List<VisionMeasurement> m_ReverseMeasurements = new ArrayList<>();
+
+  // Last accepted measurement per camera — purely for telemetry / logVisionMeasurement.
+  private Optional<VisionMeasurement> m_LastRightAccepted = Optional.empty();
+  private Optional<VisionMeasurement> m_LastForwardAccepted = Optional.empty();
+  private Optional<VisionMeasurement> m_LastReverseAccepted = Optional.empty();
+
+  // Edge-triggered calibration warnings so the log isn't spammed every loop.
+  private boolean m_RightUncalibratedLogged = false;
+  private boolean m_ForwardUncalibratedLogged = false;
+  private boolean m_ReverseUncalibratedLogged = false;
 
   private int m_RightRejectionCount = 0;
   private int m_ForwardRejectionCount = 0;
@@ -110,16 +123,29 @@ public class VisionSubsystem extends SubsystemBase {
     }
   }
 
-  public Optional<VisionMeasurement> getLatestRightVisionMeasurement() {
-    return m_LatestRightVisionMeasurement;
+  /**
+   * Returns and clears all vision measurements queued since the last drain. Each call returns a
+   * snapshot — repeated calls without new frames return empty lists.
+   */
+  public List<VisionMeasurement> drainRightMeasurements() {
+    return drain(m_RightMeasurements);
   }
 
-  public Optional<VisionMeasurement> getLatestForwardVisionMeasurement() {
-    return m_LatestForwardVisionMeasurement;
+  public List<VisionMeasurement> drainForwardMeasurements() {
+    return drain(m_ForwardMeasurements);
   }
 
-  public Optional<VisionMeasurement> getLatestReverseVisionMeasurement() {
-    return m_LatestReverseVisionMeasurement;
+  public List<VisionMeasurement> drainReverseMeasurements() {
+    return drain(m_ReverseMeasurements);
+  }
+
+  private static List<VisionMeasurement> drain(List<VisionMeasurement> src) {
+    if (src.isEmpty()) {
+      return List.of();
+    }
+    var copy = new ArrayList<>(src);
+    src.clear();
+    return copy;
   }
 
   @Override
@@ -132,54 +158,114 @@ public class VisionSubsystem extends SubsystemBase {
       SmartDashboard.putBoolean("Vision/Reverse/Connected", m_ReverseCamera.isConnected());
     }
 
-    if (m_RightCamera.isConnected()) {
-      var result = processCamera(m_RightCamera, m_RightPoseEstimator, "Right", verbose);
-      if (result != null) {
-        m_LatestRightVisionMeasurement = result;
-        publishMeasurementTelemetry("Right", result, verbose);
-      }
-    } else {
-      m_LatestRightVisionMeasurement = Optional.empty();
-    }
-
-    if (m_ForwardCamera.isConnected()) {
-      var result = processCamera(m_ForwardCamera, m_ForwardPoseEstimator, "Forward", verbose);
-      if (result != null) {
-        m_LatestForwardVisionMeasurement = result;
-        publishMeasurementTelemetry("Forward", result, verbose);
-      }
-    } else {
-      m_LatestForwardVisionMeasurement = Optional.empty();
-    }
-
-    if (m_ReverseCamera.isConnected()) {
-      var result = processCamera(m_ReverseCamera, m_ReversePoseEstimator, "Reverse", verbose);
-      if (result != null) {
-        m_LatestReverseVisionMeasurement = result;
-        publishMeasurementTelemetry("Reverse", result, verbose);
-      }
-    } else {
-      m_LatestReverseVisionMeasurement = Optional.empty();
-    }
+    processAllResults(m_RightCamera, m_RightPoseEstimator, "Right", m_RightMeasurements, verbose);
+    processAllResults(
+        m_ForwardCamera, m_ForwardPoseEstimator, "Forward", m_ForwardMeasurements, verbose);
+    processAllResults(
+        m_ReverseCamera, m_ReversePoseEstimator, "Reverse", m_ReverseMeasurements, verbose);
 
     // Log critical vision data every 10th cycle (200ms) for match analysis
     if (++m_logCounter >= 10) {
       logVisionMeasurement(
-          "Right",
-          m_LatestRightVisionMeasurement,
-          m_RightCamera.isConnected(),
-          m_RightRejectionReason);
+          "Right", m_LastRightAccepted, m_RightCamera.isConnected(), m_RightRejectionReason);
       logVisionMeasurement(
           "Forward",
-          m_LatestForwardVisionMeasurement,
+          m_LastForwardAccepted,
           m_ForwardCamera.isConnected(),
           m_ForwardRejectionReason);
       logVisionMeasurement(
           "Reverse",
-          m_LatestReverseVisionMeasurement,
+          m_LastReverseAccepted,
           m_ReverseCamera.isConnected(),
           m_ReverseRejectionReason);
       m_logCounter = 0;
+    }
+  }
+
+  /**
+   * Processes every unread pipeline result for a camera (not just the latest), applies the full
+   * filter cascade per frame, and appends accepted measurements to {@code outList}. Also verifies
+   * that PhotonVision has returned a calibration matrix — if not, we refuse to compute poses at all
+   * (they'd be garbage) and log an edge-triggered warning.
+   */
+  private void processAllResults(
+      PhotonCamera camera,
+      PhotonPoseEstimator poseEstimator,
+      String cameraName,
+      List<VisionMeasurement> outList,
+      boolean verbose) {
+    if (!camera.isConnected()) {
+      // Don't feed stale measurements from a disconnected camera
+      outList.clear();
+      clearLastAccepted(cameraName);
+      return;
+    }
+
+    // Calibration verification — edge-triggered so the log isn't spammed.
+    boolean calibrated = camera.getCameraMatrix().isPresent();
+    trackCalibrationState(cameraName, calibrated);
+    if (verbose) {
+      SmartDashboard.putBoolean("Vision/" + cameraName + "/Calibrated", calibrated);
+    }
+    if (!calibrated) {
+      // Without intrinsics the pose solution is meaningless — don't even try.
+      return;
+    }
+
+    var allResults = camera.getAllUnreadResults();
+    if (allResults.isEmpty()) {
+      return;
+    }
+
+    for (var result : allResults) {
+      VisionMeasurement measurement = processFrame(result, poseEstimator, cameraName, verbose);
+      if (measurement != null) {
+        outList.add(measurement);
+        publishMeasurementTelemetry(cameraName, Optional.of(measurement), verbose);
+        switch (cameraName) {
+          case "Right" -> m_LastRightAccepted = Optional.of(measurement);
+          case "Forward" -> m_LastForwardAccepted = Optional.of(measurement);
+          case "Reverse" -> m_LastReverseAccepted = Optional.of(measurement);
+          default -> {}
+        }
+      }
+    }
+  }
+
+  private void clearLastAccepted(String cameraName) {
+    switch (cameraName) {
+      case "Right" -> m_LastRightAccepted = Optional.empty();
+      case "Forward" -> m_LastForwardAccepted = Optional.empty();
+      case "Reverse" -> m_LastReverseAccepted = Optional.empty();
+      default -> {}
+    }
+  }
+
+  private void trackCalibrationState(String cameraName, boolean calibrated) {
+    boolean previouslyLogged =
+        switch (cameraName) {
+          case "Right" -> m_RightUncalibratedLogged;
+          case "Forward" -> m_ForwardUncalibratedLogged;
+          case "Reverse" -> m_ReverseUncalibratedLogged;
+          default -> false;
+        };
+
+    if (!calibrated && !previouslyLogged) {
+      DataLogManager.log(
+          "Vision/" + cameraName + " WARNING: camera returned no calibration matrix");
+      setUncalibratedLogged(cameraName, true);
+    } else if (calibrated && previouslyLogged) {
+      DataLogManager.log("Vision/" + cameraName + " calibration now available");
+      setUncalibratedLogged(cameraName, false);
+    }
+  }
+
+  private void setUncalibratedLogged(String cameraName, boolean value) {
+    switch (cameraName) {
+      case "Right" -> m_RightUncalibratedLogged = value;
+      case "Forward" -> m_ForwardUncalibratedLogged = value;
+      case "Reverse" -> m_ReverseUncalibratedLogged = value;
+      default -> {}
     }
   }
 
@@ -267,24 +353,20 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   /**
-   * Returns null if no new frames were available, Optional.empty() if rejected, or the measurement.
+   * Applies the full filter cascade to a single PhotonVision pipeline result. Returns the accepted
+   * {@link VisionMeasurement} or {@code null} if the frame was rejected.
    */
-  private Optional<VisionMeasurement> processCamera(
-      PhotonCamera camera, PhotonPoseEstimator poseEstimator, String cameraName, boolean verbose) {
-    var allResults = camera.getAllUnreadResults();
-    if (allResults.isEmpty()) {
-      return null; // no new frames — keep previous state
-    }
-
-    // Only process the most recent frame — older queued frames are stale
-    PhotonPipelineResult result = allResults.get(allResults.size() - 1);
-
+  private VisionMeasurement processFrame(
+      PhotonPipelineResult result,
+      PhotonPoseEstimator poseEstimator,
+      String cameraName,
+      boolean verbose) {
     if (!result.hasTargets()) {
       publishRejection(cameraName, "no_targets", verbose);
       if (verbose) {
         SmartDashboard.putBoolean("Vision/" + cameraName + "/TagDetected", false);
       }
-      return Optional.empty();
+      return null;
     }
 
     if (verbose) {
@@ -301,7 +383,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     if (targetCount < Constants.Vision.kMinAprilTagsForPose) {
       publishRejection(cameraName, "too_few_targets:" + targetCount, verbose);
-      return Optional.empty();
+      return null;
     }
 
     if (targetCount == 1
@@ -311,7 +393,7 @@ public class VisionSubsystem extends SubsystemBase {
           cameraName,
           "ambiguity_too_high:" + String.format("%.2f", result.getBestTarget().getPoseAmbiguity()),
           verbose);
-      return Optional.empty();
+      return null;
     }
 
     if (targetCount == 1) {
@@ -320,7 +402,7 @@ public class VisionSubsystem extends SubsystemBase {
       if (distanceToTag > Constants.Vision.kMaxSingleTagDistanceMeters) {
         publishRejection(
             cameraName, "single_tag_too_far:" + String.format("%.2f", distanceToTag), verbose);
-        return Optional.empty();
+        return null;
       }
     }
 
@@ -369,13 +451,13 @@ public class VisionSubsystem extends SubsystemBase {
             "pose_estimation_failed|multitag:" + multiTagFailReason + "|fallback:" + fallbackReason,
             verbose);
       }
-      return Optional.empty();
+      return null;
     }
 
     double poseZ = estimatedPose.get().estimatedPose.getZ();
     if (Math.abs(poseZ) > Constants.Vision.kMaxPoseHeightMeters) {
       publishRejection(cameraName, "z_out_of_range:" + String.format("%.2f", poseZ), verbose);
-      return Optional.empty();
+      return null;
     }
 
     Pose2d robotPose = estimatedPose.get().estimatedPose.toPose2d();
@@ -388,7 +470,7 @@ public class VisionSubsystem extends SubsystemBase {
           cameraName,
           "outside_field:" + String.format("(%.2f, %.2f)", robotPose.getX(), robotPose.getY()),
           verbose);
-      return Optional.empty();
+      return null;
     }
 
     Matrix<N3, N1> stdDevs = computeDynamicStdDevs(estimatedPose.get());
@@ -399,8 +481,7 @@ public class VisionSubsystem extends SubsystemBase {
       SmartDashboard.putNumberArray("Vision/" + cameraName + "/UsedTagIDs", usedIds);
     }
 
-    return Optional.of(
-        new VisionMeasurement(robotPose, estimatedPose.get().timestampSeconds, stdDevs));
+    return new VisionMeasurement(robotPose, estimatedPose.get().timestampSeconds, stdDevs);
   }
 
   private static Matrix<N3, N1> computeDynamicStdDevs(EstimatedRobotPose estimatedPose) {
