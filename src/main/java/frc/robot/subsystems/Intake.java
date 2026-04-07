@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
@@ -57,7 +58,8 @@ public class Intake extends SubsystemBase {
   private Agitator m_Agitator;
 
   Timer m_Timer = new Timer();
-  // private final StatusSignal<ReverseLimitValue> m_reverseLimitSignal;
+  private final StatusSignal<ReverseLimitValue> m_reverseLimitSignal;
+  private boolean m_wasLimitClosed = false;
 
   private double FORWARD_LIMIT = 5.0; // Placeholder
   private double REVERSE_LIMIT = 0;
@@ -84,8 +86,7 @@ public class Intake extends SubsystemBase {
 
     m_Agitator = agitator;
 
-    // Used for the magnetic limit switch
-    // m_reverseLimitSignal = m_IntakeMotorArm.getReverseLimit();
+    m_reverseLimitSignal = m_IntakeMotorArm.getReverseLimit();
 
     m_IntakeState = IntakeState.S_Retract;
 
@@ -321,13 +322,12 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
-    // m_reverseLimitSignal.refresh();
-    // if (m_reverseLimitSignal.getValue() == ReverseLimitValue.ClosedToGround) {
-    //   m_IntakeMotorArm.setPosition(0);
-    // }
-    if (m_IntakeMotorArm.getReverseLimit().getValue() == ReverseLimitValue.ClosedToGround) {
+    m_reverseLimitSignal.refresh();
+    boolean limitClosed = m_reverseLimitSignal.getValue() == ReverseLimitValue.ClosedToGround;
+    if (limitClosed && !m_wasLimitClosed) {
       m_IntakeMotorArm.setPosition(0);
     }
+    m_wasLimitClosed = limitClosed;
 
     RunIntakeState();
 

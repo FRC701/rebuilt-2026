@@ -15,6 +15,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,7 +31,12 @@ public class Feeder extends SubsystemBase {
   private FlywheelSim m_flywheelSim;
   private TalonFXSimState m_simState;
 
+  // Logging - throttle to every 10th cycle (200ms)
+  private int m_logCounter = 0;
+  private int m_motorID;
+
   public Feeder(int motorID) {
+    m_motorID = motorID;
     m_FeederMotor = new TalonFX(motorID);
 
     m_FeederState = FeederState.S_Off;
@@ -97,6 +103,18 @@ public class Feeder extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     runFeederState();
+
+    // Log critical values every 10th cycle (200ms) for match analysis
+    if (++m_logCounter >= 10) {
+      DataLogManager.log(
+          "Feeder"
+              + m_motorID
+              + " i:"
+              + m_FeederMotor.getStatorCurrent().getValueAsDouble()
+              + " s:"
+              + m_FeederState.name());
+      m_logCounter = 0;
+    }
   }
 
   @Override
