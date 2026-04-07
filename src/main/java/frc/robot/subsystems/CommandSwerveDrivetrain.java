@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,6 +19,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -221,25 +223,57 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             || Math.abs(speeds.omegaRadiansPerSecond) > Constants.Vision.kMaxVisionRotationSpeed;
 
     if (!tooFast) {
-      m_visionSubsystem
-          .getLatestRightVisionMeasurement()
-          .ifPresent(
-              m -> {
-                addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
-              });
+      m_visionSubsystem.getLatestRightVisionMeasurement().ifPresent(m -> tryFuseVision(m, "Right"));
       m_visionSubsystem
           .getLatestForwardVisionMeasurement()
-          .ifPresent(
-              m -> {
-                addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
-              });
+          .ifPresent(m -> tryFuseVision(m, "Forward"));
       m_visionSubsystem
           .getLatestReverseVisionMeasurement()
-          .ifPresent(
-              m -> {
-                addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
-              });
+          .ifPresent(m -> tryFuseVision(m, "Reverse"));
     }
+  }
+
+  /**
+   * Cross-sensor sanity check before fusing a vision measurement. Rejects poses that jump too far
+   * from odometry or whose heading disagrees with the gyro, both of which are symptoms of AprilTag
+   * pose-flipping or a miscalibrated camera transform. Bypassed while disabled so the pose can snap
+   * in during field setup.
+   */
+  private void tryFuseVision(VisionSubsystem.VisionMeasurement m, String cameraName) {
+    if (DriverStation.isDisabled()) {
+      addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
+      return;
+    }
+
+    // Sample odometry at the frame capture time for an apples-to-apples comparison.
+    Pose2d odomAtVisionTime = samplePoseAt(m.timestampSeconds()).orElse(getState().Pose);
+
+    double jumpMeters = odomAtVisionTime.getTranslation().getDistance(m.pose().getTranslation());
+    if (jumpMeters > Constants.Vision.kMaxPoseJumpMeters) {
+      DataLogManager.log(
+          "Vision/"
+              + cameraName
+              + " rejected by drivetrain: pose_jump "
+              + String.format("%.2f", jumpMeters)
+              + "m");
+      return;
+    }
+
+    double headingDiffRad =
+        Math.abs(
+            MathUtil.angleModulus(
+                m.pose().getRotation().getRadians() - odomAtVisionTime.getRotation().getRadians()));
+    if (headingDiffRad > Constants.Vision.kMaxHeadingDisagreementRad) {
+      DataLogManager.log(
+          "Vision/"
+              + cameraName
+              + " rejected by drivetrain: heading_disagree "
+              + String.format("%.1f", Math.toDegrees(headingDiffRad))
+              + "deg");
+      return;
+    }
+
+    addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
   }
 
   private void startSimThread() {

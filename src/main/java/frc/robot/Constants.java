@@ -240,6 +240,13 @@ public final class Constants {
     public static final double kMaxVisionRotationSpeed =
         Math.toRadians(720); // rad/s (2 full rotations)
 
+    // Cross-sensor sanity gates applied in CommandSwerveDrivetrain.periodic().
+    // Bypassed while disabled so pose can warm up / snap in on the field.
+    // Reject vision if it disagrees with odometry XY by more than this:
+    public static final double kMaxPoseJumpMeters = 1.0;
+    // Reject vision if heading disagrees with gyro by more than this:
+    public static final double kMaxHeadingDisagreementRad = Math.toRadians(30);
+
     // Simulation camera properties (Limelight 4 — OV9782, HFOV 82°, VFOV ~56°)
     // Two resolutions are available (640x400 and 1280x800)
     public static final int kSimCameraResWidth = 1280;
