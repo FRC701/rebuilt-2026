@@ -205,7 +205,6 @@ public class RobotContainer {
         .rightTrigger()
         .onTrue(
             new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
-    m_xboxController.x().onTrue(m_NotShootingCommand);
     // Playstation variant of ^^^
     m_ps4Controller
         .R2()
@@ -220,7 +219,7 @@ public class RobotContainer {
 
     // AimBot Binding - aims at hub while held
     m_xboxController
-        .y()
+        .a()
         .whileTrue(
             new AimAtHub(
                 m_DriveTrain,
@@ -228,7 +227,7 @@ public class RobotContainer {
                 () -> -m_xboxController.getLeftX() * MaxSpeed));
     // Playstation variant of ^^^
     m_ps4Controller
-        .triangle()
+        .cross()
         .whileTrue(
             new AimAtHub(
                 m_DriveTrain,
