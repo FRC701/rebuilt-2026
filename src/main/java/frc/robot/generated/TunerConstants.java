@@ -171,7 +171,7 @@ public class TunerConstants {
   private static final int kFrontRightEncoderId = 1;
   private static final Angle kFrontRightEncoderOffset =
       Rotations.of(
-          -0.18671875 + SmartDashboard.getNumber("frontRightCoderOffset", 0)); // -0.21671875
+          -0.19071875 + SmartDashboard.getNumber("frontRightCoderOffset", 0)); // -0.21671875
   private static final boolean kFrontRightSteerMotorInverted = true;
   private static final boolean kFrontRightEncoderInverted = false;
 
@@ -184,7 +184,7 @@ public class TunerConstants {
   private static final int kBackLeftEncoderId = 0;
   private static final Angle kBackLeftEncoderOffset =
       Rotations.of(
-          -0.538630859375 + SmartDashboard.getNumber("backLeftCoderOffset", 0)); // -0.528630859375
+          -0.573630859375 + SmartDashboard.getNumber("backLeftCoderOffset", 0)); // -0.528630859375
   private static final boolean kBackLeftSteerMotorInverted = true;
   private static final boolean kBackLeftEncoderInverted = false;
 
