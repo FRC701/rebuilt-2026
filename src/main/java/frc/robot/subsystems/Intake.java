@@ -83,6 +83,7 @@ public class Intake extends SubsystemBase {
     // Created Three Motors
     m_IntakeMotorArm = new TalonFX(IntakeConstants.kIntakeMotorArm);
     m_IntakeMotorRoller = new TalonFX(IntakeConstants.kIntakeMotorRoller);
+    // m_IntakeMotorRoller2 = new TalonFX(IntakeConstants.kIntakeMotorRoller2);
 
     m_Agitator = agitator;
 
@@ -90,7 +91,10 @@ public class Intake extends SubsystemBase {
 
     m_IntakeState = IntakeState.S_Retract;
 
-    // Configs that use the PID values to help with motor speed and limits
+    // m_IntakeMotorRoller2.setControl(
+    //     new Follower(m_IntakeMotorRoller1.getDeviceID(), MotorAlignmentValue.Opposed));
+
+    // Configs that use the PID values to help with motor speed
     var m_armConfigs =
         new TalonFXConfiguration()
             .withSoftwareLimitSwitch(
