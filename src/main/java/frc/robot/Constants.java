@@ -185,7 +185,7 @@ public final class Constants {
                 kForwardCameraMountPitchAngleRad,
                 kForwardCameraMountYawAngleRad));
 
-    // Reverse camera name (same position as forward, facing backward)
+    // Reverse camera name 
     // Must match camera set in PhotonVision UI
     public static final String kReverseCameraName = "reversePhotonvisionCamera";
 
@@ -249,8 +249,8 @@ public final class Constants {
 
     // Simulation camera properties (Limelight 4 — OV9782, HFOV 82°, VFOV ~56°)
     // Two resolutions are available (640x400 and 1280x800)
-    public static final int kSimCameraResWidth = 1280;
-    public static final int kSimCameraResHeight = 800;
+    public static final int kSimCameraResWidth = 640;
+    public static final int kSimCameraResHeight = 400;
     public static final double kSimCameraFOVDeg = 91.4; // diagonal FOV derived from 82° HFOV
     public static final double kSimAvgLatencyMs = 35.0;
     public static final double kSimLatencyStdDevMs = 5.0;

@@ -91,7 +91,7 @@ public class VisionSubsystem extends SubsystemBase {
     m_ReversePoseEstimator =
         new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kReverseRobotToCam3d);
 
-    SmartDashboard.putBoolean("Vision/VerboseTelemetry", true);
+    SmartDashboard.putBoolean("Vision/VerboseTelemetry", false);
 
     if (Utils.isSimulation()) {
       m_visionSim = new VisionSystemSim("main");
