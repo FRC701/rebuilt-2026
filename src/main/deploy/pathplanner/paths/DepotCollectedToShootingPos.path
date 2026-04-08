@@ -8,11 +8,27 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3166895310583526,
-        "y": 4.8796378478884215
+        "x": 2.4857550326905926,
+        "y": 6.032897458090395
       },
       "isLocked": false,
       "linkedName": "DepotCollected"
+    },
+    {
+      "anchor": {
+        "x": 2.0,
+        "y": 5.95
+      },
+      "prevControl": {
+        "x": 1.673062194340122,
+        "y": 5.950225591150134
+      },
+      "nextControl": {
+        "x": 2.3832981208225945,
+        "y": 5.949735519531779
+      },
+      "isLocked": false,
+      "linkedName": null
     },
     {
       "anchor": {
@@ -20,15 +36,20 @@
         "y": 5.3
       },
       "prevControl": {
-        "x": 1.8609993371566507,
-        "y": 5.766169705998102
+        "x": 2.0143446384791757,
+        "y": 5.564956336461932
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "LeftShootPos"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": 180.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],

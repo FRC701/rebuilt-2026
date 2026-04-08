@@ -9,12 +9,6 @@
           "data": {
             "pathName": "RightTrenchToAway"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ExtendIntake"
-          }
         }
       ]
     }

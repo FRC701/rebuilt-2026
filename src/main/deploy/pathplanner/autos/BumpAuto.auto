@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SlightTurnRightBump"
+            "pathName": "SlightTurnLeftBump"
           }
         },
         {
@@ -17,13 +17,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "ShootCommand"
+                  "name": "FeederOn"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "FeederOn"
+                  "name": "ShootCommand"
                 }
               }
             ]
@@ -39,6 +39,24 @@
           "type": "named",
           "data": {
             "name": "StopShooting"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SlightTurnLeftBumpBackwards"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BumpTest"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BumpTestBackwards"
           }
         }
       ]

@@ -17,18 +17,6 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "ExtendIntake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "AutoAim"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
                   "name": "ShootCommand"
                 }
               },
@@ -63,6 +51,12 @@
           "type": "path",
           "data": {
             "pathName": "RightBumpToNeutralIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ExtendIntake"
           }
         },
         {

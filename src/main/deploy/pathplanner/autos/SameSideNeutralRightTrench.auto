@@ -25,12 +25,6 @@
                 "data": {
                   "name": "FeederOn"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ExtendIntake"
-                }
               }
             ]
           }
@@ -45,12 +39,6 @@
           "type": "named",
           "data": {
             "name": "StopShooting"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "RetractIntake"
           }
         },
         {
@@ -112,6 +100,12 @@
           "type": "named",
           "data": {
             "name": "StopShooting"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RetractIntake"
           }
         }
       ]

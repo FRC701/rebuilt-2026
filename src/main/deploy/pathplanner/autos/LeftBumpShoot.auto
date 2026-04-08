@@ -17,12 +17,6 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "ExtendIntake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
                   "name": "ShootCommand"
                 }
               },
