@@ -97,6 +97,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "StopShooting"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "LeftShootToOutOfWay"

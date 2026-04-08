@@ -122,13 +122,13 @@ public class Shooter extends SubsystemBase {
   }
 
   // returns true if no balls in shooter
-  public boolean CurrentCHeck() {
+  public boolean CurrentCheck() {
     return m_ShooterMotor.getStatorCurrent().getValueAsDouble() <= 30; // placeholder
   }
 
   public boolean UpToSpeed() {
-    return (VoltageCheck() <= Constants.ShooterConstants.shootRev + 3
-        && VoltageCheck() >= Constants.ShooterConstants.shootRev - 3);
+    return (VoltageCheck() <= Constants.ShooterConstants.shootRev + 5
+        && VoltageCheck() >= Constants.ShooterConstants.shootRev - 5);
   }
 
   public enum ShooterEnumState {
@@ -176,6 +176,7 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("ShooterVoltage", VoltageCheck());
     // This method will be called once per scheduler run
     velocitySignal.refresh();
 

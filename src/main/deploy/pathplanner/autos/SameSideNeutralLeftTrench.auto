@@ -29,7 +29,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "AutoAim"
+                  "name": "ExtendIntake"
                 }
               }
             ]
@@ -48,6 +48,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "RetractIntake"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "TurnLeftTrenchBackwards"
@@ -57,6 +63,12 @@
           "type": "path",
           "data": {
             "pathName": "LeftTrenchToNeutral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ExtendIntake"
           }
         },
         {
@@ -85,12 +97,6 @@
                 "type": "named",
                 "data": {
                   "name": "FeederOn"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "AutoAim"
                 }
               }
             ]

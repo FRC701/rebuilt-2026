@@ -24,6 +24,7 @@ import frc.robot.Constants.FeederConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AimAtHub;
 import frc.robot.commands.ExtendIntake;
+import frc.robot.commands.RetractIntake;
 import frc.robot.commands.FeederOn;
 import frc.robot.commands.LaunchToggle;
 import frc.robot.commands.NotShootingCommand;
@@ -109,6 +110,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("StopShooting", m_NotShootingCommand);
     NamedCommands.registerCommand("FeederOn", new FeederOn(m_LeftFeeder, m_RightFeeder));
     NamedCommands.registerCommand("ExtendIntake", new ExtendIntake(m_Intake));
+    NamedCommands.registerCommand("RetractIntake", new RetractIntake(m_Intake));
     NamedCommands.registerCommand(
         "AutoAim",
         new AimAtHub(

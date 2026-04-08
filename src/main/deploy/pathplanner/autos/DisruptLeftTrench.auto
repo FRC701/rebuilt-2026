@@ -25,12 +25,6 @@
                 "data": {
                   "name": "FeederOn"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "AutoAim"
-                }
               }
             ]
           }
