@@ -185,7 +185,7 @@ public final class Constants {
                 kForwardCameraMountPitchAngleRad,
                 kForwardCameraMountYawAngleRad));
 
-    // Reverse camera name 
+    // Reverse camera name
     // Must match camera set in PhotonVision UI
     public static final String kReverseCameraName = "reversePhotonvisionCamera";
 

@@ -60,7 +60,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization =
       new SwerveRequest.SysIdSwerveRotation();
 
-  private final VisionSubsystem m_visionSubsystem = new VisionSubsystem();
+  // Injected by RobotContainer via setVisionSubsystem() to keep subsystems decoupled.
+  // Null until wired; periodic() skips vision fusion until it is provided.
+  private VisionSubsystem m_visionSubsystem;
 
   /* === Field visualization === */
   private final StructPublisher<Pose2d> m_posePublisher =
@@ -139,6 +141,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     if (Utils.isSimulation()) startSimThread();
   }
 
+  /**
+   * Injects the {@link VisionSubsystem} used for AprilTag pose fusion. Must be called during robot
+   * construction (typically from {@code RobotContainer}) before the scheduler starts running {@link
+   * #periodic()}. Until this is called, vision fusion is a no-op.
+   */
+  public void setVisionSubsystem(VisionSubsystem visionSubsystem) {
+    m_visionSubsystem = visionSubsystem;
+  }
+
   public Command applyRequest(Supplier<SwerveRequest> request) {
     return run(() -> setControl(request.get()));
   }
@@ -211,6 +222,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     Pose2d currentPose = getState().Pose;
     m_posePublisher.set(currentPose);
+
+    // Vision fusion is skipped until RobotContainer injects the VisionSubsystem via
+    // setVisionSubsystem(). This keeps drivetrain construction independent of vision.
+    if (m_visionSubsystem == null) {
+      return;
+    }
 
     if (Utils.isSimulation()) {
       m_visionSubsystem.setSimRobotPose(currentPose);
