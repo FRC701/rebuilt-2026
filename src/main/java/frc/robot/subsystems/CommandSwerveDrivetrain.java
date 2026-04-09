@@ -252,9 +252,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     } else {
       // Dropping stale frames while too-fast avoids a burst of queued measurements getting
       // fused all at once the moment the robot slows down.
-      m_visionSubsystem.drainRightMeasurements();
-      m_visionSubsystem.drainForwardMeasurements();
-      m_visionSubsystem.drainReverseMeasurements();
+      int dropped =
+          m_visionSubsystem.drainRightMeasurements().size()
+              + m_visionSubsystem.drainForwardMeasurements().size()
+              + m_visionSubsystem.drainReverseMeasurements().size();
+      if (dropped > 0) {
+        DataLogManager.log(
+            "Vision: dropped "
+                + dropped
+                + " measurements (tooFast: v="
+                + String.format("%.2f", translationSpeed)
+                + "m/s w="
+                + String.format("%.1f", Math.toDegrees(Math.abs(speeds.omegaRadiansPerSecond)))
+                + "deg/s)");
+      }
     }
   }
 
@@ -271,7 +282,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     // Sample odometry at the frame capture time for an apples-to-apples comparison.
-    Pose2d odomAtVisionTime = samplePoseAt(m.timestampSeconds()).orElse(getState().Pose);
+    // If the timestamp is outside the odometry buffer window, skip the measurement
+    // entirely — falling back to the current pose would defeat the jump gate.
+    Optional<Pose2d> odomSample = samplePoseAt(m.timestampSeconds());
+    if (odomSample.isEmpty()) {
+      DataLogManager.log(
+          "Vision/"
+              + cameraName
+              + " rejected by drivetrain: timestamp_outside_odom_buffer "
+              + String.format("%.3f", m.timestampSeconds())
+              + "s");
+      return;
+    }
+    Pose2d odomAtVisionTime = odomSample.get();
 
     double jumpMeters = odomAtVisionTime.getTranslation().getDistance(m.pose().getTranslation());
     if (jumpMeters > Constants.Vision.kMaxPoseJumpMeters) {
