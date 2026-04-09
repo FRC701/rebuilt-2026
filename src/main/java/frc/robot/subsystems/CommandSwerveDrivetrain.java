@@ -244,33 +244,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         translationSpeed > Constants.Vision.kMaxVisionTranslationSpeed
             || Math.abs(speeds.omegaRadiansPerSecond) > Constants.Vision.kMaxVisionRotationSpeed;
 
+    var allMeasurements = m_visionSubsystem.drainAllMeasurements();
     if (!tooFast) {
-      for (var m : m_visionSubsystem.drainRightMeasurements()) {
-        tryFuseVision(m, "Right");
+      for (var m : allMeasurements) {
+        tryFuseVision(m, m.cameraName());
       }
-      for (var m : m_visionSubsystem.drainForwardMeasurements()) {
-        tryFuseVision(m, "Forward");
-      }
-      for (var m : m_visionSubsystem.drainReverseMeasurements()) {
-        tryFuseVision(m, "Reverse");
-      }
-    } else {
+    } else if (!allMeasurements.isEmpty()) {
       // Dropping stale frames while too-fast avoids a burst of queued measurements getting
       // fused all at once the moment the robot slows down.
-      int dropped =
-          m_visionSubsystem.drainRightMeasurements().size()
-              + m_visionSubsystem.drainForwardMeasurements().size()
-              + m_visionSubsystem.drainReverseMeasurements().size();
-      if (dropped > 0) {
-        DataLogManager.log(
-            "Vision: dropped "
-                + dropped
-                + " measurements (tooFast: v="
-                + String.format("%.2f", translationSpeed)
-                + "m/s w="
-                + String.format("%.1f", Math.toDegrees(Math.abs(speeds.omegaRadiansPerSecond)))
-                + "deg/s)");
-      }
+      DataLogManager.log(
+          "Vision: dropped "
+              + allMeasurements.size()
+              + " measurements (tooFast: v="
+              + String.format("%.2f", translationSpeed)
+              + "m/s w="
+              + String.format("%.1f", Math.toDegrees(Math.abs(speeds.omegaRadiansPerSecond)))
+              + "deg/s)");
     }
   }
 
