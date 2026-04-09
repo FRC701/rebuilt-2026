@@ -64,6 +64,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   // Null until wired; periodic() skips vision fusion until it is provided.
   private VisionSubsystem m_visionSubsystem;
 
+  // Throttle for tryFuseVision rejection logs — at most one log per 25 cycles (~500ms).
+  private int m_rejectionLogThrottle = 0;
+
   /* === Field visualization === */
   private final StructPublisher<Pose2d> m_posePublisher =
       NetworkTableInstance.getDefault().getStructTopic("RobotPose", Pose2d.struct).publish();
@@ -223,6 +226,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     Pose2d currentPose = getState().Pose;
     m_posePublisher.set(currentPose);
 
+    if (m_rejectionLogThrottle > 0) m_rejectionLogThrottle--;
+
     // Vision fusion is skipped until RobotContainer injects the VisionSubsystem via
     // setVisionSubsystem(). This keeps drivetrain construction independent of vision.
     if (m_visionSubsystem == null) {
@@ -286,7 +291,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // entirely — falling back to the current pose would defeat the jump gate.
     Optional<Pose2d> odomSample = samplePoseAt(m.timestampSeconds());
     if (odomSample.isEmpty()) {
-      DataLogManager.log(
+      logRejectionThrottled(
           "Vision/"
               + cameraName
               + " rejected by drivetrain: timestamp_outside_odom_buffer "
@@ -298,7 +303,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     double jumpMeters = odomAtVisionTime.getTranslation().getDistance(m.pose().getTranslation());
     if (jumpMeters > Constants.Vision.kMaxPoseJumpMeters) {
-      DataLogManager.log(
+      logRejectionThrottled(
           "Vision/"
               + cameraName
               + " rejected by drivetrain: pose_jump "
@@ -312,7 +317,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             MathUtil.angleModulus(
                 m.pose().getRotation().getRadians() - odomAtVisionTime.getRotation().getRadians()));
     if (headingDiffRad > Constants.Vision.kMaxHeadingDisagreementRad) {
-      DataLogManager.log(
+      logRejectionThrottled(
           "Vision/"
               + cameraName
               + " rejected by drivetrain: heading_disagree "
@@ -322,6 +327,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
+  }
+
+  /** Logs a rejection message at most once every 25 cycles (~500ms) to avoid log spam. */
+  private void logRejectionThrottled(String message) {
+    if (m_rejectionLogThrottle <= 0) {
+      DataLogManager.log(message);
+      m_rejectionLogThrottle = 25;
+    }
   }
 
   private void startSimThread() {
