@@ -9,10 +9,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import java.util.ArrayList;
@@ -59,6 +59,8 @@ public class VisionSubsystem extends SubsystemBase {
   private String m_ForwardRejectionReason = "";
   private String m_ReverseRejectionReason = "";
 
+  private final NetworkTable m_visionTable = NetworkTableInstance.getDefault().getTable("Vision");
+
   private final StructPublisher<Pose2d> m_RightPosePublisher =
       NetworkTableInstance.getDefault()
           .getStructTopic("Vision/Right/Pose", Pose2d.struct)
@@ -90,8 +92,6 @@ public class VisionSubsystem extends SubsystemBase {
     m_ReverseCamera = new PhotonCamera(Constants.Vision.kReverseCameraName);
     m_ReversePoseEstimator =
         new PhotonPoseEstimator(m_FieldLayout, Constants.Vision.kReverseRobotToCam3d);
-
-    SmartDashboard.putBoolean("Vision/VerboseTelemetry", false);
 
     if (Utils.isSimulation()) {
       m_visionSim = new VisionSystemSim("main");
@@ -150,12 +150,12 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    boolean verbose = SmartDashboard.getBoolean("Vision/VerboseTelemetry", true);
+    boolean verbose = Constants.UtilityConstants.kTuningMode;
 
     if (verbose) {
-      SmartDashboard.putBoolean("Vision/Right/Connected", m_RightCamera.isConnected());
-      SmartDashboard.putBoolean("Vision/Forward/Connected", m_ForwardCamera.isConnected());
-      SmartDashboard.putBoolean("Vision/Reverse/Connected", m_ReverseCamera.isConnected());
+      m_visionTable.getEntry("Right/Connected").setBoolean(m_RightCamera.isConnected());
+      m_visionTable.getEntry("Forward/Connected").setBoolean(m_ForwardCamera.isConnected());
+      m_visionTable.getEntry("Reverse/Connected").setBoolean(m_ReverseCamera.isConnected());
     }
 
     processAllResults(m_RightCamera, m_RightPoseEstimator, "Right", m_RightMeasurements, verbose);
@@ -205,7 +205,7 @@ public class VisionSubsystem extends SubsystemBase {
     boolean calibrated = camera.getCameraMatrix().isPresent();
     trackCalibrationState(cameraName, calibrated);
     if (verbose) {
-      SmartDashboard.putBoolean("Vision/" + cameraName + "/Calibrated", calibrated);
+      m_visionTable.getEntry(cameraName + "/Calibrated").setBoolean(calibrated);
     }
     if (!calibrated) {
       // Without intrinsics the pose solution is meaningless — don't even try.
@@ -311,44 +311,49 @@ public class VisionSubsystem extends SubsystemBase {
       }
 
       if (verbose) {
-        String prefix = "Vision/" + cameraName + "/";
-        SmartDashboard.putBoolean(prefix + "Accepted", true);
-        SmartDashboard.putString(prefix + "RejectionReason", "");
-        SmartDashboard.putNumber(prefix + "PoseX_m", m.pose().getX());
-        SmartDashboard.putNumber(prefix + "PoseY_m", m.pose().getY());
-        SmartDashboard.putNumber(prefix + "PoseHeading_deg", m.pose().getRotation().getDegrees());
-        SmartDashboard.putNumber(prefix + "StdDevXY", m.stdDevs().get(0, 0));
-        SmartDashboard.putNumber(
-            prefix + "StdDevHeading_deg", Math.toDegrees(m.stdDevs().get(2, 0)));
+        m_visionTable.getEntry(cameraName + "/Accepted").setBoolean(true);
+        m_visionTable.getEntry(cameraName + "/RejectionReason").setString("");
+        m_visionTable.getEntry(cameraName + "/PoseX_m").setDouble(m.pose().getX());
+        m_visionTable.getEntry(cameraName + "/PoseY_m").setDouble(m.pose().getY());
+        m_visionTable
+            .getEntry(cameraName + "/PoseHeading_deg")
+            .setDouble(m.pose().getRotation().getDegrees());
+        m_visionTable.getEntry(cameraName + "/StdDevXY").setDouble(m.stdDevs().get(0, 0));
+        m_visionTable
+            .getEntry(cameraName + "/StdDevHeading_deg")
+            .setDouble(Math.toDegrees(m.stdDevs().get(2, 0)));
       }
     } else if (verbose) {
-      SmartDashboard.putBoolean("Vision/" + cameraName + "/Accepted", false);
+      m_visionTable.getEntry(cameraName + "/Accepted").setBoolean(false);
     }
   }
 
   private void publishRejection(String cameraName, String reason, boolean verbose) {
-    // Store rejection reason for logging
-    if (cameraName.equals("Right")) {
-      m_RightRejectionReason = reason;
-      if (verbose) {
-        SmartDashboard.putString("Vision/" + cameraName + "/RejectionReason", reason);
-        SmartDashboard.putNumber(
-            "Vision/" + cameraName + "/RejectionCount", ++m_RightRejectionCount);
+    // Always track rejection state regardless of verbose mode.
+    switch (cameraName) {
+      case "Right" -> {
+        m_RightRejectionReason = reason;
+        m_RightRejectionCount++;
       }
-    } else if (cameraName.equals("Forward")) {
-      m_ForwardRejectionReason = reason;
-      if (verbose) {
-        SmartDashboard.putString("Vision/" + cameraName + "/RejectionReason", reason);
-        SmartDashboard.putNumber(
-            "Vision/" + cameraName + "/RejectionCount", ++m_ForwardRejectionCount);
+      case "Forward" -> {
+        m_ForwardRejectionReason = reason;
+        m_ForwardRejectionCount++;
       }
-    } else {
-      m_ReverseRejectionReason = reason;
-      if (verbose) {
-        SmartDashboard.putString("Vision/" + cameraName + "/RejectionReason", reason);
-        SmartDashboard.putNumber(
-            "Vision/" + cameraName + "/RejectionCount", ++m_ReverseRejectionCount);
+      default -> {
+        m_ReverseRejectionReason = reason;
+        m_ReverseRejectionCount++;
       }
+    }
+
+    if (verbose) {
+      int count =
+          switch (cameraName) {
+            case "Right" -> m_RightRejectionCount;
+            case "Forward" -> m_ForwardRejectionCount;
+            default -> m_ReverseRejectionCount;
+          };
+      m_visionTable.getEntry(cameraName + "/RejectionReason").setString(reason);
+      m_visionTable.getEntry(cameraName + "/RejectionCount").setDouble(count);
     }
   }
 
@@ -364,19 +369,18 @@ public class VisionSubsystem extends SubsystemBase {
     if (!result.hasTargets()) {
       publishRejection(cameraName, "no_targets", verbose);
       if (verbose) {
-        SmartDashboard.putBoolean("Vision/" + cameraName + "/TagDetected", false);
+        m_visionTable.getEntry(cameraName + "/TagDetected").setBoolean(false);
       }
       return null;
     }
 
     if (verbose) {
-      String prefix = "Vision/" + cameraName + "/";
-      SmartDashboard.putBoolean(prefix + "TagDetected", true);
+      m_visionTable.getEntry(cameraName + "/TagDetected").setBoolean(true);
       double[] visibleIds = result.targets.stream().mapToDouble(t -> t.getFiducialId()).toArray();
-      SmartDashboard.putNumberArray(prefix + "VisibleTagIDs", visibleIds);
+      m_visionTable.getEntry(cameraName + "/VisibleTagIDs").setDoubleArray(visibleIds);
       double[] ambiguities =
           result.targets.stream().mapToDouble(t -> t.getPoseAmbiguity()).toArray();
-      SmartDashboard.putNumberArray(prefix + "Ambiguities", ambiguities);
+      m_visionTable.getEntry(cameraName + "/Ambiguities").setDoubleArray(ambiguities);
     }
 
     int targetCount = result.targets.size();
@@ -435,7 +439,7 @@ public class VisionSubsystem extends SubsystemBase {
         int tagId = bestTarget.getFiducialId();
         boolean tagInLayout = m_FieldLayout.getTagPose(tagId).isPresent();
         double ambiguity = bestTarget.getPoseAmbiguity();
-        SmartDashboard.putNumber("Vision/" + cameraName + "/ambiguity", ambiguity);
+        m_visionTable.getEntry(cameraName + "/ambiguity").setDouble(ambiguity);
 
         String fallbackReason;
         if (!tagInLayout) {
@@ -478,7 +482,7 @@ public class VisionSubsystem extends SubsystemBase {
     if (verbose) {
       double[] usedIds =
           estimatedPose.get().targetsUsed.stream().mapToDouble(t -> t.getFiducialId()).toArray();
-      SmartDashboard.putNumberArray("Vision/" + cameraName + "/UsedTagIDs", usedIds);
+      m_visionTable.getEntry(cameraName + "/UsedTagIDs").setDoubleArray(usedIds);
     }
 
     return new VisionMeasurement(robotPose, estimatedPose.get().timestampSeconds, stdDevs);

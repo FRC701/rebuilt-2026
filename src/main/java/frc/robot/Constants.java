@@ -18,6 +18,11 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static class UtilityConstants {
+    /** Set to false before competition deploy to save bandwidth and loop time. */
+    public static final boolean kTuningMode = false;
+  }
+
   public static class OperatorConstants {
     public static final int kXboxControllerPort = 1;
     public static final int kPs4ControllerPort = 0;
