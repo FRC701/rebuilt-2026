@@ -32,16 +32,16 @@
     },
     {
       "anchor": {
-        "x": 3.5,
-        "y": 0.8
+        "x": 3.4904157303370784,
+        "y": 0.6006292134831461
       },
       "prevControl": {
-        "x": 3.3599006177155415,
-        "y": 1.0070559419179106
+        "x": 3.35031634805262,
+        "y": 0.8076851554010567
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "RightTrenchStart"
+      "linkedName": "RightTrenchAuto"
     }
   ],
   "rotationTargets": [],
