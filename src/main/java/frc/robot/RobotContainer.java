@@ -24,10 +24,10 @@ import frc.robot.Constants.FeederConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AimAtHub;
 import frc.robot.commands.ExtendIntake;
-import frc.robot.commands.RetractIntake;
 import frc.robot.commands.FeederOn;
 import frc.robot.commands.LaunchToggle;
 import frc.robot.commands.NotShootingCommand;
+import frc.robot.commands.RetractIntake;
 import frc.robot.commands.ShootCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
@@ -37,6 +37,7 @@ import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.VisionSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -69,6 +70,11 @@ public class RobotContainer {
 
   // Instantiating the Subsystems
 
+  // VisionSubsystem is declared before the drivetrain so that its SubsystemBase
+  // auto-registration runs first. That guarantees its periodic() drains camera
+  // frames into the per-camera queues before CommandSwerveDrivetrain.periodic()
+  // consumes them on the same scheduler tick.
+  public final VisionSubsystem m_Vision = new VisionSubsystem();
   public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
   private final Agitator m_Agitator = new Agitator();
   private Intake m_Intake = new Intake(m_Agitator);
@@ -103,6 +109,11 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    // Inject vision into the drivetrain so its periodic() can fuse AprilTag
+    // pose measurements. Until this call, CommandSwerveDrivetrain.periodic()
+    // short-circuits past the vision block.
+    m_DriveTrain.setVisionSubsystem(m_Vision);
 
     // NamedCommands.registerCommand(
     NamedCommands.registerCommand(

@@ -60,7 +60,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization =
       new SwerveRequest.SysIdSwerveRotation();
 
-  private final VisionSubsystem m_visionSubsystem = new VisionSubsystem();
+  // Injected by RobotContainer via setVisionSubsystem() to keep subsystems decoupled.
+  // Null until wired; periodic() skips vision fusion until it is provided.
+  private VisionSubsystem m_visionSubsystem;
+
+  // Throttle for tryFuseVision rejection logs — at most one log per 25 cycles (~500ms).
+  private int m_rejectionLogThrottle = 0;
 
   /* === Field visualization === */
   private final StructPublisher<Pose2d> m_posePublisher =
@@ -139,6 +144,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     if (Utils.isSimulation()) startSimThread();
   }
 
+  /**
+   * Injects the {@link VisionSubsystem} used for AprilTag pose fusion. Must be called during robot
+   * construction (typically from {@code RobotContainer}) before the scheduler starts running {@link
+   * #periodic()}. Until this is called, vision fusion is a no-op.
+   */
+  public void setVisionSubsystem(VisionSubsystem visionSubsystem) {
+    m_visionSubsystem = visionSubsystem;
+  }
+
   public Command applyRequest(Supplier<SwerveRequest> request) {
     return run(() -> setControl(request.get()));
   }
@@ -212,6 +226,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     Pose2d currentPose = getState().Pose;
     m_posePublisher.set(currentPose);
 
+    if (m_rejectionLogThrottle > 0) m_rejectionLogThrottle--;
+
+    // Vision fusion is skipped until RobotContainer injects the VisionSubsystem via
+    // setVisionSubsystem(). This keeps drivetrain construction independent of vision.
+    if (m_visionSubsystem == null) {
+      return;
+    }
+
     if (Utils.isSimulation()) {
       m_visionSubsystem.setSimRobotPose(currentPose);
     }
@@ -222,22 +244,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         translationSpeed > Constants.Vision.kMaxVisionTranslationSpeed
             || Math.abs(speeds.omegaRadiansPerSecond) > Constants.Vision.kMaxVisionRotationSpeed;
 
+    var allMeasurements = m_visionSubsystem.drainAllMeasurements();
     if (!tooFast) {
-      for (var m : m_visionSubsystem.drainRightMeasurements()) {
-        tryFuseVision(m, "Right");
+      for (var m : allMeasurements) {
+        tryFuseVision(m, m.cameraName());
       }
-      for (var m : m_visionSubsystem.drainForwardMeasurements()) {
-        tryFuseVision(m, "Forward");
-      }
-      for (var m : m_visionSubsystem.drainReverseMeasurements()) {
-        tryFuseVision(m, "Reverse");
-      }
-    } else {
+    } else if (!allMeasurements.isEmpty()) {
       // Dropping stale frames while too-fast avoids a burst of queued measurements getting
       // fused all at once the moment the robot slows down.
-      m_visionSubsystem.drainRightMeasurements();
-      m_visionSubsystem.drainForwardMeasurements();
-      m_visionSubsystem.drainReverseMeasurements();
+      DataLogManager.log(
+          "Vision: dropped "
+              + allMeasurements.size()
+              + " measurements (tooFast: v="
+              + String.format("%.2f", translationSpeed)
+              + "m/s w="
+              + String.format("%.1f", Math.toDegrees(Math.abs(speeds.omegaRadiansPerSecond)))
+              + "deg/s)");
     }
   }
 
@@ -254,11 +276,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     // Sample odometry at the frame capture time for an apples-to-apples comparison.
-    Pose2d odomAtVisionTime = samplePoseAt(m.timestampSeconds()).orElse(getState().Pose);
+    // If the timestamp is outside the odometry buffer window, skip the measurement
+    // entirely — falling back to the current pose would defeat the jump gate.
+    Optional<Pose2d> odomSample = samplePoseAt(m.timestampSeconds());
+    if (odomSample.isEmpty()) {
+      logRejectionThrottled(
+          "Vision/"
+              + cameraName
+              + " rejected by drivetrain: timestamp_outside_odom_buffer "
+              + String.format("%.3f", m.timestampSeconds())
+              + "s");
+      return;
+    }
+    Pose2d odomAtVisionTime = odomSample.get();
 
     double jumpMeters = odomAtVisionTime.getTranslation().getDistance(m.pose().getTranslation());
     if (jumpMeters > Constants.Vision.kMaxPoseJumpMeters) {
-      DataLogManager.log(
+      logRejectionThrottled(
           "Vision/"
               + cameraName
               + " rejected by drivetrain: pose_jump "
@@ -272,7 +306,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             MathUtil.angleModulus(
                 m.pose().getRotation().getRadians() - odomAtVisionTime.getRotation().getRadians()));
     if (headingDiffRad > Constants.Vision.kMaxHeadingDisagreementRad) {
-      DataLogManager.log(
+      logRejectionThrottled(
           "Vision/"
               + cameraName
               + " rejected by drivetrain: heading_disagree "
@@ -282,6 +316,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
+  }
+
+  /** Logs a rejection message at most once every 25 cycles (~500ms) to avoid log spam. */
+  private void logRejectionThrottled(String message) {
+    if (m_rejectionLogThrottle <= 0) {
+      DataLogManager.log(message);
+      m_rejectionLogThrottle = 25;
+    }
   }
 
   private void startSimThread() {
