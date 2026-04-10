@@ -176,9 +176,9 @@ public final class Constants {
     public static final double kForwardCameraMountRollAngleRad = Units.degreesToRadians(0);
     public static final double kForwardCameraMountYawAngleRad = Units.degreesToRadians(0);
 
-    public static final double kForwardCameraForwardMeters = Units.inchesToMeters(-2);
+    public static final double kForwardCameraForwardMeters = Units.inchesToMeters(-0.5);
     public static final double kForwardCameraLeftMeters = Units.inchesToMeters(0);
-    public static final double kForwardCameraUpMeters = Units.inchesToMeters(21.5);
+    public static final double kForwardCameraUpMeters = Units.inchesToMeters(20.5);
 
     // Robot to forward camera transform
     public static final Transform3d kForwardRobotToCam3d =
@@ -198,8 +198,8 @@ public final class Constants {
     public static final double kReverseCameraMountRollAngleRad = Units.degreesToRadians(0);
     public static final double kReverseCameraMountYawAngleRad = Units.degreesToRadians(180);
 
-    public static final double kReverseCameraForwardMeters = Units.inchesToMeters(7.5);
-    public static final double kReverseCameraLeftMeters = Units.inchesToMeters(11);
+    public static final double kReverseCameraForwardMeters = Units.inchesToMeters(-12.5);
+    public static final double kReverseCameraLeftMeters = Units.inchesToMeters(8.75);
     public static final double kReverseCameraUpMeters = Units.inchesToMeters(12);
 
     // Robot to reverse camera transform
