@@ -238,28 +238,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       m_visionSubsystem.setSimRobotPose(currentPose);
     }
 
-    var speeds = getState().Speeds;
-    double translationSpeed = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
-    boolean tooFast =
-        translationSpeed > Constants.Vision.kMaxVisionTranslationSpeed
-            || Math.abs(speeds.omegaRadiansPerSecond) > Constants.Vision.kMaxVisionRotationSpeed;
-
     var allMeasurements = m_visionSubsystem.drainAllMeasurements();
-    if (!tooFast) {
-      for (var m : allMeasurements) {
-        tryFuseVision(m, m.cameraName());
-      }
-    } else if (!allMeasurements.isEmpty()) {
-      // Dropping stale frames while too-fast avoids a burst of queued measurements getting
-      // fused all at once the moment the robot slows down.
-      DataLogManager.log(
-          "Vision: dropped "
-              + allMeasurements.size()
-              + " measurements (tooFast: v="
-              + String.format("%.2f", translationSpeed)
-              + "m/s w="
-              + String.format("%.1f", Math.toDegrees(Math.abs(speeds.omegaRadiansPerSecond)))
-              + "deg/s)");
+    for (var m : allMeasurements) {
+      tryFuseVision(m, m.cameraName());
     }
   }
 
