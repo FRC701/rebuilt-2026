@@ -212,21 +212,15 @@ public final class Constants {
                 kReverseCameraMountPitchAngleRad,
                 kReverseCameraMountYawAngleRad));
 
-    // Dynamic std-dev scaling constants
-    // Formula: stdDev = base * (avgDistance ^ exponent)
+    // Dynamic std-dev scaling constants (3061-lib / 6328 pattern)
+    // Formula: stdDev = base * (avgDistance ^ kDistanceExponent) / numTags
+    // Single-tag heading is always POSITIVE_INFINITY (ignored by Kalman filter).
     // If the robot snaps/jumps to vision poses too aggressively → increase the base
     // If vision corrections feel sluggish or ignored → decrease the base
-    public static final double kSingleTagBaseXYStdDev = 1.5; // base error in meters at 1m distance
-    // Large but finite — Kalman gain rounds to ~0 without overflowing when multiplied
-    // by distance factors. Effectively ignores single-tag heading.
-    public static final double kSingleTagBaseHeadingStdDev = 10.0; // radians (~573°)
-    public static final double kMultiTagBaseXYStdDev = 1.0; // base error in meters at 1m distance
-    public static final double kMultiTagBaseHeadingStdDev =
-        0.45; // base error in radians at 1m (~34 deg)
-    // Use different exponents for single vs multi case because in multi tag you have more corners
-    // of april tags (4 each) to rely on
-    public static final double kSingleTagDistanceExponent = 2.0; // quadratic scaling
-    public static final double kMultiTagDistanceExponent = 1.0; // linear scaling
+    public static final double kSingleTagBaseXYStdDev = 0.10; // meters at 1m, 1 tag
+    public static final double kMultiTagBaseXYStdDev = 0.05; // meters at 1m, 1 tag
+    public static final double kMultiTagBaseHeadingStdDev = 0.10; // radians at 1m, 1 tag (~5.7 deg)
+    public static final double kDistanceExponent = 2.0; // quadratic scaling (6328 2026 pattern)
 
     // Acceptance rules
     public static final int kMinAprilTagsForPose = 1;
@@ -238,12 +232,6 @@ public final class Constants {
     public static final double kFieldBoundaryMarginMeters =
         0.5; // allow slightly outside field edge
     public static final double kMaxSingleTagDistanceMeters = 2.5; // max reliable single-tag range
-
-    // Speed filters — reject vision when robot is moving too fast (motion blur)
-    // These will only filter out extreme motion blur. Can tighten based on testing.
-    public static final double kMaxVisionTranslationSpeed = 4.0; // m/s
-    public static final double kMaxVisionRotationSpeed =
-        Math.toRadians(720); // rad/s (2 full rotations)
 
     // Cross-sensor sanity gates applied in CommandSwerveDrivetrain.periodic().
     // Bypassed while disabled so pose can warm up / snap in on the field.

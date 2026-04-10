@@ -399,30 +399,28 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   private static Matrix<N3, N1> computeDynamicStdDevs(EstimatedRobotPose estimatedPose) {
-    boolean isMultiTag = estimatedPose.targetsUsed.size() > 1;
+    int numTags = estimatedPose.targetsUsed.size();
+    boolean isMultiTag = numTags > 1;
 
     double totalDistance = 0.0;
     for (var target : estimatedPose.targetsUsed) {
       totalDistance += target.getBestCameraToTarget().getTranslation().getNorm();
     }
-    double avgDistance = totalDistance / estimatedPose.targetsUsed.size();
+    double avgDistance = totalDistance / numTags;
 
-    double baseXY;
-    double baseHeading;
-    double exponent;
-    if (isMultiTag) {
-      baseXY = Constants.Vision.kMultiTagBaseXYStdDev;
-      baseHeading = Constants.Vision.kMultiTagBaseHeadingStdDev;
-      exponent = Constants.Vision.kMultiTagDistanceExponent;
-    } else {
-      baseXY = Constants.Vision.kSingleTagBaseXYStdDev;
-      baseHeading = Constants.Vision.kSingleTagBaseHeadingStdDev;
-      exponent = Constants.Vision.kSingleTagDistanceExponent;
-    }
+    double distanceFactor = Math.pow(avgDistance, Constants.Vision.kDistanceExponent);
 
-    double distanceFactor = Math.pow(avgDistance, exponent);
-    double xyStdDev = baseXY * distanceFactor;
-    double headingStdDev = baseHeading * distanceFactor;
+    double baseXY =
+        isMultiTag
+            ? Constants.Vision.kMultiTagBaseXYStdDev
+            : Constants.Vision.kSingleTagBaseXYStdDev;
+    double xyStdDev = baseXY * distanceFactor / numTags;
+
+    // Single-tag heading is unreliable due to the ambiguity problem — ignore it entirely.
+    double headingStdDev =
+        isMultiTag
+            ? Constants.Vision.kMultiTagBaseHeadingStdDev * distanceFactor / numTags
+            : Double.POSITIVE_INFINITY;
 
     return VecBuilder.fill(xyStdDev, xyStdDev, headingStdDev);
   }
