@@ -289,7 +289,7 @@ public class Intake extends SubsystemBase {
   // Extends the intake out and starts the rollers
   public void ExtendPosition() {
     // If motor has reached its destination the stop the arm and start the rollers
-    m_IntakeMotorRoller.setVoltage(6.5);
+    //m_IntakeMotorRoller.setVoltage(6.5);
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeState = IntakeState.S_Down;
     }

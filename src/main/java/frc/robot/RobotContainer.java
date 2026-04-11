@@ -25,6 +25,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AimAtHub;
 import frc.robot.commands.ExtendIntake;
 import frc.robot.commands.FeederOn;
+import frc.robot.commands.IntakeToggle;
 import frc.robot.commands.LaunchToggle;
 import frc.robot.commands.NotShootingCommand;
 import frc.robot.commands.RetractIntake;
@@ -208,9 +209,9 @@ public class RobotContainer {
     m_DriveTrain.registerTelemetry(logger::telemeterize);
 
     // Intake Bindings
-    m_xboxController.leftTrigger().toggleOnTrue(m_IntakeToggle);
+    m_xboxController.leftTrigger().onTrue(new IntakeToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
     // Playstation variant of ^^^
-    m_ps4Controller.L2().toggleOnTrue(m_IntakeToggle);
+    m_ps4Controller.L2().onTrue(new IntakeToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
     // m_ps4Controller.povRight().onTrue(m_IntakeRollerToggle);
 
     // Shooter Binding XBox
