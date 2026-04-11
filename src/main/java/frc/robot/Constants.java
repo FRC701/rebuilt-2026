@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -139,78 +136,11 @@ public final class Constants {
   }
 
   public static final class Vision {
-    // Right camera name
-    // Must match camera set in PhotonVision UI at photonvision.local:5800
-    public static final String kRightCameraName = "rightPhotonvisionCamera";
-    // Robot -> Camera transform (camera pose relative to robot origin).
-    // WPILib coordinate convention: +X forward, +Y left, +Z up.
-    // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
-    // In most cases in WPILib programming, 0° is aligned with the positive X axis,
-    // and 180° is aligned with the negative X axis. CCW rotation is positive, so
-    // 90° is aligned with the positive Y axis, and -90° is aligned with the
-    // negative Y axis.
-
-    public static final double kRightCameraMountPitchAngleRad = Units.degreesToRadians(0);
-    public static final double kRightCameraMountRollAngleRad = Units.degreesToRadians(-90);
-    public static final double kRightCameraMountYawAngleRad = Units.degreesToRadians(-90);
-
-    public static final double kRightCameraForwardMeters = Units.inchesToMeters(-3.78);
-    public static final double kRightCameraLeftMeters = Units.inchesToMeters(-3);
-    public static final double kRightCameraUpMeters = Units.inchesToMeters(22);
-
-    // Robot to right camera transform
-    public static final Transform3d kRightRobotToCam3d =
-        new Transform3d(
-            new Translation3d(
-                kRightCameraForwardMeters, kRightCameraLeftMeters, kRightCameraUpMeters),
-            new Rotation3d(
-                kRightCameraMountRollAngleRad,
-                kRightCameraMountPitchAngleRad,
-                kRightCameraMountYawAngleRad));
-
-    // Forward camera name
-    // Must match camera set in PhotonVision UI
-    public static final String kForwardCameraName = "forwardPhotonvisionCamera";
-
-    public static final double kForwardCameraMountPitchAngleRad = Units.degreesToRadians(0);
-    public static final double kForwardCameraMountRollAngleRad = Units.degreesToRadians(0);
-    public static final double kForwardCameraMountYawAngleRad = Units.degreesToRadians(0);
-
-    public static final double kForwardCameraForwardMeters = Units.inchesToMeters(-0.5);
-    public static final double kForwardCameraLeftMeters = Units.inchesToMeters(0);
-    public static final double kForwardCameraUpMeters = Units.inchesToMeters(20.5);
-
-    // Robot to forward camera transform
-    public static final Transform3d kForwardRobotToCam3d =
-        new Transform3d(
-            new Translation3d(
-                kForwardCameraForwardMeters, kForwardCameraLeftMeters, kForwardCameraUpMeters),
-            new Rotation3d(
-                kForwardCameraMountRollAngleRad,
-                kForwardCameraMountPitchAngleRad,
-                kForwardCameraMountYawAngleRad));
-
-    // Reverse camera name
-    // Must match camera set in PhotonVision UI
-    public static final String kReverseCameraName = "reversePhotonvisionCamera";
-
-    public static final double kReverseCameraMountPitchAngleRad = Units.degreesToRadians(0);
-    public static final double kReverseCameraMountRollAngleRad = Units.degreesToRadians(0);
-    public static final double kReverseCameraMountYawAngleRad = Units.degreesToRadians(180);
-
-    public static final double kReverseCameraForwardMeters = Units.inchesToMeters(-12.5);
-    public static final double kReverseCameraLeftMeters = Units.inchesToMeters(8.75);
-    public static final double kReverseCameraUpMeters = Units.inchesToMeters(12);
-
-    // Robot to reverse camera transform
-    public static final Transform3d kReverseRobotToCam3d =
-        new Transform3d(
-            new Translation3d(
-                kReverseCameraForwardMeters, kReverseCameraLeftMeters, kReverseCameraUpMeters),
-            new Rotation3d(
-                kReverseCameraMountRollAngleRad,
-                kReverseCameraMountPitchAngleRad,
-                kReverseCameraMountYawAngleRad));
+    // Limelight camera names — must match the NetworkTables table name for each camera.
+    // Camera-to-robot transforms are configured on the Limelight hardware, not in code.
+    public static final String kRightCameraName = "limelight-right";
+    public static final String kForwardCameraName = "limelight-forward";
+    public static final String kReverseCameraName = "limelight-reverse";
 
     // Dynamic std-dev scaling constants
     // Formula: stdDev = base * (avgDistance ^ exponent)
@@ -233,8 +163,6 @@ public final class Constants {
     public static final double kMaxAcceptableSingleTagAmbiguity = 0.2;
 
     // Pose sanity / QC filters
-    public static final double kMaxPoseHeightMeters =
-        0.75; // reject if estimated Z is off the floor
     public static final double kFieldBoundaryMarginMeters =
         0.5; // allow slightly outside field edge
     public static final double kMaxSingleTagDistanceMeters = 2.5; // max reliable single-tag range
@@ -251,17 +179,6 @@ public final class Constants {
     public static final double kMaxPoseJumpMeters = 1.0;
     // Reject vision if heading disagrees with gyro by more than this:
     public static final double kMaxHeadingDisagreementRad = Math.toRadians(30);
-
-    // Simulation camera properties (Limelight 4 — OV9782, HFOV 82°, VFOV ~56°)
-    // Two resolutions are available (640x400 and 1280x800)
-    public static final int kSimCameraResWidth = 640;
-    public static final int kSimCameraResHeight = 400;
-    public static final double kSimCameraFOVDeg = 91.4; // diagonal FOV derived from 82° HFOV
-    public static final double kSimAvgLatencyMs = 35.0;
-    public static final double kSimLatencyStdDevMs = 5.0;
-    public static final int kSimCameraFPS = 20;
-    public static final double kSimMaxSightRangeMeters =
-        kMaxSingleTagDistanceMeters; // 4.0; // max range for tag detection in sim
   }
 
   public static class AimBotConstants {

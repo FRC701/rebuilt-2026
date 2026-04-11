@@ -115,6 +115,9 @@ public class RobotContainer {
     // short-circuits past the vision block.
     m_DriveTrain.setVisionSubsystem(m_Vision);
 
+    // Feed gyro heading to VisionSubsystem for MegaTag2 orientation-constrained solving.
+    m_Vision.setGyroHeadingSupplier(() -> m_DriveTrain.getState().Pose.getRotation());
+
     // NamedCommands.registerCommand(
     NamedCommands.registerCommand(
         "ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter, m_Intake));

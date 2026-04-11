@@ -1,13 +1,11 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.Utils;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTable;
@@ -16,16 +14,11 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.LimelightHelpers.PoseEstimate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.simulation.SimCameraProperties;
-import org.photonvision.simulation.VisionSystemSim;
-import org.photonvision.targeting.PhotonPipelineResult;
+import java.util.function.Supplier;
 
 public class VisionSubsystem extends SubsystemBase {
 
@@ -34,30 +27,20 @@ public class VisionSubsystem extends SubsystemBase {
 
   /** All per-camera state in one place — eliminates the 3x field duplication. */
   private static class CameraState {
-    final PhotonCamera camera;
-    final PhotonPoseEstimator poseEstimator;
-    final String name;
-    final Transform3d robotToCam;
+    final String name; // NT table name for LimelightHelpers calls
+    final String displayName; // for logging and telemetry
     final StructPublisher<Pose2d> posePublisher;
     final List<VisionMeasurement> measurements = new ArrayList<>();
     Optional<VisionMeasurement> lastAccepted = Optional.empty();
-    boolean uncalibratedLogged = false;
-    boolean calibrationConfirmed = false;
     int rejectionCount = 0;
     String rejectionReason = "";
 
-    CameraState(
-        String name,
-        String cameraConfigName,
-        AprilTagFieldLayout fieldLayout,
-        Transform3d robotToCam) {
+    CameraState(String name, String displayName) {
       this.name = name;
-      this.robotToCam = robotToCam;
-      this.camera = new PhotonCamera(cameraConfigName);
-      this.poseEstimator = new PhotonPoseEstimator(fieldLayout, robotToCam);
+      this.displayName = displayName;
       this.posePublisher =
           NetworkTableInstance.getDefault()
-              .getStructTopic("Vision/" + name + "/Pose", Pose2d.struct)
+              .getStructTopic("Vision/" + displayName + "/Pose", Pose2d.struct)
               .publish();
     }
   }
@@ -67,9 +50,9 @@ public class VisionSubsystem extends SubsystemBase {
 
   private final NetworkTable m_visionTable = NetworkTableInstance.getDefault().getTable("Vision");
 
-  // Simulation support
-  private VisionSystemSim m_visionSim;
-  private Pose2d m_simRobotPose = new Pose2d();
+  // Gyro heading supplier — injected by RobotContainer after drivetrain is constructed.
+  // Used to feed MegaTag2 orientation. Defaults to zero heading until wired.
+  private Supplier<Rotation2d> m_gyroSupplier = Rotation2d::new;
 
   // Logging — throttle to every 10th cycle (200ms)
   private int m_logCounter = 0;
@@ -79,44 +62,19 @@ public class VisionSubsystem extends SubsystemBase {
 
     m_cameras =
         new CameraState[] {
-          new CameraState(
-              "Right",
-              Constants.Vision.kRightCameraName,
-              m_FieldLayout,
-              Constants.Vision.kRightRobotToCam3d),
-          new CameraState(
-              "Forward",
-              Constants.Vision.kForwardCameraName,
-              m_FieldLayout,
-              Constants.Vision.kForwardRobotToCam3d),
-          new CameraState(
-              "Reverse",
-              Constants.Vision.kReverseCameraName,
-              m_FieldLayout,
-              Constants.Vision.kReverseRobotToCam3d),
+          new CameraState(Constants.Vision.kRightCameraName, "Right"),
+          new CameraState(Constants.Vision.kForwardCameraName, "Forward"),
+          new CameraState(Constants.Vision.kReverseCameraName, "Reverse"),
         };
+  }
 
-    if (Utils.isSimulation()) {
-      m_visionSim = new VisionSystemSim("main");
-      m_visionSim.addAprilTags(m_FieldLayout);
-
-      var cameraProp = new SimCameraProperties();
-      cameraProp.setCalibration(
-          Constants.Vision.kSimCameraResWidth,
-          Constants.Vision.kSimCameraResHeight,
-          Rotation2d.fromDegrees(Constants.Vision.kSimCameraFOVDeg));
-      cameraProp.setCalibError(0.25, 0.08);
-      cameraProp.setFPS(Constants.Vision.kSimCameraFPS);
-      cameraProp.setAvgLatencyMs(Constants.Vision.kSimAvgLatencyMs);
-      cameraProp.setLatencyStdDevMs(Constants.Vision.kSimLatencyStdDevMs);
-
-      for (var cam : m_cameras) {
-        var cameraSim = new PhotonCameraSim(cam.camera, cameraProp);
-        cameraSim.enableDrawWireframe(true);
-        cameraSim.setMaxSightRange(Constants.Vision.kSimMaxSightRangeMeters);
-        m_visionSim.addCamera(cameraSim, cam.robotToCam);
-      }
-    }
+  /**
+   * Injects the gyro heading supplier used for MegaTag2 orientation. Must be called during robot
+   * construction (typically from {@code RobotContainer}) before the scheduler starts running {@link
+   * #periodic()}.
+   */
+  public void setGyroHeadingSupplier(Supplier<Rotation2d> supplier) {
+    m_gyroSupplier = supplier;
   }
 
   /**
@@ -138,11 +96,19 @@ public class VisionSubsystem extends SubsystemBase {
   public void periodic() {
     boolean verbose = Constants.UtilityConstants.kTuningMode;
 
+    // Feed gyro heading to all cameras for MegaTag2 orientation-constrained solving.
+    double yawDeg = m_gyroSupplier.get().getDegrees();
+    for (var cam : m_cameras) {
+      LimelightHelpers.SetRobotOrientation(cam.name, yawDeg, 0, 0, 0, 0, 0);
+    }
+
     for (var cam : m_cameras) {
       if (verbose) {
-        m_visionTable.getEntry(cam.name + "/Connected").setBoolean(cam.camera.isConnected());
+        m_visionTable
+            .getEntry(cam.displayName + "/Connected")
+            .setBoolean(LimelightHelpers.getTV(cam.name) || hasRecentHeartbeat(cam.name));
       }
-      processAllResults(cam, verbose);
+      processCamera(cam, verbose);
     }
 
     // Log critical vision data every 10th cycle (200ms) for match analysis
@@ -154,76 +120,133 @@ public class VisionSubsystem extends SubsystemBase {
     }
   }
 
-  /**
-   * Processes every unread pipeline result for a camera (not just the latest), applies the full
-   * filter cascade per frame, and appends accepted measurements to the camera's queue. Also
-   * verifies that PhotonVision has returned a calibration matrix — if not, we refuse to compute
-   * poses at all (they'd be garbage) and log an edge-triggered warning. After the first successful
-   * calibration check, the result is cached and the check is skipped on subsequent cycles.
-   */
-  private void processAllResults(CameraState cam, boolean verbose) {
-    if (!cam.camera.isConnected()) {
-      cam.measurements.clear();
-      cam.lastAccepted = Optional.empty();
-      return;
-    }
+  /** Returns true if the Limelight heartbeat has incremented recently. */
+  private boolean hasRecentHeartbeat(String cameraName) {
+    return LimelightHelpers.getHeartbeat(cameraName) > 0;
+  }
 
-    // Calibration verification — cached after first success so we don't call
-    // getCameraMatrix() every loop once we know intrinsics are loaded.
-    if (!cam.calibrationConfirmed) {
-      boolean calibrated = cam.camera.getCameraMatrix().isPresent();
-      trackCalibrationState(cam, calibrated);
-      if (verbose) {
-        m_visionTable.getEntry(cam.name + "/Calibrated").setBoolean(calibrated);
-      }
-      if (!calibrated) {
+  /**
+   * Gets a pose estimate from a single Limelight camera, applies the filter cascade, and queues
+   * accepted measurements. Tries MegaTag2 first, falls back to MegaTag1.
+   */
+  private void processCamera(CameraState cam, boolean verbose) {
+    // Try MegaTag2 first (orientation-constrained, more accurate)
+    PoseEstimate estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cam.name);
+    boolean isMegaTag2 = true;
+
+    if (!LimelightHelpers.validPoseEstimate(estimate) || estimate.tagCount == 0) {
+      // Fall back to MegaTag1
+      estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(cam.name);
+      isMegaTag2 = false;
+
+      if (!LimelightHelpers.validPoseEstimate(estimate) || estimate.tagCount == 0) {
+        publishRejection(cam, "no_valid_estimate", verbose);
+        cam.lastAccepted = Optional.empty();
         return;
       }
-      cam.calibrationConfirmed = true;
     }
 
-    var allResults = cam.camera.getAllUnreadResults();
-    if (allResults.isEmpty()) {
-      return;
-    }
-
-    for (var result : allResults) {
-      VisionMeasurement measurement = processFrame(result, cam, verbose);
-      if (measurement != null) {
-        // Cap queue size to prevent unbounded growth if the consumer stalls.
-        if (cam.measurements.size() >= kMaxQueuedMeasurements) {
-          cam.measurements.remove(0);
-        }
-        cam.measurements.add(measurement);
-        publishMeasurementTelemetry(cam, measurement, verbose);
-        cam.lastAccepted = Optional.of(measurement);
+    VisionMeasurement measurement = processEstimate(estimate, cam, isMegaTag2, verbose);
+    if (measurement != null) {
+      // Cap queue size to prevent unbounded growth if the consumer stalls.
+      if (cam.measurements.size() >= kMaxQueuedMeasurements) {
+        cam.measurements.remove(0);
       }
+      cam.measurements.add(measurement);
+      publishMeasurementTelemetry(cam, measurement, verbose);
+      cam.lastAccepted = Optional.of(measurement);
     }
   }
 
-  private void trackCalibrationState(CameraState cam, boolean calibrated) {
-    if (!calibrated && !cam.uncalibratedLogged) {
-      DataLogManager.log("Vision/" + cam.name + " WARNING: camera returned no calibration matrix");
-      cam.uncalibratedLogged = true;
-    } else if (calibrated && cam.uncalibratedLogged) {
-      DataLogManager.log("Vision/" + cam.name + " calibration now available");
-      cam.uncalibratedLogged = false;
+  /**
+   * Applies the full filter cascade to a Limelight PoseEstimate. Returns the accepted {@link
+   * VisionMeasurement} or {@code null} if the estimate was rejected.
+   */
+  private VisionMeasurement processEstimate(
+      PoseEstimate estimate, CameraState cam, boolean isMegaTag2, boolean verbose) {
+    int tagCount = estimate.tagCount;
+
+    if (verbose) {
+      m_visionTable.getEntry(cam.displayName + "/TagDetected").setBoolean(true);
+      m_visionTable.getEntry(cam.displayName + "/TagCount").setDouble(tagCount);
+      m_visionTable.getEntry(cam.displayName + "/AvgTagDist").setDouble(estimate.avgTagDist);
+      m_visionTable.getEntry(cam.displayName + "/MegaTag2").setBoolean(isMegaTag2);
+
+      if (estimate.rawFiducials != null) {
+        double[] visibleIds = new double[estimate.rawFiducials.length];
+        double[] ambiguities = new double[estimate.rawFiducials.length];
+        for (int i = 0; i < estimate.rawFiducials.length; i++) {
+          visibleIds[i] = estimate.rawFiducials[i].id;
+          ambiguities[i] = estimate.rawFiducials[i].ambiguity;
+        }
+        m_visionTable.getEntry(cam.displayName + "/VisibleTagIDs").setDoubleArray(visibleIds);
+        m_visionTable.getEntry(cam.displayName + "/Ambiguities").setDoubleArray(ambiguities);
+      }
     }
+
+    if (tagCount < Constants.Vision.kMinAprilTagsForPose) {
+      publishRejection(cam, "too_few_targets:" + tagCount, verbose);
+      return null;
+    }
+
+    // Single-tag ambiguity check
+    if (tagCount == 1
+        && estimate.rawFiducials != null
+        && estimate.rawFiducials.length > 0
+        && estimate.rawFiducials[0].ambiguity > Constants.Vision.kMaxAcceptableSingleTagAmbiguity) {
+      publishRejection(
+          cam,
+          "ambiguity_too_high:" + String.format("%.2f", estimate.rawFiducials[0].ambiguity),
+          verbose);
+      return null;
+    }
+
+    // Single-tag distance check
+    if (tagCount == 1 && estimate.avgTagDist > Constants.Vision.kMaxSingleTagDistanceMeters) {
+      publishRejection(
+          cam, "single_tag_too_far:" + String.format("%.2f", estimate.avgTagDist), verbose);
+      return null;
+    }
+
+    Pose2d robotPose = estimate.pose;
+
+    // Field boundary check
+    double fieldMargin = Constants.Vision.kFieldBoundaryMarginMeters;
+    if (robotPose.getX() < -fieldMargin
+        || robotPose.getX() > m_FieldLayout.getFieldLength() + fieldMargin
+        || robotPose.getY() < -fieldMargin
+        || robotPose.getY() > m_FieldLayout.getFieldWidth() + fieldMargin) {
+      publishRejection(
+          cam,
+          "outside_field:" + String.format("(%.2f, %.2f)", robotPose.getX(), robotPose.getY()),
+          verbose);
+      return null;
+    }
+
+    Matrix<N3, N1> stdDevs = computeDynamicStdDevs(tagCount, estimate.avgTagDist);
+
+    if (verbose) {
+      if (estimate.rawFiducials != null) {
+        double[] usedIds = new double[estimate.rawFiducials.length];
+        for (int i = 0; i < estimate.rawFiducials.length; i++) {
+          usedIds[i] = estimate.rawFiducials[i].id;
+        }
+        m_visionTable.getEntry(cam.displayName + "/UsedTagIDs").setDoubleArray(usedIds);
+      }
+    }
+
+    return new VisionMeasurement(robotPose, estimate.timestampSeconds, stdDevs, cam.displayName);
   }
 
   private void logVisionMeasurement(CameraState cam) {
-    if (!cam.camera.isConnected()) {
-      DataLogManager.log("Vision/" + cam.name + " disconnected");
-      return;
-    }
     if (cam.lastAccepted.isEmpty()) {
-      DataLogManager.log("Vision/" + cam.name + " rejected:" + cam.rejectionReason);
+      DataLogManager.log("Vision/" + cam.displayName + " rejected:" + cam.rejectionReason);
       return;
     }
     VisionMeasurement m = cam.lastAccepted.get();
     DataLogManager.log(
         "Vision/"
-            + cam.name
+            + cam.displayName
             + " t:"
             + String.format("%.3f", m.timestampSeconds())
             + " x:"
@@ -243,16 +266,18 @@ public class VisionSubsystem extends SubsystemBase {
     cam.posePublisher.set(measurement.pose());
 
     if (verbose) {
-      m_visionTable.getEntry(cam.name + "/Accepted").setBoolean(true);
-      m_visionTable.getEntry(cam.name + "/RejectionReason").setString("");
-      m_visionTable.getEntry(cam.name + "/PoseX_m").setDouble(measurement.pose().getX());
-      m_visionTable.getEntry(cam.name + "/PoseY_m").setDouble(measurement.pose().getY());
+      m_visionTable.getEntry(cam.displayName + "/Accepted").setBoolean(true);
+      m_visionTable.getEntry(cam.displayName + "/RejectionReason").setString("");
+      m_visionTable.getEntry(cam.displayName + "/PoseX_m").setDouble(measurement.pose().getX());
+      m_visionTable.getEntry(cam.displayName + "/PoseY_m").setDouble(measurement.pose().getY());
       m_visionTable
-          .getEntry(cam.name + "/PoseHeading_deg")
+          .getEntry(cam.displayName + "/PoseHeading_deg")
           .setDouble(measurement.pose().getRotation().getDegrees());
-      m_visionTable.getEntry(cam.name + "/StdDevXY").setDouble(measurement.stdDevs().get(0, 0));
       m_visionTable
-          .getEntry(cam.name + "/StdDevHeading_deg")
+          .getEntry(cam.displayName + "/StdDevXY")
+          .setDouble(measurement.stdDevs().get(0, 0));
+      m_visionTable
+          .getEntry(cam.displayName + "/StdDevHeading_deg")
           .setDouble(Math.toDegrees(measurement.stdDevs().get(2, 0)));
     }
   }
@@ -262,150 +287,14 @@ public class VisionSubsystem extends SubsystemBase {
     cam.rejectionCount++;
 
     if (verbose) {
-      m_visionTable.getEntry(cam.name + "/Accepted").setBoolean(false);
-      m_visionTable.getEntry(cam.name + "/RejectionReason").setString(reason);
-      m_visionTable.getEntry(cam.name + "/RejectionCount").setDouble(cam.rejectionCount);
+      m_visionTable.getEntry(cam.displayName + "/Accepted").setBoolean(false);
+      m_visionTable.getEntry(cam.displayName + "/RejectionReason").setString(reason);
+      m_visionTable.getEntry(cam.displayName + "/RejectionCount").setDouble(cam.rejectionCount);
     }
   }
 
-  /**
-   * Applies the full filter cascade to a single PhotonVision pipeline result. Returns the accepted
-   * {@link VisionMeasurement} or {@code null} if the frame was rejected.
-   */
-  private VisionMeasurement processFrame(
-      PhotonPipelineResult result, CameraState cam, boolean verbose) {
-    if (!result.hasTargets()) {
-      publishRejection(cam, "no_targets", verbose);
-      if (verbose) {
-        m_visionTable.getEntry(cam.name + "/TagDetected").setBoolean(false);
-      }
-      return null;
-    }
-
-    if (verbose) {
-      m_visionTable.getEntry(cam.name + "/TagDetected").setBoolean(true);
-      double[] visibleIds = result.targets.stream().mapToDouble(t -> t.getFiducialId()).toArray();
-      m_visionTable.getEntry(cam.name + "/VisibleTagIDs").setDoubleArray(visibleIds);
-      double[] ambiguities =
-          result.targets.stream().mapToDouble(t -> t.getPoseAmbiguity()).toArray();
-      m_visionTable.getEntry(cam.name + "/Ambiguities").setDoubleArray(ambiguities);
-    }
-
-    int targetCount = result.targets.size();
-
-    if (targetCount < Constants.Vision.kMinAprilTagsForPose) {
-      publishRejection(cam, "too_few_targets:" + targetCount, verbose);
-      return null;
-    }
-
-    if (targetCount == 1
-        && result.getBestTarget().getPoseAmbiguity()
-            > Constants.Vision.kMaxAcceptableSingleTagAmbiguity) {
-      publishRejection(
-          cam,
-          "ambiguity_too_high:" + String.format("%.2f", result.getBestTarget().getPoseAmbiguity()),
-          verbose);
-      return null;
-    }
-
-    if (targetCount == 1) {
-      double distanceToTag =
-          result.getBestTarget().getBestCameraToTarget().getTranslation().getNorm();
-      if (distanceToTag > Constants.Vision.kMaxSingleTagDistanceMeters) {
-        publishRejection(
-            cam, "single_tag_too_far:" + String.format("%.2f", distanceToTag), verbose);
-        return null;
-      }
-    }
-
-    // Attempt coprocessor multi-tag first, fall back to lowest ambiguity
-    Optional<EstimatedRobotPose> estimatedPose =
-        cam.poseEstimator.estimateCoprocMultiTagPose(result);
-    String multiTagFailReason = "";
-
-    if (estimatedPose.isEmpty()) {
-      if (verbose) {
-        // Diagnose why coprocessor multi-tag failed.
-        var multiTagResult = result.getMultiTagResult();
-        if (multiTagResult.isEmpty()) {
-          multiTagFailReason = "no_multitag_result";
-        } else if (multiTagResult.get().estimatedPose.bestReprojErr == 0) {
-          multiTagFailReason = "multitag_transform_invalid(reproj=0)";
-        } else {
-          multiTagFailReason =
-              "multitag_estimator_rejected(reproj:"
-                  + String.format("%.2f", multiTagResult.get().estimatedPose.bestReprojErr)
-                  + "px)";
-        }
-      }
-
-      estimatedPose = cam.poseEstimator.estimateLowestAmbiguityPose(result);
-    }
-
-    if (estimatedPose.isEmpty()) {
-      if (verbose) {
-        var bestTarget = result.getBestTarget();
-        int tagId = bestTarget.getFiducialId();
-        boolean tagInLayout = m_FieldLayout.getTagPose(tagId).isPresent();
-        double ambiguity = bestTarget.getPoseAmbiguity();
-        m_visionTable.getEntry(cam.name + "/ambiguity").setDouble(ambiguity);
-
-        String fallbackReason;
-        if (!tagInLayout) {
-          fallbackReason = "tag_" + tagId + "_not_in_layout";
-        } else if (ambiguity < 0) {
-          fallbackReason = "ambiguity_unavailable(tag_" + tagId + ")";
-        } else {
-          fallbackReason = "lowest_ambiguity_rejected:" + String.format("%.2f", ambiguity);
-        }
-
-        publishRejection(
-            cam,
-            "pose_estimation_failed|multitag:" + multiTagFailReason + "|fallback:" + fallbackReason,
-            verbose);
-      }
-      return null;
-    }
-
-    double poseZ = estimatedPose.get().estimatedPose.getZ();
-    if (Math.abs(poseZ) > Constants.Vision.kMaxPoseHeightMeters) {
-      publishRejection(cam, "z_out_of_range:" + String.format("%.2f", poseZ), verbose);
-      return null;
-    }
-
-    Pose2d robotPose = estimatedPose.get().estimatedPose.toPose2d();
-    double fieldMargin = Constants.Vision.kFieldBoundaryMarginMeters;
-    if (robotPose.getX() < -fieldMargin
-        || robotPose.getX() > m_FieldLayout.getFieldLength() + fieldMargin
-        || robotPose.getY() < -fieldMargin
-        || robotPose.getY() > m_FieldLayout.getFieldWidth() + fieldMargin) {
-      publishRejection(
-          cam,
-          "outside_field:" + String.format("(%.2f, %.2f)", robotPose.getX(), robotPose.getY()),
-          verbose);
-      return null;
-    }
-
-    Matrix<N3, N1> stdDevs = computeDynamicStdDevs(estimatedPose.get());
-
-    if (verbose) {
-      double[] usedIds =
-          estimatedPose.get().targetsUsed.stream().mapToDouble(t -> t.getFiducialId()).toArray();
-      m_visionTable.getEntry(cam.name + "/UsedTagIDs").setDoubleArray(usedIds);
-    }
-
-    return new VisionMeasurement(
-        robotPose, estimatedPose.get().timestampSeconds, stdDevs, cam.name);
-  }
-
-  private static Matrix<N3, N1> computeDynamicStdDevs(EstimatedRobotPose estimatedPose) {
-    boolean isMultiTag = estimatedPose.targetsUsed.size() > 1;
-
-    double totalDistance = 0.0;
-    for (var target : estimatedPose.targetsUsed) {
-      totalDistance += target.getBestCameraToTarget().getTranslation().getNorm();
-    }
-    double avgDistance = totalDistance / estimatedPose.targetsUsed.size();
+  private static Matrix<N3, N1> computeDynamicStdDevs(int tagCount, double avgDistance) {
+    boolean isMultiTag = tagCount > 1;
 
     double baseXY;
     double baseHeading;
@@ -427,15 +316,14 @@ public class VisionSubsystem extends SubsystemBase {
     return VecBuilder.fill(xyStdDev, xyStdDev, headingStdDev);
   }
 
+  /** Stub for simulation — Limelight has no sim equivalent. */
   public void setSimRobotPose(Pose2d pose) {
-    m_simRobotPose = pose;
+    // No-op: Limelight does not support desktop simulation.
   }
 
   @Override
   public void simulationPeriodic() {
-    if (m_visionSim != null) {
-      m_visionSim.update(m_simRobotPose);
-    }
+    // No-op: Limelight does not support desktop simulation.
   }
 
   public static record VisionMeasurement(
