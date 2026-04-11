@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SlightTurnRightBump"
+            "pathName": "SlightTurnLeftBump"
           }
         },
         {
@@ -44,13 +44,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SlightTurnRightBumpBackwards"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "RightBumpToNeutralIntake"
+            "pathName": "LeftShootPosToDepot"
           }
         },
         {
@@ -62,13 +56,62 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RightNeutralDrive"
+            "pathName": "DepotToDepotCollected"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RetractIntake"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "RightEndNeutralToShoot"
+            "pathName": "DepotCollectedToShootingPos"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShootCommand"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "FeederOn"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopShooting"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftShootToOutOfWay"
           }
         }
       ]

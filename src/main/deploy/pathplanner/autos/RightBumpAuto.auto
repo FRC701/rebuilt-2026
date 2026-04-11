@@ -17,13 +17,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "ShootCommand"
+                  "name": "FeederOn"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "FeederOn"
+                  "name": "ShootCommand"
                 }
               }
             ]
@@ -50,25 +50,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RightBumpToNeutralIntake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ExtendIntake"
+            "pathName": "RightBumpTest"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "RightNeutralDrive"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "RightEndNeutralToShoot"
+            "pathName": "RightBumpTestBackwards"
           }
         }
       ]

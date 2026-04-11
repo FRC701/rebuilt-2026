@@ -70,49 +70,6 @@
           "data": {
             "pathName": "RightNeutralToShoot"
           }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "ShootCommand"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "FeederOn"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "RetractIntake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopShooting"
-          }
         }
       ]
     }
