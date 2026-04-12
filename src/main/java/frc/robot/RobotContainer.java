@@ -64,7 +64,7 @@ public class RobotContainer {
           .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
           .withDriveRequestType(
               DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  private final SwerveRequest.SwerveDriveBrake m_lock = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
@@ -226,7 +226,7 @@ public class RobotContainer {
         .onTrue(
             new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
     //  m_ps4Controller.square().onTrue(m_NotShootingCommand);
-
+    m_ps4Controller.R1().whileTrue(m_DriveTrain.applyRequest(()-> m_lock));
     // Playstation Climber Binding
     // m_ps4Controller.R1().onTrue(new ClimberUpDownToggle(m_Climber, m_Agitator, m_LeftFeeder,
     // m_RightFeeder, m_LeftShooter, m_RightShooter));
