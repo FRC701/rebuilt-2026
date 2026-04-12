@@ -71,12 +71,15 @@ public class VisionSubsystem extends SubsystemBase {
           NetworkTableInstance.getDefault()
               .getStructTopic("Vision/" + displayName + "/Pose", Pose2d.struct)
               .publish();
-      this.enabledEntry = visionTable.getBooleanTopic(displayName + " Camera On").getEntry(true);
+      this.enabledEntry =
+          visionTable
+              .getBooleanTopic(displayName + " Camera On")
+              .getEntry(Constants.Vision.kDefaultCameraEnabled);
       this.fusingEntry =
           visionTable.getBooleanTopic(displayName + " Camera Fusing").getEntry(false);
       this.connectedEntry =
           visionTable.getBooleanTopic(displayName + " Camera Connected").getEntry(false);
-      this.enabledEntry.setDefault(true);
+      this.enabledEntry.setDefault(Constants.Vision.kDefaultCameraEnabled);
       this.fusingEntry.setDefault(false);
       this.connectedEntry.setDefault(false);
     }
