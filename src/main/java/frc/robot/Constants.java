@@ -165,7 +165,10 @@ public final class Constants {
     // Pose sanity / QC filters
     public static final double kFieldBoundaryMarginMeters =
         0.5; // allow slightly outside field edge
-    public static final double kMaxSingleTagDistanceMeters = 2.5; // max reliable single-tag range
+    public static final double kMaxSingleTagDistanceMeters =
+        2.5; // max reliable single-tag range (MT1)
+    public static final double kMaxSingleTagDistanceMT2Meters =
+        4.0; // MegaTag2 is reliable at greater range
 
     // Speed filters — reject vision when robot is moving too fast (motion blur)
     // These will only filter out extreme motion blur. Can tighten based on testing.

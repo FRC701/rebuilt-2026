@@ -189,8 +189,10 @@ public class VisionSubsystem extends SubsystemBase {
       return null;
     }
 
-    // Single-tag ambiguity check
-    if (tagCount == 1
+    // Single-tag ambiguity check — only meaningful for MegaTag1.
+    // MegaTag2 is inherently ambiguity-free (uses gyro heading as constraint).
+    if (!isMegaTag2
+        && tagCount == 1
         && estimate.rawFiducials != null
         && estimate.rawFiducials.length > 0
         && estimate.rawFiducials[0].ambiguity > Constants.Vision.kMaxAcceptableSingleTagAmbiguity) {
@@ -201,8 +203,12 @@ public class VisionSubsystem extends SubsystemBase {
       return null;
     }
 
-    // Single-tag distance check
-    if (tagCount == 1 && estimate.avgTagDist > Constants.Vision.kMaxSingleTagDistanceMeters) {
+    // Single-tag distance check — MegaTag2 is reliable at greater distances.
+    double maxSingleTagDist =
+        isMegaTag2
+            ? Constants.Vision.kMaxSingleTagDistanceMT2Meters
+            : Constants.Vision.kMaxSingleTagDistanceMeters;
+    if (tagCount == 1 && estimate.avgTagDist > maxSingleTagDist) {
       publishRejection(
           cam, "single_tag_too_far:" + String.format("%.2f", estimate.avgTagDist), verbose);
       return null;
@@ -223,7 +229,7 @@ public class VisionSubsystem extends SubsystemBase {
       return null;
     }
 
-    Matrix<N3, N1> stdDevs = computeDynamicStdDevs(tagCount, estimate.avgTagDist);
+    Matrix<N3, N1> stdDevs = computeDynamicStdDevs(tagCount, estimate.avgTagDist, isMegaTag2);
 
     if (verbose) {
       if (estimate.rawFiducials != null) {
@@ -293,25 +299,36 @@ public class VisionSubsystem extends SubsystemBase {
     }
   }
 
-  private static Matrix<N3, N1> computeDynamicStdDevs(int tagCount, double avgDistance) {
+  private static Matrix<N3, N1> computeDynamicStdDevs(
+      int tagCount, double avgDistance, boolean isMegaTag2) {
     boolean isMultiTag = tagCount > 1;
 
     double baseXY;
-    double baseHeading;
     double exponent;
     if (isMultiTag) {
       baseXY = Constants.Vision.kMultiTagBaseXYStdDev;
-      baseHeading = Constants.Vision.kMultiTagBaseHeadingStdDev;
       exponent = Constants.Vision.kMultiTagDistanceExponent;
     } else {
       baseXY = Constants.Vision.kSingleTagBaseXYStdDev;
-      baseHeading = Constants.Vision.kSingleTagBaseHeadingStdDev;
       exponent = Constants.Vision.kSingleTagDistanceExponent;
     }
 
     double distanceFactor = Math.pow(avgDistance, exponent);
-    double xyStdDev = baseXY * distanceFactor;
-    double headingStdDev = baseHeading * distanceFactor;
+    double xyStdDev = baseXY * distanceFactor / tagCount;
+
+    // MegaTag2 already uses gyro heading as an input — trusting its heading output
+    // would create a circular dependency. Set heading stddev to effectively infinity.
+    // For MegaTag1 fallback, scale heading normally.
+    double headingStdDev;
+    if (isMegaTag2) {
+      headingStdDev = 9999999.0;
+    } else {
+      double baseHeading =
+          isMultiTag
+              ? Constants.Vision.kMultiTagBaseHeadingStdDev
+              : Constants.Vision.kSingleTagBaseHeadingStdDev;
+      headingStdDev = baseHeading * distanceFactor / tagCount;
+    }
 
     return VecBuilder.fill(xyStdDev, xyStdDev, headingStdDev);
   }
