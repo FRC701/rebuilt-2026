@@ -179,9 +179,9 @@ public final class Constants {
     // Cross-sensor sanity gates applied in CommandSwerveDrivetrain.periodic().
     // Bypassed while disabled so pose can warm up / snap in on the field.
     // Reject vision if it disagrees with odometry XY by more than this:
-    public static final double kMaxPoseJumpMeters = 1.0;
+    public static final double kMaxPoseJumpMeters = 1.0; // meters
     // Reject vision if heading disagrees with gyro by more than this:
-    public static final double kMaxHeadingDisagreementRad = Math.toRadians(30);
+    public static final double kMaxHeadingDisagreementRad = Math.toRadians(30); // radians
 
     /** Pipeline index 0 is the AprilTag localization pipeline on all three cameras. */
     public static final int kAprilTagPipeline = 0;
@@ -191,7 +191,7 @@ public final class Constants {
      * cycle this is 50 cycles — long enough to survive a busy loop but short enough to catch a
      * genuinely dead camera before the match ends.
      */
-    public static final double kHeartbeatTimeoutSec = 1.0;
+    public static final double kHeartbeatTimeoutSec = 1.0; // seconds
 
     // Default enable states — flip to false here to disable vision globally or per-camera
     // at startup without touching subsystem code. Useful during development and debugging.

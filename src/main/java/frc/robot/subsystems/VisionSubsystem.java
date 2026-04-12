@@ -30,7 +30,7 @@ public class VisionSubsystem extends SubsystemBase {
     FORWARD(Constants.Vision.kForwardCameraName),
     REVERSE(Constants.Vision.kReverseCameraName);
 
-    final String ntName;
+    private final String ntName;
 
     Camera(String ntName) {
       this.ntName = ntName;
