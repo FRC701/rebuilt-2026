@@ -53,6 +53,10 @@ public class VisionSubsystem extends SubsystemBase {
     // Enable/disable toggle — readable and writable from Elastic via NetworkTables.
     final BooleanEntry enabledEntry;
 
+    // Whether this camera's measurements are currently being fused into pose estimation.
+    // Published every cycle so Elastic shows compute-only vs active fusion.
+    final BooleanEntry fusingEntry;
+
     // Connected status — published to NT every cycle.
     final BooleanEntry connectedEntry;
 
@@ -68,9 +72,12 @@ public class VisionSubsystem extends SubsystemBase {
               .getStructTopic("Vision/" + displayName + "/Pose", Pose2d.struct)
               .publish();
       this.enabledEntry = visionTable.getBooleanTopic(displayName + " Camera On").getEntry(true);
+      this.fusingEntry =
+          visionTable.getBooleanTopic(displayName + " Camera Fusing").getEntry(false);
       this.connectedEntry =
           visionTable.getBooleanTopic(displayName + " Camera Connected").getEntry(false);
       this.enabledEntry.setDefault(true);
+      this.fusingEntry.setDefault(false);
       this.connectedEntry.setDefault(false);
     }
   }
@@ -177,23 +184,20 @@ public class VisionSubsystem extends SubsystemBase {
     boolean allCamerasEnabled =
         m_allCamerasEnabledEntry.get(Constants.Vision.kDefaultAllCamerasEnabled);
 
-    // Feed gyro heading to all active cameras for MegaTag2 orientation-constrained solving.
+    // Always feed gyro heading so MegaTag2 has fresh orientation data even on disabled cameras.
     double yawDeg = m_gyroSupplier.get().getDegrees();
     for (var cam : m_cameras) {
-      boolean connected = isConnected(cam);
-
       // Always publish status so drive team can see camera health in Elastic.
-      cam.connectedEntry.set(connected);
-
-      if (allCamerasEnabled && cam.enabledEntry.get(Constants.Vision.kDefaultCameraEnabled)) {
-        LimelightHelpers.SetRobotOrientation(cam.name, yawDeg, 0, 0, 0, 0, 0);
-      }
+      cam.connectedEntry.set(isConnected(cam));
+      LimelightHelpers.SetRobotOrientation(cam.name, yawDeg, 0, 0, 0, 0, 0);
     }
 
     for (var cam : m_cameras) {
-      if (!allCamerasEnabled || !cam.enabledEntry.get(Constants.Vision.kDefaultCameraEnabled))
-        continue;
-      processCamera(cam, verbose);
+      // Always process (compute + log) — only fuse when the camera is enabled.
+      boolean shouldFuse =
+          allCamerasEnabled && cam.enabledEntry.get(Constants.Vision.kDefaultCameraEnabled);
+      cam.fusingEntry.set(shouldFuse);
+      processCamera(cam, verbose, shouldFuse);
     }
 
     // Log critical vision data every 10th cycle (200ms) for match analysis.
@@ -229,9 +233,10 @@ public class VisionSubsystem extends SubsystemBase {
 
   /**
    * Gets a pose estimate from a single Limelight camera, applies the filter cascade, and queues
-   * accepted measurements. Tries MegaTag2 first, falls back to MegaTag1.
+   * accepted measurements. Tries MegaTag2 first, falls back to MegaTag1. Pose is always computed
+   * and logged; it is only added to the fusion queue when {@code shouldFuse} is true.
    */
-  private void processCamera(CameraState cam, boolean verbose) {
+  private void processCamera(CameraState cam, boolean verbose, boolean shouldFuse) {
     // Try MegaTag2 first (orientation-constrained, more accurate)
     PoseEstimate estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cam.name);
     boolean isMegaTag2 = true;
@@ -250,13 +255,17 @@ public class VisionSubsystem extends SubsystemBase {
 
     VisionMeasurement measurement = processEstimate(estimate, cam, isMegaTag2, verbose);
     if (measurement != null) {
-      // Cap queue size to prevent unbounded growth if the consumer stalls.
-      if (cam.measurements.size() >= kMaxQueuedMeasurements) {
-        cam.measurements.remove(0);
-      }
-      cam.measurements.add(measurement);
+      // Always publish pose and telemetry for logging/visualization regardless of fusion state.
       publishMeasurementTelemetry(cam, measurement, verbose);
       cam.lastAccepted = Optional.of(measurement);
+
+      if (shouldFuse) {
+        // Cap queue size to prevent unbounded growth if the consumer stalls.
+        if (cam.measurements.size() >= kMaxQueuedMeasurements) {
+          cam.measurements.remove(0);
+        }
+        cam.measurements.add(measurement);
+      }
     }
   }
 
