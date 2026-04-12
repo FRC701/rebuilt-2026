@@ -8,10 +8,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.LimelightHelpers.PoseEstimate;
@@ -21,6 +23,19 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class VisionSubsystem extends SubsystemBase {
+
+  /** Identifies a specific Limelight camera — use instead of raw strings in code. */
+  public enum Camera {
+    RIGHT(Constants.Vision.kRightCameraName),
+    FORWARD(Constants.Vision.kForwardCameraName),
+    REVERSE(Constants.Vision.kReverseCameraName);
+
+    final String ntName;
+
+    Camera(String ntName) {
+      this.ntName = ntName;
+    }
+  }
 
   /** Maximum queued measurements per camera before oldest entries are dropped. */
   private static final int kMaxQueuedMeasurements = 20;
@@ -35,13 +50,28 @@ public class VisionSubsystem extends SubsystemBase {
     int rejectionCount = 0;
     String rejectionReason = "";
 
-    CameraState(String name, String displayName) {
+    // Enable/disable toggle — readable and writable from Elastic via NetworkTables.
+    final BooleanEntry enabledEntry;
+
+    // Connected status — published to NT every cycle.
+    final BooleanEntry connectedEntry;
+
+    // Heartbeat tracking — detect cameras that stop sending data mid-match.
+    double lastHeartbeat = -1;
+    double lastHeartbeatTimeSec = 0;
+
+    CameraState(String name, String displayName, NetworkTable visionTable) {
       this.name = name;
       this.displayName = displayName;
       this.posePublisher =
           NetworkTableInstance.getDefault()
               .getStructTopic("Vision/" + displayName + "/Pose", Pose2d.struct)
               .publish();
+      this.enabledEntry = visionTable.getBooleanTopic(displayName + " Camera On").getEntry(true);
+      this.connectedEntry =
+          visionTable.getBooleanTopic(displayName + " Camera Connected").getEntry(false);
+      this.enabledEntry.setDefault(true);
+      this.connectedEntry.setDefault(false);
     }
   }
 
@@ -49,6 +79,12 @@ public class VisionSubsystem extends SubsystemBase {
   private final CameraState[] m_cameras;
 
   private final NetworkTable m_visionTable = NetworkTableInstance.getDefault().getTable("Vision");
+
+  // All-cameras enable flag — operators can toggle from Elastic without redeploying.
+  private final BooleanEntry m_allCamerasEnabledEntry =
+      m_visionTable
+          .getBooleanTopic("All Cameras On")
+          .getEntry(Constants.Vision.kDefaultAllCamerasEnabled);
 
   // Gyro heading supplier — injected by RobotContainer after drivetrain is constructed.
   // Used to feed MegaTag2 orientation. Defaults to zero heading until wired.
@@ -62,10 +98,25 @@ public class VisionSubsystem extends SubsystemBase {
 
     m_cameras =
         new CameraState[] {
-          new CameraState(Constants.Vision.kRightCameraName, "Right"),
-          new CameraState(Constants.Vision.kForwardCameraName, "Forward"),
-          new CameraState(Constants.Vision.kReverseCameraName, "Reverse"),
+          new CameraState(Constants.Vision.kRightCameraName, "Right", m_visionTable),
+          new CameraState(Constants.Vision.kForwardCameraName, "Forward", m_visionTable),
+          new CameraState(Constants.Vision.kReverseCameraName, "Reverse", m_visionTable),
         };
+
+    for (var cam : m_cameras) {
+      initCamera(cam);
+    }
+    m_allCamerasEnabledEntry.setDefault(Constants.Vision.kDefaultAllCamerasEnabled);
+  }
+
+  /**
+   * Sets the AprilTag pipeline and puts LEDs under pipeline control for a single camera. Called
+   * once per camera in the constructor so the robot starts in a known state regardless of what was
+   * previously saved on the Limelight hardware.
+   */
+  private void initCamera(CameraState cam) {
+    LimelightHelpers.setPipelineIndex(cam.name, Constants.Vision.kAprilTagPipeline);
+    LimelightHelpers.setLEDMode_PipelineControl(cam.name);
   }
 
   /**
@@ -76,6 +127,31 @@ public class VisionSubsystem extends SubsystemBase {
   public void setGyroHeadingSupplier(Supplier<Rotation2d> supplier) {
     m_gyroSupplier = supplier;
   }
+
+  // ── Enable / Disable API ────────────────────────────────────────────────────
+
+  /** Enables or disables vision processing for all cameras at once. */
+  public void setAllCamerasEnabled(boolean enabled) {
+    m_allCamerasEnabledEntry.set(enabled);
+  }
+
+  /**
+   * Enables or disables a single camera.
+   *
+   * <pre>
+   * m_visionSubsystem.setCameraEnabled(Camera.RIGHT, false);
+   * </pre>
+   */
+  public void setCameraEnabled(Camera camera, boolean enabled) {
+    for (var cam : m_cameras) {
+      if (cam.name.equals(camera.ntName)) {
+        cam.enabledEntry.set(enabled);
+        return;
+      }
+    }
+  }
+
+  // ── Measurement drain ───────────────────────────────────────────────────────
 
   /**
    * Returns and clears all vision measurements queued across all cameras since the last drain. Each
@@ -92,26 +168,35 @@ public class VisionSubsystem extends SubsystemBase {
     return all;
   }
 
+  // ── Periodic ────────────────────────────────────────────────────────────────
+
   @Override
   public void periodic() {
     boolean verbose = Constants.UtilityConstants.kTuningMode;
 
-    // Feed gyro heading to all cameras for MegaTag2 orientation-constrained solving.
+    boolean allCamerasEnabled =
+        m_allCamerasEnabledEntry.get(Constants.Vision.kDefaultAllCamerasEnabled);
+
+    // Feed gyro heading to all active cameras for MegaTag2 orientation-constrained solving.
     double yawDeg = m_gyroSupplier.get().getDegrees();
     for (var cam : m_cameras) {
-      LimelightHelpers.SetRobotOrientation(cam.name, yawDeg, 0, 0, 0, 0, 0);
+      boolean connected = isConnected(cam);
+
+      // Always publish status so drive team can see camera health in Elastic.
+      cam.connectedEntry.set(connected);
+
+      if (allCamerasEnabled && cam.enabledEntry.get(Constants.Vision.kDefaultCameraEnabled)) {
+        LimelightHelpers.SetRobotOrientation(cam.name, yawDeg, 0, 0, 0, 0, 0);
+      }
     }
 
     for (var cam : m_cameras) {
-      if (verbose) {
-        m_visionTable
-            .getEntry(cam.displayName + "/Connected")
-            .setBoolean(LimelightHelpers.getTV(cam.name) || hasRecentHeartbeat(cam.name));
-      }
+      if (!allCamerasEnabled || !cam.enabledEntry.get(Constants.Vision.kDefaultCameraEnabled))
+        continue;
       processCamera(cam, verbose);
     }
 
-    // Log critical vision data every 10th cycle (200ms) for match analysis
+    // Log critical vision data every 10th cycle (200ms) for match analysis.
     if (++m_logCounter >= 10) {
       for (var cam : m_cameras) {
         logVisionMeasurement(cam);
@@ -120,10 +205,27 @@ public class VisionSubsystem extends SubsystemBase {
     }
   }
 
-  /** Returns true if the Limelight heartbeat has incremented recently. */
-  private boolean hasRecentHeartbeat(String cameraName) {
-    return LimelightHelpers.getHeartbeat(cameraName) > 0;
+  // ── Heartbeat / connectivity ─────────────────────────────────────────────────
+
+  /**
+   * Returns true if the Limelight heartbeat has incremented within the configured timeout window.
+   * Updates the stored heartbeat value and timestamp on every call.
+   */
+  private boolean isConnected(CameraState cam) {
+    double hb = LimelightHelpers.getHeartbeat(cam.name);
+    double now = Timer.getFPGATimestamp();
+
+    if (hb != cam.lastHeartbeat) {
+      cam.lastHeartbeat = hb;
+      cam.lastHeartbeatTimeSec = now;
+    }
+
+    // Camera is live if we have ever seen a heartbeat AND it changed recently enough.
+    return cam.lastHeartbeatTimeSec > 0
+        && (now - cam.lastHeartbeatTimeSec) < Constants.Vision.kHeartbeatTimeoutSec;
   }
+
+  // ── Camera processing ────────────────────────────────────────────────────────
 
   /**
    * Gets a pose estimate from a single Limelight camera, applies the filter cascade, and queues
@@ -244,6 +346,8 @@ public class VisionSubsystem extends SubsystemBase {
     return new VisionMeasurement(robotPose, estimate.timestampSeconds, stdDevs, cam.displayName);
   }
 
+  // ── Telemetry & logging ──────────────────────────────────────────────────────
+
   private void logVisionMeasurement(CameraState cam) {
     if (cam.lastAccepted.isEmpty()) {
       DataLogManager.log("Vision/" + cam.displayName + " rejected:" + cam.rejectionReason);
@@ -299,6 +403,8 @@ public class VisionSubsystem extends SubsystemBase {
     }
   }
 
+  // ── Standard deviation computation ──────────────────────────────────────────
+
   private static Matrix<N3, N1> computeDynamicStdDevs(
       int tagCount, double avgDistance, boolean isMegaTag2) {
     boolean isMultiTag = tagCount > 1;
@@ -333,6 +439,8 @@ public class VisionSubsystem extends SubsystemBase {
     return VecBuilder.fill(xyStdDev, xyStdDev, headingStdDev);
   }
 
+  // ── Simulation stubs ─────────────────────────────────────────────────────────
+
   /** Stub for simulation — Limelight has no sim equivalent. */
   public void setSimRobotPose(Pose2d pose) {
     // No-op: Limelight does not support desktop simulation.
@@ -342,6 +450,8 @@ public class VisionSubsystem extends SubsystemBase {
   public void simulationPeriodic() {
     // No-op: Limelight does not support desktop simulation.
   }
+
+  // ── Record type ──────────────────────────────────────────────────────────────
 
   public static record VisionMeasurement(
       Pose2d pose, double timestampSeconds, Matrix<N3, N1> stdDevs, String cameraName) {}

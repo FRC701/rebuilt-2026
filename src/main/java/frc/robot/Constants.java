@@ -182,6 +182,21 @@ public final class Constants {
     public static final double kMaxPoseJumpMeters = 1.0;
     // Reject vision if heading disagrees with gyro by more than this:
     public static final double kMaxHeadingDisagreementRad = Math.toRadians(30);
+
+    /** Pipeline index 0 is the AprilTag localization pipeline on all three cameras. */
+    public static final int kAprilTagPipeline = 0;
+
+    /**
+     * Seconds without a heartbeat increment before a camera is flagged as disconnected. At 20 ms /
+     * cycle this is 50 cycles — long enough to survive a busy loop but short enough to catch a
+     * genuinely dead camera before the match ends.
+     */
+    public static final double kHeartbeatTimeoutSec = 1.0;
+
+    // Default enable states — flip to false here to disable vision globally or per-camera
+    // at startup without touching subsystem code. Useful during development and debugging.
+    public static final boolean kDefaultAllCamerasEnabled = true;
+    public static final boolean kDefaultCameraEnabled = true;
   }
 
   public static class AimBotConstants {
