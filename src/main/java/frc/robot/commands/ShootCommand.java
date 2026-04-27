@@ -30,7 +30,7 @@ public class ShootCommand extends Command {
   public void initialize() {
     m_LeftShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_Shooting;
     m_RightShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_Shooting;
-    m_Intake.m_IntakeState = IntakeState.S_ShootingCycleDown;
+    m_Intake.m_IntakeState = IntakeState.S_Down;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
