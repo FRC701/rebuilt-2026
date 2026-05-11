@@ -36,9 +36,9 @@ public class TunerConstants {
   private static final Slot0Configs driveGains =
       new Slot0Configs()
           .withKP(SmartDashboard.getNumber("dKP", 0.1))
-          .withKI(SmartDashboard.getNumber("dKI", 0))
-          .withKD(SmartDashboard.getNumber("dKD", 0.001))
-          .withKS(SmartDashboard.getNumber("dKS", 0))
+          .withKI(SmartDashboard.getNumber("dKI", 0.0001))
+          .withKD(SmartDashboard.getNumber("dKD", 0.01))
+          .withKS(SmartDashboard.getNumber("dKS", 0.02))
           .withKV(SmartDashboard.getNumber("dKV", 0.124));
 
   // The closed-loop output type to use for the steer motors;
@@ -61,25 +61,11 @@ public class TunerConstants {
 
   // The stator current at which the wheels start to slip;
   // This needs to be tuned to your individual robot
-  private static final Current kSlipCurrent = Amps.of(70);
+  private static final Current kSlipCurrent = Amps.of(120);
 
   // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
   // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
-  private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration();
-  //   private static final TalonFXConfiguration steerInitialConfigs =
-  //       new TalonFXConfiguration()
-  //           .withCurrentLimits(
-  //               new CurrentLimitsConfigs()
-  //                   // Swerve azimuth does not require much torque output, so we can set a
-  // relatively
-  //                   // low
-  //                   // stator current limit to help avoid brownouts without impacting
-  // performance.
-  //                   .withStatorCurrentLimit(Amps.of(60))
-  //                   .withStatorCurrentLimitEnable(true)
-  //                   .withSupplyCurrentLimit(60)
-  //                   .withSupplyCurrentLimitEnable(true));
-  private static final TalonFXConfiguration steerInitialConfigs =
+  private static final TalonFXConfiguration driveInitialConfigs = 
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
@@ -90,11 +76,25 @@ public class TunerConstants {
                   .withStatorCurrentLimitEnable(true)
                   .withSupplyCurrentLimit(60)
                   .withSupplyCurrentLimitEnable(true));
+  private static final TalonFXConfiguration steerInitialConfigs =
+      new TalonFXConfiguration()
+          .withCurrentLimits(
+              new CurrentLimitsConfigs()
+                  // Swerve azimuth does not require much torque output, so we can set a relatively
+                  // low
+                  // stator current limit to help avoid brownouts without impacting performance.
+                  .withStatorCurrentLimit(Amps.of(40))
+                  .withStatorCurrentLimitEnable(true)
+                  .withSupplyCurrentLimit(40)
+                  .withSupplyCurrentLimitEnable(true));
+
 
   private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
   // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
   private static final Pigeon2Configuration pigeonConfigs = null;
 
+  // CAN bus that the devices are located on;
+  // All swerve devices must share the same CAN bus
   public static final CANBus kCANBus = new CANBus("*", "./logs/example.hoot");
 
   // Theoretical free speed (m/s) at 12 V applied output;
@@ -170,8 +170,7 @@ public class TunerConstants {
   private static final int kFrontRightSteerMotorId = 1;
   private static final int kFrontRightEncoderId = 1;
   private static final Angle kFrontRightEncoderOffset =
-      Rotations.of(
-          -0.18071875 + SmartDashboard.getNumber("frontRightCoderOffset", 0)); // -0.21671875
+      Rotations.of(-0.21671875 + SmartDashboard.getNumber("frontRightCoderOffset", 0) + 0.04);
   private static final boolean kFrontRightSteerMotorInverted = true;
   private static final boolean kFrontRightEncoderInverted = false;
 
@@ -183,8 +182,7 @@ public class TunerConstants {
   private static final int kBackLeftSteerMotorId = 4;
   private static final int kBackLeftEncoderId = 0;
   private static final Angle kBackLeftEncoderOffset =
-      Rotations.of(
-          -0.608630859375 + SmartDashboard.getNumber("backLeftCoderOffset", 0)); // -0.528630859375
+      Rotations.of(-0.528630859375 + SmartDashboard.getNumber("backLeftCoderOffset", 0) - 0.078); //-0.021630859375 
   private static final boolean kBackLeftSteerMotorInverted = true;
   private static final boolean kBackLeftEncoderInverted = false;
 
@@ -196,7 +194,7 @@ public class TunerConstants {
   private static final int kBackRightSteerMotorId = 8;
   private static final int kBackRightEncoderId = 3;
   private static final Angle kBackRightEncoderOffset =
-      Rotations.of(-0.538070703125 + SmartDashboard.getNumber("backRightCoderOffset", 0));
+      Rotations.of(-0.529970703125 + SmartDashboard.getNumber("backRightCoderOffset", 0));
   private static final boolean kBackRightSteerMotorInverted = true;
   private static final boolean kBackRightEncoderInverted = false;
 
