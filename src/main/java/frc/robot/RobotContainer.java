@@ -209,9 +209,15 @@ public class RobotContainer {
     m_DriveTrain.registerTelemetry(logger::telemeterize);
 
     // Intake Bindings
-    m_xboxController.leftTrigger().onTrue(new IntakeToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
+    m_xboxController
+        .leftTrigger()
+        .onTrue(
+            new IntakeToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
     // Playstation variant of ^^^
-    m_ps4Controller.L2().onTrue(new IntakeToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
+    m_ps4Controller
+        .L2()
+        .onTrue(
+            new IntakeToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
     // m_ps4Controller.povRight().onTrue(m_IntakeRollerToggle);
 
     // Shooter Binding XBox
@@ -226,7 +232,7 @@ public class RobotContainer {
         .onTrue(
             new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
     //  m_ps4Controller.square().onTrue(m_NotShootingCommand);
-    m_ps4Controller.R1().whileTrue(m_DriveTrain.applyRequest(()-> m_lock));
+    m_ps4Controller.R1().whileTrue(m_DriveTrain.applyRequest(() -> m_lock));
     // Playstation Climber Binding
     // m_ps4Controller.R1().onTrue(new ClimberUpDownToggle(m_Climber, m_Agitator, m_LeftFeeder,
     // m_RightFeeder, m_LeftShooter, m_RightShooter));

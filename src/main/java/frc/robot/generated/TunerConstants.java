@@ -65,7 +65,7 @@ public class TunerConstants {
 
   // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
   // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
-  private static final TalonFXConfiguration driveInitialConfigs = 
+  private static final TalonFXConfiguration driveInitialConfigs =
       new TalonFXConfiguration()
           .withCurrentLimits(
               new CurrentLimitsConfigs()
@@ -87,7 +87,6 @@ public class TunerConstants {
                   .withStatorCurrentLimitEnable(true)
                   .withSupplyCurrentLimit(40)
                   .withSupplyCurrentLimitEnable(true));
-
 
   private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
   // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
@@ -182,7 +181,10 @@ public class TunerConstants {
   private static final int kBackLeftSteerMotorId = 4;
   private static final int kBackLeftEncoderId = 0;
   private static final Angle kBackLeftEncoderOffset =
-      Rotations.of(-0.528630859375 + SmartDashboard.getNumber("backLeftCoderOffset", 0) - 0.078); //-0.021630859375 
+      Rotations.of(
+          -0.528630859375
+              + SmartDashboard.getNumber("backLeftCoderOffset", 0)
+              - 0.078); // -0.021630859375
   private static final boolean kBackLeftSteerMotorInverted = true;
   private static final boolean kBackLeftEncoderInverted = false;
 

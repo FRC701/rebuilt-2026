@@ -9,6 +9,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShooterEnumState;
+import frc.robot.subsystems.CandleSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ShootCommand extends Command {
@@ -16,13 +17,15 @@ public class ShootCommand extends Command {
   Shooter m_LeftShooterSubsystem;
   Shooter m_RightShooterSubsystem;
   Intake m_Intake;
+  CandleSubsystem m_Candle;
 
   /** Creates a new ShootCommand. */
-  public ShootCommand(Shooter leftShooter, Shooter rightShooter, Intake intake) {
+  public ShootCommand(Shooter leftShooter, Shooter rightShooter, Intake intake, CandleSubsystem Candle) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_LeftShooterSubsystem = leftShooter;
     m_RightShooterSubsystem = rightShooter;
     m_Intake = intake;
+    m_Candle = Candle; 
   }
 
   // Called when the command is initially scheduled.
@@ -31,6 +34,7 @@ public class ShootCommand extends Command {
     m_LeftShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_Shooting;
     m_RightShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_Shooting;
     m_Intake.m_IntakeState = IntakeState.S_Down;
+    m_Candle.shootingLED();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
