@@ -32,6 +32,7 @@ import frc.robot.commands.RetractIntake;
 import frc.robot.commands.ShootCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
+import frc.robot.subsystems.CandleSubsystem;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
@@ -87,6 +88,7 @@ public class RobotContainer {
       new Shooter(
           Constants.ShooterConstants.kRightShooterId, "Right Shooter", m_Agitator, m_Intake);
   private Climber m_Climber = new Climber();
+  private CandleSubsystem m_Candle = new CandleSubsystem();
 
   // Instantiating Shooter Commands
 
@@ -118,7 +120,7 @@ public class RobotContainer {
 
     // NamedCommands.registerCommand(
     NamedCommands.registerCommand(
-        "ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter, m_Intake));
+        "ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter, m_Intake, m_Candle));
     NamedCommands.registerCommand("StopShooting", m_NotShootingCommand);
     NamedCommands.registerCommand("FeederOn", new FeederOn(m_LeftFeeder, m_RightFeeder));
     NamedCommands.registerCommand("ExtendIntake", new ExtendIntake(m_Intake));

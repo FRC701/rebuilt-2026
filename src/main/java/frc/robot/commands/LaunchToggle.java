@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.subsystems.CandleSubsystem;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Feeder.FeederState;
 import frc.robot.subsystems.Intake;
@@ -22,13 +23,15 @@ public class LaunchToggle extends InstantCommand {
   Shooter m_LeftShooter;
   Shooter m_RightShooter;
   Intake m_Intake;
+  CandleSubsystem m_Candle;
 
   public LaunchToggle(
       Feeder tempLeftFeeder,
       Feeder tempRightFeeder,
       Shooter tempLeftShooter,
       Shooter tempRightShooter,
-      Intake tempIntake) {
+      Intake tempIntake,
+      CandleSubsystem tempCandle) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_LeftShooter = tempLeftShooter;
     m_RightShooter = tempRightShooter;
@@ -46,6 +49,7 @@ public class LaunchToggle extends InstantCommand {
       m_LeftFeeder.m_FeederState = FeederState.S_Off;
       m_RightFeeder.m_FeederState = FeederState.S_Off;
       m_Intake.m_IntakeState = IntakeState.S_ExtendCycleUp;
+      m_Candle.notShootingLED();
 
     } else {
       m_LeftShooter.m_ShooterEnumState = ShooterEnumState.S_Shooting;
@@ -53,6 +57,7 @@ public class LaunchToggle extends InstantCommand {
       m_Intake.m_IntakeState = IntakeState.S_Down;
       m_LeftFeeder.m_FeederState = FeederState.S_On;
       m_RightFeeder.m_FeederState = FeederState.S_On;
+      m_Candle.shootingLED();
     }
   }
 }

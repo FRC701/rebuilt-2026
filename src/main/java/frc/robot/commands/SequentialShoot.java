@@ -36,7 +36,7 @@ public class SequentialShoot extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
         // new ShootingCommand(m_LeftShooter, m_RightShooter),
-        new ShootCommand(m_LeftShooter, m_RightShooter, m_Intake),
+        new ShootCommand(m_LeftShooter, m_RightShooter, m_Intake, m_Candle),
         new FeederOn(m_LeftFeeder, m_RightFeeder));
     
         
