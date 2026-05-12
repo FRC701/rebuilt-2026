@@ -38,6 +38,7 @@ public class LaunchToggle extends InstantCommand {
     m_LeftFeeder = tempLeftFeeder;
     m_RightFeeder = tempRightFeeder;
     m_Intake = tempIntake;
+    m_Candle = tempCandle;
   }
 
   // Called when the command is initially scheduled.

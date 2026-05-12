@@ -46,7 +46,7 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A quite fast, purple animation, possible for shooter LEDs?
   private final LarsonAnimation m_slot0Animation =
-      new LarsonAnimation(0, 127)
+      new LarsonAnimation(0, 318)
           .withSlot(0)
           .withColor(new RGBWColor(190, 8, 255, 0))
           .withSize(15)
@@ -55,25 +55,25 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A light, spring green color, this animation blinks slowly without fade
   private final StrobeAnimation m_slot1Animation =
-      new StrobeAnimation(0, 127)
+      new StrobeAnimation(0, 318)
           .withSlot(1)
           .withColor(new RGBWColor(70, 255, 35, 0))
           .withFrameRate(Hertz.of(1));
 
   // Rainbow Fade, medium speed
   private final RgbFadeAnimation m_slot2Animation =
-      new RgbFadeAnimation(0, 127).withSlot(2).withBrightness(0.541).withFrameRate(Hertz.of(76.44));
+      new RgbFadeAnimation(0, 318).withSlot(2).withBrightness(0.541).withFrameRate(Hertz.of(76.44));
 
   // Gold color, blinks with fade
   private final SingleFadeAnimation m_slot3Animation =
-      new SingleFadeAnimation(0, 127)
+      new SingleFadeAnimation(0, 318)
           .withSlot(3)
           .withColor(new RGBWColor(255, 196, 7, 0))
           .withFrameRate(Hertz.of(70.952));
 
   // Hot pink color (correlate with our girl robot?) twinkles quite fast
   private final TwinkleAnimation m_slot4Animation =
-      new TwinkleAnimation(0, 127)
+      new TwinkleAnimation(0, 318)
           .withSlot(4)
           .withColor(new RGBWColor(255, 27, 51, 0))
           .withMaxLEDsOnProportion(0.78)
@@ -81,7 +81,7 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A cool, fading rainbow animation with half speed and brightness
   private final RainbowAnimation m_slot5Animation =
-      new RainbowAnimation(0, 127)
+      new RainbowAnimation(0, 318)
           .withSlot(5)
           .withBrightness(0.562)
           .withDirection(AnimationDirectionValue.Forward)
@@ -89,7 +89,7 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A fast fire animation (not even the fastest it goes :0)
   private final FireAnimation m_slot6Animation =
-      new FireAnimation(0, 127)
+      new FireAnimation(0, 318)
           .withSlot(6)
           .withBrightness(0.689)
           .withDirection(AnimationDirectionValue.Forward)
@@ -99,7 +99,7 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A cherry red flow, supposed to go backwards? Doesn't give me an option to see in phoenix tuner
   private final ColorFlowAnimation m_slot7Animation =
-      new ColorFlowAnimation(0, 127)
+      new ColorFlowAnimation(0, 318)
           .withSlot(7)
           .withColor(new RGBWColor(255, 13, 2, 0))
           .withDirection(AnimationDirectionValue.Backward)
@@ -185,5 +185,6 @@ public class CandleSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    defaultLED();
   }
 }
