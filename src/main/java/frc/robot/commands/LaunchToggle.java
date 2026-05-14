@@ -50,7 +50,6 @@ public class LaunchToggle extends InstantCommand {
       m_LeftFeeder.m_FeederState = FeederState.S_Off;
       m_RightFeeder.m_FeederState = FeederState.S_Off;
       m_Intake.m_IntakeState = IntakeState.S_ExtendCycleUp;
-      m_Candle.notShootingLED();
 
     } else {
       m_LeftShooter.m_ShooterEnumState = ShooterEnumState.S_Shooting;

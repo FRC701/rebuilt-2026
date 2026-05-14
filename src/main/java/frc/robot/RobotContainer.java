@@ -226,13 +226,15 @@ public class RobotContainer {
     m_xboxController
         .rightTrigger()
         .onTrue(
-            new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake, m_Candle));
+            new LaunchToggle(
+                m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake, m_Candle));
     m_xboxController.x().onTrue(m_NotShootingCommand);
     // Playstation variant of ^^^
     m_ps4Controller
         .R2()
         .onTrue(
-            new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake, m_Candle));
+            new LaunchToggle(
+                m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake, m_Candle));
     //  m_ps4Controller.square().onTrue(m_NotShootingCommand);
     m_ps4Controller.R1().whileTrue(m_DriveTrain.applyRequest(() -> m_lock));
     // Playstation Climber Binding
