@@ -41,7 +41,7 @@ public class CandleSubsystem extends SubsystemBase {
     m_Candle
         .getConfigurator()
         .apply(new LEDConfigs().withStripType(StripTypeValue.GRB).withBrightnessScalar(1.0));
-    setDefaultCommand(defaultLED());
+    //setDefaultCommand(defaultLED());
   }
 
   // A quite fast, purple animation, possible for shooter LEDs?
