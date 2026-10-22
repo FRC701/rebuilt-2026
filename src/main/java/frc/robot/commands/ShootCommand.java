@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.CandleSubsystem;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Shooter;
@@ -16,13 +17,16 @@ public class ShootCommand extends Command {
   Shooter m_LeftShooterSubsystem;
   Shooter m_RightShooterSubsystem;
   Intake m_Intake;
+  CandleSubsystem m_Candle;
 
   /** Creates a new ShootCommand. */
-  public ShootCommand(Shooter leftShooter, Shooter rightShooter, Intake intake) {
+  public ShootCommand(
+      Shooter leftShooter, Shooter rightShooter, Intake intake, CandleSubsystem Candle) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_LeftShooterSubsystem = leftShooter;
     m_RightShooterSubsystem = rightShooter;
     m_Intake = intake;
+    m_Candle = Candle;
   }
 
   // Called when the command is initially scheduled.
@@ -30,7 +34,8 @@ public class ShootCommand extends Command {
   public void initialize() {
     m_LeftShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_Shooting;
     m_RightShooterSubsystem.m_ShooterEnumState = ShooterEnumState.S_Shooting;
-    m_Intake.m_IntakeState = IntakeState.S_ShootingCycleDown;
+    m_Intake.m_IntakeState = IntakeState.S_Down;
+    m_Candle.shootingLED();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

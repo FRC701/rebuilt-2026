@@ -48,6 +48,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "RetractIntake"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "LeftShootToOutOfWay"

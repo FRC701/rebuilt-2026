@@ -18,6 +18,11 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static class UtilityConstants {
+    /** Set to false before competition deploy to save bandwidth and loop time. */
+    public static final boolean kTuningMode = false;
+  }
+
   public static class OperatorConstants {
     public static final int kXboxControllerPort = 1;
     public static final int kPs4ControllerPort = 0;
@@ -27,7 +32,7 @@ public final class Constants {
   public static class AgitatorConstants {
     public static final int kAgitatorLeftMotor = 21;
     public static final int kAgitatorRightMotor = 22;
-    public static final double kAgitatorVoltIn = 7;
+    public static final double kAgitatorVoltIn = 3.5;
     public static final double kAgitatorVoltOut = -4;
     // Simulation
     public static final double kSimAgitatorGearRatio = 2; // also a planetary
@@ -68,7 +73,7 @@ public final class Constants {
     public static final int kIntakeMotorArm = 11;
     public static final int kIntakeMotorRoller = 12;
     // The number of rotations using the falcon's encoder
-    public static final double kExtensionPosition = 4.5; // 4.7
+    public static final double kExtensionPosition = 4.7; // 4.7
     public static final double kExtentionCycleUpPos = kExtensionPosition - 0.8;
     public static final double kRetractPosition = 0; // Intake is retract ed and in the bot
 
@@ -122,7 +127,7 @@ public final class Constants {
      * Desired Rotations per second for shooter Motors
      * WARNING: CURRENTLY TEMPORARY NUMBERS
      */
-    public static final double shootRev = 100;
+    public static final double shootRev = 85;
     public static final double passRev = 1;
 
     // Simulation (4:1 gearing, each motor drives 2 shafts)
@@ -144,16 +149,6 @@ public final class Constants {
     // and 180° is aligned with the negative X axis. CCW rotation is positive, so
     // 90° is aligned with the positive Y axis, and -90° is aligned with the
     // negative Y axis.
-
-    // robot coordination system is centered on the floor. So a camer at the center, facing forward
-    // on the floor, is 0,0,0,0,0,0
-
-    //  two on mast:
-
-    // one backwards (0,-2.78,24.75,0,0,0)
-    // or
-    // one backwards (0,-2.78,24.75)
-    // one facing right rotated  90 CW  (top pointing intake) (must match photonvision ui) in )
 
     public static final double kRightCameraMountPitchAngleRad = Units.degreesToRadians(0);
     public static final double kRightCameraMountRollAngleRad = Units.degreesToRadians(-90);
@@ -181,9 +176,9 @@ public final class Constants {
     public static final double kForwardCameraMountRollAngleRad = Units.degreesToRadians(0);
     public static final double kForwardCameraMountYawAngleRad = Units.degreesToRadians(0);
 
-    public static final double kForwardCameraForwardMeters = Units.inchesToMeters(0);
+    public static final double kForwardCameraForwardMeters = Units.inchesToMeters(-0.5);
     public static final double kForwardCameraLeftMeters = Units.inchesToMeters(0);
-    public static final double kForwardCameraUpMeters = Units.inchesToMeters(22);
+    public static final double kForwardCameraUpMeters = Units.inchesToMeters(20.5);
 
     // Robot to forward camera transform
     public static final Transform3d kForwardRobotToCam3d =
@@ -195,7 +190,7 @@ public final class Constants {
                 kForwardCameraMountPitchAngleRad,
                 kForwardCameraMountYawAngleRad));
 
-    // Reverse camera name (same position as forward, facing backward)
+    // Reverse camera name
     // Must match camera set in PhotonVision UI
     public static final String kReverseCameraName = "reversePhotonvisionCamera";
 
@@ -203,9 +198,9 @@ public final class Constants {
     public static final double kReverseCameraMountRollAngleRad = Units.degreesToRadians(0);
     public static final double kReverseCameraMountYawAngleRad = Units.degreesToRadians(180);
 
-    public static final double kReverseCameraForwardMeters = Units.inchesToMeters(0);
-    public static final double kReverseCameraLeftMeters = Units.inchesToMeters(0);
-    public static final double kReverseCameraUpMeters = Units.inchesToMeters(22);
+    public static final double kReverseCameraForwardMeters = Units.inchesToMeters(-12.5);
+    public static final double kReverseCameraLeftMeters = Units.inchesToMeters(8.75);
+    public static final double kReverseCameraUpMeters = Units.inchesToMeters(12);
 
     // Robot to reverse camera transform
     public static final Transform3d kReverseRobotToCam3d =
@@ -222,8 +217,9 @@ public final class Constants {
     // If the robot snaps/jumps to vision poses too aggressively → increase the base
     // If vision corrections feel sluggish or ignored → decrease the base
     public static final double kSingleTagBaseXYStdDev = 1.5; // base error in meters at 1m distance
-    public static final double kSingleTagBaseHeadingStdDev =
-        Double.MAX_VALUE; // don't trust single-tag heading
+    // Large but finite — Kalman gain rounds to ~0 without overflowing when multiplied
+    // by distance factors. Effectively ignores single-tag heading.
+    public static final double kSingleTagBaseHeadingStdDev = 10.0; // radians (~573°)
     public static final double kMultiTagBaseXYStdDev = 1.0; // base error in meters at 1m distance
     public static final double kMultiTagBaseHeadingStdDev =
         0.45; // base error in radians at 1m (~34 deg)
@@ -234,14 +230,14 @@ public final class Constants {
 
     // Acceptance rules
     public static final int kMinAprilTagsForPose = 1;
-    public static final double kMaxAcceptableSingleTagAmbiguity = 0.3;
+    public static final double kMaxAcceptableSingleTagAmbiguity = 0.2;
 
     // Pose sanity / QC filters
     public static final double kMaxPoseHeightMeters =
         0.75; // reject if estimated Z is off the floor
     public static final double kFieldBoundaryMarginMeters =
         0.5; // allow slightly outside field edge
-    public static final double kMaxSingleTagDistanceMeters = 4.0; // max reliable single-tag range
+    public static final double kMaxSingleTagDistanceMeters = 2.5; // max reliable single-tag range
 
     // Speed filters — reject vision when robot is moving too fast (motion blur)
     // These will only filter out extreme motion blur. Can tighten based on testing.
@@ -249,10 +245,17 @@ public final class Constants {
     public static final double kMaxVisionRotationSpeed =
         Math.toRadians(720); // rad/s (2 full rotations)
 
+    // Cross-sensor sanity gates applied in CommandSwerveDrivetrain.periodic().
+    // Bypassed while disabled so pose can warm up / snap in on the field.
+    // Reject vision if it disagrees with odometry XY by more than this:
+    public static final double kMaxPoseJumpMeters = 1.0;
+    // Reject vision if heading disagrees with gyro by more than this:
+    public static final double kMaxHeadingDisagreementRad = Math.toRadians(30);
+
     // Simulation camera properties (Limelight 4 — OV9782, HFOV 82°, VFOV ~56°)
     // Two resolutions are available (640x400 and 1280x800)
-    public static final int kSimCameraResWidth = 1280;
-    public static final int kSimCameraResHeight = 800;
+    public static final int kSimCameraResWidth = 640;
+    public static final int kSimCameraResHeight = 400;
     public static final double kSimCameraFOVDeg = 91.4; // diagonal FOV derived from 82° HFOV
     public static final double kSimAvgLatencyMs = 35.0;
     public static final double kSimLatencyStdDevMs = 5.0;

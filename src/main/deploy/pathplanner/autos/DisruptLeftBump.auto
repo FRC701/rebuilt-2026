@@ -17,12 +17,6 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "ExtendIntake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
                   "name": "ShootCommand"
                 }
               },
@@ -60,6 +54,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "ExtendIntake"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "LeftNeutralToDisrupt"
@@ -69,12 +69,6 @@
           "type": "path",
           "data": {
             "pathName": "RightNeutralToShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AutoAim"
           }
         }
       ]

@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,6 +19,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -58,7 +60,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization =
       new SwerveRequest.SysIdSwerveRotation();
 
-  private final VisionSubsystem m_visionSubsystem = new VisionSubsystem();
+  // Injected by RobotContainer via setVisionSubsystem() to keep subsystems decoupled.
+  // Null until wired; periodic() skips vision fusion until it is provided.
+  private VisionSubsystem m_visionSubsystem;
+
+  // Throttle for tryFuseVision rejection logs — at most one log per 25 cycles (~500ms).
+  private int m_rejectionLogThrottle = 0;
 
   /* === Field visualization === */
   private final StructPublisher<Pose2d> m_posePublisher =
@@ -137,6 +144,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     if (Utils.isSimulation()) startSimThread();
   }
 
+  /**
+   * Injects the {@link VisionSubsystem} used for AprilTag pose fusion. Must be called during robot
+   * construction (typically from {@code RobotContainer}) before the scheduler starts running {@link
+   * #periodic()}. Until this is called, vision fusion is a no-op.
+   */
+  public void setVisionSubsystem(VisionSubsystem visionSubsystem) {
+    m_visionSubsystem = visionSubsystem;
+  }
+
   public Command applyRequest(Supplier<SwerveRequest> request) {
     return run(() -> setControl(request.get()));
   }
@@ -185,6 +201,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   public void periodic() {
     // Get current alliance
     var allianceOptional = DriverStation.getAlliance();
+    // var m_backLeftCoderOffset = SmartDashboard.putNumber("backLeftCoderOffset", 0);
 
     // Reset perspective flag if alliance changed or robot is disabled
     if (allianceOptional.isPresent()) {
@@ -210,6 +227,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     Pose2d currentPose = getState().Pose;
     m_posePublisher.set(currentPose);
 
+    if (m_rejectionLogThrottle > 0) m_rejectionLogThrottle--;
+
+    // Vision fusion is skipped until RobotContainer injects the VisionSubsystem via
+    // setVisionSubsystem(). This keeps drivetrain construction independent of vision.
+    if (m_visionSubsystem == null) {
+      return;
+    }
+
     if (Utils.isSimulation()) {
       m_visionSubsystem.setSimRobotPose(currentPose);
     }
@@ -220,25 +245,85 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         translationSpeed > Constants.Vision.kMaxVisionTranslationSpeed
             || Math.abs(speeds.omegaRadiansPerSecond) > Constants.Vision.kMaxVisionRotationSpeed;
 
+    var allMeasurements = m_visionSubsystem.drainAllMeasurements();
     if (!tooFast) {
-      m_visionSubsystem
-          .getLatestRightVisionMeasurement()
-          .ifPresent(
-              m -> {
-                addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
-              });
-      m_visionSubsystem
-          .getLatestForwardVisionMeasurement()
-          .ifPresent(
-              m -> {
-                addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
-              });
-      m_visionSubsystem
-          .getLatestReverseVisionMeasurement()
-          .ifPresent(
-              m -> {
-                addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
-              });
+      for (var m : allMeasurements) {
+        tryFuseVision(m, m.cameraName());
+      }
+    } else if (!allMeasurements.isEmpty()) {
+      // Dropping stale frames while too-fast avoids a burst of queued measurements getting
+      // fused all at once the moment the robot slows down.
+      DataLogManager.log(
+          "Vision: dropped "
+              + allMeasurements.size()
+              + " measurements (tooFast: v="
+              + String.format("%.2f", translationSpeed)
+              + "m/s w="
+              + String.format("%.1f", Math.toDegrees(Math.abs(speeds.omegaRadiansPerSecond)))
+              + "deg/s)");
+    }
+  }
+
+  /**
+   * Cross-sensor sanity check before fusing a vision measurement. Rejects poses that jump too far
+   * from odometry or whose heading disagrees with the gyro, both of which are symptoms of AprilTag
+   * pose-flipping or a miscalibrated camera transform. Bypassed while disabled so the pose can snap
+   * in during field setup.
+   */
+  private void tryFuseVision(VisionSubsystem.VisionMeasurement m, String cameraName) {
+    if (DriverStation.isDisabled()) {
+      addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
+      return;
+    }
+
+    // Sample odometry at the frame capture time for an apples-to-apples comparison.
+    // If the timestamp is outside the odometry buffer window, skip the measurement
+    // entirely — falling back to the current pose would defeat the jump gate.
+    Optional<Pose2d> odomSample = samplePoseAt(m.timestampSeconds());
+    if (odomSample.isEmpty()) {
+      logRejectionThrottled(
+          "Vision/"
+              + cameraName
+              + " rejected by drivetrain: timestamp_outside_odom_buffer "
+              + String.format("%.3f", m.timestampSeconds())
+              + "s");
+      return;
+    }
+    Pose2d odomAtVisionTime = odomSample.get();
+
+    double jumpMeters = odomAtVisionTime.getTranslation().getDistance(m.pose().getTranslation());
+    if (jumpMeters > Constants.Vision.kMaxPoseJumpMeters) {
+      logRejectionThrottled(
+          "Vision/"
+              + cameraName
+              + " rejected by drivetrain: pose_jump "
+              + String.format("%.2f", jumpMeters)
+              + "m");
+      return;
+    }
+
+    double headingDiffRad =
+        Math.abs(
+            MathUtil.angleModulus(
+                m.pose().getRotation().getRadians() - odomAtVisionTime.getRotation().getRadians()));
+    if (headingDiffRad > Constants.Vision.kMaxHeadingDisagreementRad) {
+      logRejectionThrottled(
+          "Vision/"
+              + cameraName
+              + " rejected by drivetrain: heading_disagree "
+              + String.format("%.1f", Math.toDegrees(headingDiffRad))
+              + "deg");
+      return;
+    }
+
+    addVisionMeasurement(m.pose(), m.timestampSeconds(), m.stdDevs());
+  }
+
+  /** Logs a rejection message at most once every 25 cycles (~500ms) to avoid log spam. */
+  private void logRejectionThrottled(String message) {
+    if (m_rejectionLogThrottle <= 0) {
+      DataLogManager.log(message);
+      m_rejectionLogThrottle = 25;
     }
   }
 

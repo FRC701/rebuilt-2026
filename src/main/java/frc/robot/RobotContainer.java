@@ -25,17 +25,21 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AimAtHub;
 import frc.robot.commands.ExtendIntake;
 import frc.robot.commands.FeederOn;
+import frc.robot.commands.IntakeToggle;
 import frc.robot.commands.LaunchToggle;
 import frc.robot.commands.NotShootingCommand;
+import frc.robot.commands.RetractIntake;
 import frc.robot.commands.ShootCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Agitator;
+import frc.robot.subsystems.CandleSubsystem;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.VisionSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -61,13 +65,18 @@ public class RobotContainer {
           .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
           .withDriveRequestType(
               DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  private final SwerveRequest.SwerveDriveBrake m_lock = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
   // Instantiating the Subsystems
 
+  // VisionSubsystem is declared before the drivetrain so that its SubsystemBase
+  // auto-registration runs first. That guarantees its periodic() drains camera
+  // frames into the per-camera queues before CommandSwerveDrivetrain.periodic()
+  // consumes them on the same scheduler tick.
+  public final VisionSubsystem m_Vision = new VisionSubsystem();
   public final CommandSwerveDrivetrain m_DriveTrain = TunerConstants.createDrivetrain();
   private final Agitator m_Agitator = new Agitator();
   private Intake m_Intake = new Intake(m_Agitator);
@@ -79,6 +88,7 @@ public class RobotContainer {
       new Shooter(
           Constants.ShooterConstants.kRightShooterId, "Right Shooter", m_Agitator, m_Intake);
   private Climber m_Climber = new Climber();
+  private CandleSubsystem m_Candle = new CandleSubsystem();
 
   // Instantiating Shooter Commands
 
@@ -103,12 +113,18 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
+    // Inject vision into the drivetrain so its periodic() can fuse AprilTag
+    // pose measurements. Until this call, CommandSwerveDrivetrain.periodic()
+    // short-circuits past the vision block.
+    m_DriveTrain.setVisionSubsystem(m_Vision);
+
     // NamedCommands.registerCommand(
     NamedCommands.registerCommand(
-        "ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter, m_Intake));
+        "ShootCommand", new ShootCommand(m_LeftShooter, m_RightShooter, m_Intake, m_Candle));
     NamedCommands.registerCommand("StopShooting", m_NotShootingCommand);
     NamedCommands.registerCommand("FeederOn", new FeederOn(m_LeftFeeder, m_RightFeeder));
     NamedCommands.registerCommand("ExtendIntake", new ExtendIntake(m_Intake));
+    NamedCommands.registerCommand("RetractIntake", new RetractIntake(m_Intake));
     NamedCommands.registerCommand(
         "AutoAim",
         new AimAtHub(
@@ -195,24 +211,32 @@ public class RobotContainer {
     m_DriveTrain.registerTelemetry(logger::telemeterize);
 
     // Intake Bindings
-    m_xboxController.leftTrigger().toggleOnTrue(m_IntakeToggle);
+    m_xboxController
+        .leftTrigger()
+        .onTrue(
+            new IntakeToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
     // Playstation variant of ^^^
-    m_ps4Controller.L2().toggleOnTrue(m_IntakeToggle);
+    m_ps4Controller
+        .L2()
+        .onTrue(
+            new IntakeToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
     // m_ps4Controller.povRight().onTrue(m_IntakeRollerToggle);
 
     // Shooter Binding XBox
     m_xboxController
         .rightTrigger()
         .onTrue(
-            new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
+            new LaunchToggle(
+                m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake, m_Candle));
     m_xboxController.x().onTrue(m_NotShootingCommand);
     // Playstation variant of ^^^
     m_ps4Controller
         .R2()
         .onTrue(
-            new LaunchToggle(m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake));
+            new LaunchToggle(
+                m_LeftFeeder, m_RightFeeder, m_LeftShooter, m_RightShooter, m_Intake, m_Candle));
     //  m_ps4Controller.square().onTrue(m_NotShootingCommand);
-
+    m_ps4Controller.R1().whileTrue(m_DriveTrain.applyRequest(() -> m_lock));
     // Playstation Climber Binding
     // m_ps4Controller.R1().onTrue(new ClimberUpDownToggle(m_Climber, m_Agitator, m_LeftFeeder,
     // m_RightFeeder, m_LeftShooter, m_RightShooter));

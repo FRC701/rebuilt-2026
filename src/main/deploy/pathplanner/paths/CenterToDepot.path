@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.75,
-        "y": 4.0
+        "x": 3.194876404494382,
+        "y": 4.004426966292135
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7450775997578813,
-        "y": 3.75004846474595
+        "x": 3.189954004252263,
+        "y": 3.754475431038085
       },
       "isLocked": false,
       "linkedName": "FieldCenter"

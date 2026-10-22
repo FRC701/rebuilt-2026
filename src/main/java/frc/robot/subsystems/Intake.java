@@ -22,6 +22,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -149,6 +150,7 @@ public class Intake extends SubsystemBase {
 
     MotorOutputConfigs RollerOutputConfigs = m_rollerConfigs.MotorOutput;
     RollerOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
+    RollerOutputConfigs.NeutralMode = NeutralModeValue.Brake;
 
     // Apply the Configs to the Motor Objects
     m_IntakeMotorArm.getConfigurator().apply(m_armConfigs);
@@ -250,7 +252,7 @@ public class Intake extends SubsystemBase {
 
   public void ExtendCycleUp() {
     m_Timer.start();
-    m_IntakeMotorRoller.setVoltage(7);
+    m_IntakeMotorRoller.setVoltage(4);
     if (m_Timer.hasElapsed(0.15)) {
       m_IntakeState = IntakeState.S_Down;
       m_Timer.reset();
@@ -262,7 +264,7 @@ public class Intake extends SubsystemBase {
   public void Down() {
     // If motor has reached its destination the stop the arm and start the rollers
     m_Timer.start();
-    m_IntakeMotorRoller.setVoltage(7);
+    m_IntakeMotorRoller.setVoltage(4);
     if (m_Timer.hasElapsed(0.35)) {
       m_IntakeState = IntakeState.S_ExtendCycleUp;
       m_Timer.reset();
@@ -287,7 +289,7 @@ public class Intake extends SubsystemBase {
   // Extends the intake out and starts the rollers
   public void ExtendPosition() {
     // If motor has reached its destination the stop the arm and start the rollers
-    m_IntakeMotorRoller.setVoltage(6.5);
+    // m_IntakeMotorRoller.setVoltage(6.5);
     if (checkExtended(IntakeConstants.kExtensionPosition)) {
       m_IntakeState = IntakeState.S_Down;
     }
