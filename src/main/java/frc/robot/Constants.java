@@ -30,8 +30,8 @@ public final class Constants {
 
   // Agitator IDs : 20s
   public static class AgitatorConstants {
-    public static final int kAgitatorLeftMotor = 21;
-    public static final int kAgitatorRightMotor = 22;
+    public static final int kAgitatorLeftMotor = 21;//MisID
+    public static final int kAgitatorRightMotor = 43;
     public static final double kAgitatorVoltIn = 3.5;
     public static final double kAgitatorVoltOut = -4;
     // Simulation
@@ -41,7 +41,7 @@ public final class Constants {
 
   // Feeder Motor Ids = 30s
   public static class FeederConstants {
-    public static final int kFeederLeftMotor = 63;//MisID
+    public static final int kFeederLeftMotor = 31;
     public static final int kFeederRightMotor = 32;
     // 3 is a placeholder for motor voltage
     public static final double kFeederVolt = 3;

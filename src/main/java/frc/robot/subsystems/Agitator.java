@@ -41,8 +41,8 @@ public class Agitator extends SubsystemBase {
 
     m_AgitatorState = AgitatorState.S_Off;
 
-    m_AgitatorRightMotor.setControl(
-        new Follower(m_AgitatorLeftMotor.getDeviceID(), MotorAlignmentValue.Opposed));
+    // m_AgitatorRightMotor.setControl(
+    //     new Follower(m_AgitatorLeftMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
     var m_TalonFXConfig =
         new TalonFXConfiguration()
