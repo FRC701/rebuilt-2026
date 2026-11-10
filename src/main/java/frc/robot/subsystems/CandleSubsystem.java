@@ -40,13 +40,13 @@ public class CandleSubsystem extends SubsystemBase {
   public CandleSubsystem() {
     m_Candle
         .getConfigurator()
-        .apply(new LEDConfigs().withStripType(StripTypeValue.GRB).withBrightnessScalar(1.0));
+        .apply(new LEDConfigs().withStripType(StripTypeValue.GRB).withBrightnessScalar(.5));
     setDefaultCommand(defaultLED());
   }
 
   // A quite fast, purple animation, possible for shooter LEDs?
   private final LarsonAnimation m_slot0Animation =
-      new LarsonAnimation(0, 318)
+      new LarsonAnimation(0, 70)
           .withSlot(0)
           .withColor(new RGBWColor(190, 8, 255, 0))
           .withSize(15)
@@ -55,25 +55,25 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A light, spring green color, this animation blinks slowly without fade
   private final StrobeAnimation m_slot1Animation =
-      new StrobeAnimation(0, 318)
+      new StrobeAnimation(0, 70)
           .withSlot(1)
           .withColor(new RGBWColor(70, 255, 35, 0))
           .withFrameRate(Hertz.of(1));
 
   // Rainbow Fade, medium speed
   private final RgbFadeAnimation m_slot2Animation =
-      new RgbFadeAnimation(0, 318).withSlot(2).withBrightness(0.541).withFrameRate(Hertz.of(76.44));
+      new RgbFadeAnimation(0, 70).withSlot(2).withBrightness(0.541).withFrameRate(Hertz.of(76.44));
 
   // Gold color, blinks with fade
   private final SingleFadeAnimation m_slot3Animation =
-      new SingleFadeAnimation(0, 318)
+      new SingleFadeAnimation(0, 70)
           .withSlot(3)
           .withColor(new RGBWColor(255, 196, 7, 0))
           .withFrameRate(Hertz.of(70.952));
 
   // Hot pink color (correlate with our girl robot?) twinkles quite fast
   private final TwinkleAnimation m_slot4Animation =
-      new TwinkleAnimation(0, 318)
+      new TwinkleAnimation(0, 70)
           .withSlot(4)
           .withColor(new RGBWColor(255, 27, 51, 0))
           .withMaxLEDsOnProportion(0.78)
@@ -81,7 +81,7 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A cool, fading rainbow animation with half speed and brightness
   private final RainbowAnimation m_slot5Animation =
-      new RainbowAnimation(0, 318)
+      new RainbowAnimation(0, 70)
           .withSlot(5)
           .withBrightness(0.562)
           .withDirection(AnimationDirectionValue.Forward)
@@ -89,7 +89,7 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A fast fire animation (not even the fastest it goes :0)
   private final FireAnimation m_slot6Animation =
-      new FireAnimation(0, 318)
+      new FireAnimation(0, 70)
           .withSlot(6)
           .withBrightness(0.689)
           .withDirection(AnimationDirectionValue.Forward)
@@ -99,11 +99,14 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A cherry red flow, supposed to go backwards? Doesn't give me an option to see in phoenix tuner
   private final ColorFlowAnimation m_slot7Animation =
-      new ColorFlowAnimation(0, 318)
+      new ColorFlowAnimation(0, 70)
           .withSlot(7)
-          .withColor(new RGBWColor(255, 13, 2, 0))
+          // .withColor(new RGBWColor(255, 0, 255, 0)) //purple
+          // .withColor(new RGBWColor(50, 0, 255, 0)) //blue ish?
+          // .withColor(new RGBWColor(255, 0, 0, 0)) //red
+          .withColor(new RGBWColor(0, 255, 0, 0)) // Green?
           .withDirection(AnimationDirectionValue.Backward)
-          .withFrameRate(Hertz.of(48.216));
+          .withFrameRate(Hertz.of(70));
 
   // Bright generic green color, possibly could be used for driving practice and/or robot is on or
   // working
@@ -119,44 +122,44 @@ public class CandleSubsystem extends SubsystemBase {
     return run(
         () -> {
           for (var solidColor : m_colors) {
-            m_Candle.setControl(solidColor);
+            m_Candle.setControl(m_slot5Animation);
           }
-          m_Candle.setControl(m_slot7Animation);
+          m_Candle.setControl(m_slot5Animation);
         });
   }
 
   public Command shootingLED() {
     return run(
         () -> {
-          m_Candle.setControl(m_slot0Animation);
+          m_Candle.setControl(m_slot5Animation);
         });
   }
 
   public Command passingLED() {
     return run(
         () -> {
-          m_Candle.setControl(m_slot3Animation);
+          m_Candle.setControl(m_slot5Animation);
         });
   }
 
   public Command intakeLED() {
     return run(
         () -> {
-          m_Candle.setControl(m_slot1Animation);
+          m_Candle.setControl(m_slot5Animation);
         });
   }
 
   public Command climberLED() {
     return run(
         () -> {
-          m_Candle.setControl(m_slot4Animation);
+          m_Candle.setControl(m_slot5Animation);
         });
   }
 
   public Command notShootingLED() {
     return run(
         () -> {
-          m_Candle.setControl(m_slot6Animation);
+          m_Candle.setControl(m_slot5Animation);
         });
   }
 
@@ -170,7 +173,7 @@ public class CandleSubsystem extends SubsystemBase {
   public Command FunLED() {
     return run(
         () -> {
-          m_Candle.setControl(m_slot2Animation);
+          m_Candle.setControl(m_slot5Animation);
         });
   }
 

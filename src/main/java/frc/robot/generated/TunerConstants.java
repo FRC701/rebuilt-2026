@@ -72,9 +72,9 @@ public class TunerConstants {
                   // Swerve azimuth does not require much torque output, so we can set a relatively
                   // low
                   // stator current limit to help avoid brownouts without impacting performance.
-                  .withStatorCurrentLimit(Amps.of(60))
+                  .withStatorCurrentLimit(Amps.of(60)) // 60
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(60)
+                  .withSupplyCurrentLimit(60) // 60
                   .withSupplyCurrentLimitEnable(true));
   private static final TalonFXConfiguration steerInitialConfigs =
       new TalonFXConfiguration()
@@ -83,9 +83,9 @@ public class TunerConstants {
                   // Swerve azimuth does not require much torque output, so we can set a relatively
                   // low
                   // stator current limit to help avoid brownouts without impacting performance.
-                  .withStatorCurrentLimit(Amps.of(40))
+                  .withStatorCurrentLimit(Amps.of(40)) // 40
                   .withStatorCurrentLimitEnable(true)
-                  .withSupplyCurrentLimit(40)
+                  .withSupplyCurrentLimit(40) // 40
                   .withSupplyCurrentLimitEnable(true));
 
   private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
@@ -156,8 +156,7 @@ public class TunerConstants {
   private static final int kFrontLeftDriveMotorId = 5;
   private static final int kFrontLeftSteerMotorId = 6;
   private static final int kFrontLeftEncoderId = 2;
-  private static final Angle kFrontLeftEncoderOffset =
-      Rotations.of(0.4267578125 + SmartDashboard.getNumber("frontLeftCoderOffset", 0));
+  private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.4267578125 + 0);
   private static final boolean kFrontLeftSteerMotorInverted = true;
   private static final boolean kFrontLeftEncoderInverted = false;
 
@@ -168,8 +167,8 @@ public class TunerConstants {
   private static final int kFrontRightDriveMotorId = 3;
   private static final int kFrontRightSteerMotorId = 1;
   private static final int kFrontRightEncoderId = 1;
-  private static final Angle kFrontRightEncoderOffset =
-      Rotations.of(-0.21671875 + SmartDashboard.getNumber("frontRightCoderOffset", 0) + 0.04);
+  private static final Angle kFrontRightEncoderOffset = // -0.21671875
+      Rotations.of(-0.22671875 + 0.035);
   private static final boolean kFrontRightSteerMotorInverted = true;
   private static final boolean kFrontRightEncoderInverted = false;
 
@@ -196,7 +195,7 @@ public class TunerConstants {
   private static final int kBackRightSteerMotorId = 8;
   private static final int kBackRightEncoderId = 3;
   private static final Angle kBackRightEncoderOffset =
-      Rotations.of(-0.529970703125 + SmartDashboard.getNumber("backRightCoderOffset", 0));
+      Rotations.of(-0.549970703125 + SmartDashboard.getNumber("backRightCoderOffset", 0));
   private static final boolean kBackRightSteerMotorInverted = true;
   private static final boolean kBackRightEncoderInverted = false;
 
