@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import org.w3c.dom.css.RGBColor;
+
 import com.ctre.phoenix6.configs.LEDConfigs;
 import com.ctre.phoenix6.controls.ColorFlowAnimation;
 import com.ctre.phoenix6.controls.EmptyAnimation;
@@ -46,7 +48,7 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A quite fast, purple animation, possible for shooter LEDs?
   private final LarsonAnimation m_slot0Animation =
-      new LarsonAnimation(0, 318)
+      new LarsonAnimation(0, 70)
           .withSlot(0)
           .withColor(new RGBWColor(190, 8, 255, 0))
           .withSize(15)
@@ -55,25 +57,25 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A light, spring green color, this animation blinks slowly without fade
   private final StrobeAnimation m_slot1Animation =
-      new StrobeAnimation(0, 318)
+      new StrobeAnimation(0, 70)
           .withSlot(1)
           .withColor(new RGBWColor(70, 255, 35, 0))
           .withFrameRate(Hertz.of(1));
 
   // Rainbow Fade, medium speed
   private final RgbFadeAnimation m_slot2Animation =
-      new RgbFadeAnimation(0, 318).withSlot(2).withBrightness(0.541).withFrameRate(Hertz.of(76.44));
+      new RgbFadeAnimation(0, 70).withSlot(2).withBrightness(0.541).withFrameRate(Hertz.of(76.44));
 
   // Gold color, blinks with fade
   private final SingleFadeAnimation m_slot3Animation =
-      new SingleFadeAnimation(0, 318)
+      new SingleFadeAnimation(0, 70)
           .withSlot(3)
-          .withColor(new RGBWColor(255, 196, 7, 0))
+          .withColor(new RGBWColor(0, 255, 0, 0))
           .withFrameRate(Hertz.of(70.952));
 
   // Hot pink color (correlate with our girl robot?) twinkles quite fast
   private final TwinkleAnimation m_slot4Animation =
-      new TwinkleAnimation(0, 318)
+      new TwinkleAnimation(0, 70)
           .withSlot(4)
           .withColor(new RGBWColor(255, 27, 51, 0))
           .withMaxLEDsOnProportion(0.78)
@@ -81,7 +83,7 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A cool, fading rainbow animation with half speed and brightness
   private final RainbowAnimation m_slot5Animation =
-      new RainbowAnimation(0, 318)
+      new RainbowAnimation(0, 70)
           .withSlot(5)
           .withBrightness(0.562)
           .withDirection(AnimationDirectionValue.Forward)
@@ -89,7 +91,7 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A fast fire animation (not even the fastest it goes :0)
   private final FireAnimation m_slot6Animation =
-      new FireAnimation(0, 318)
+      new FireAnimation(0, 70)
           .withSlot(6)
           .withBrightness(0.689)
           .withDirection(AnimationDirectionValue.Forward)
@@ -99,9 +101,15 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A cherry red flow, supposed to go backwards? Doesn't give me an option to see in phoenix tuner
   private final ColorFlowAnimation m_slot7Animation =
-      new ColorFlowAnimation(0, 318)
+      new ColorFlowAnimation(8, 37)
+          .withSlot(6)
+          .withColor(new RGBWColor(255, 140, 0, 0))
+          .withDirection(AnimationDirectionValue.Forward)
+          .withFrameRate(Hertz.of(48.216));
+  private final ColorFlowAnimation m_slot7Animation2 =
+      new ColorFlowAnimation(38, 67)
           .withSlot(7)
-          .withColor(new RGBWColor(255, 13, 2, 0))
+          .withColor(new RGBWColor(0, 255, 0, 0))
           .withDirection(AnimationDirectionValue.Backward)
           .withFrameRate(Hertz.of(48.216));
 
@@ -119,9 +127,10 @@ public class CandleSubsystem extends SubsystemBase {
     return run(
         () -> {
           for (var solidColor : m_colors) {
-            m_Candle.setControl(solidColor);
+            m_Candle.setControl(m_slot7Animation);
+            m_Candle.setControl(m_slot7Animation2);
           }
-          m_Candle.setControl(m_slot7Animation);
+          m_Candle.setControl(m_slot7Animation2);
         });
   }
 
