@@ -48,12 +48,19 @@ public class CandleSubsystem extends SubsystemBase {
 
   // A quite fast, purple animation, possible for shooter LEDs?
   private final LarsonAnimation m_slot0Animation =
-      new LarsonAnimation(0, 70)
+      new LarsonAnimation(8, 37)
           .withSlot(0)
-          .withColor(new RGBWColor(190, 8, 255, 0))
+          .withColor(new RGBWColor(0, 255, 0, 0))
           .withSize(15)
-          .withBounceMode(LarsonBounceValue.Front)
-          .withFrameRate(Hertz.of(100));
+          .withBounceMode(LarsonBounceValue.Back)
+          .withFrameRate(Hertz.of(60));
+  private final LarsonAnimation m_slot0Animation2 =
+      new LarsonAnimation(38, 67)
+          .withSlot(1)
+          .withColor(new RGBWColor(255, 140, 0, 0))
+          .withSize(15)
+          .withBounceMode(LarsonBounceValue.Back)
+          .withFrameRate(Hertz.of(60));
 
   // A light, spring green color, this animation blinks slowly without fade
   private final StrobeAnimation m_slot1Animation =
@@ -127,10 +134,10 @@ public class CandleSubsystem extends SubsystemBase {
     return run(
         () -> {
           for (var solidColor : m_colors) {
-            m_Candle.setControl(m_slot7Animation);
-            m_Candle.setControl(m_slot7Animation2);
+            m_Candle.setControl(m_slot0Animation);
+            m_Candle.setControl(m_slot0Animation2);
           }
-          m_Candle.setControl(m_slot7Animation2);
+         m_Candle.setControl(m_slot0Animation);
         });
   }
 
